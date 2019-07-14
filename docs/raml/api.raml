@@ -1,0 +1,15 @@
+#%RAML 1.0
+title: Weekly Menu
+version: v1
+baseUri: http://localhost:8080/api/{version}
+mediaType: application/json
+
+types: 
+  Receipt: !include schemas/receipt.json
+  Ingredient: !include schemas/ingredient.json
+
+/receipt:
+    post:
+        description: Add new receipt to personal collection
+        
+            
