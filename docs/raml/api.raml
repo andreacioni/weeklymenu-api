@@ -1,15 +1,57 @@
 #%RAML 1.0
-title: Weekly Menu
+title: Weekly Menu API
 version: v1
-baseUri: http://localhost:8080/api/{version}
-mediaType: application/json
+baseUri: http://api.samplehost.com
 
-types: 
-  Receipt: !include schemas/receipt.json
-  Ingredient: !include schemas/ingredient.json
+#Security scheme
+securitySchemes:
+  basic: !include securitySchemes/basic.raml
 
-/receipt:
-    post:
-        description: Add new receipt to personal collection
-        
-            
+#Resource Types definition
+resourceTypes:
+  collection: !include resourceTypes/collection.raml
+  element: !include resourceTypes/element.raml
+
+#Traits definition
+traits:
+  pageable: !include traits/pageable.raml
+
+#Types definition
+types:
+  Recipe: !include dataTypes/recipe.raml
+  Ingredient: !include dataTypes/ingredient.raml
+  Menu: !include dataTypes/menu.raml
+
+/ingredients:
+  type: collection
+  is:  [pageable]
+  /{ingredientId}:
+    type: element
+
+/recipes:
+  type: collection
+  is:  [pageable]
+  /{recipeId}:
+    type: element
+
+/menus:
+  type: collection
+  is:  [pageable]
+  /{menuId}:
+    type: element
+  /{date}:
+    uriParameters:
+      date:
+        type: date-only
+    type: collection
+
+/shopping:
+  /day:
+    put:
+      body:
+        application/json:
+          type: object
+          properties:
+            dayOfWeek:
+              type: string
+              enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]

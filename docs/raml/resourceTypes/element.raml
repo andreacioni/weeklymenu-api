@@ -1,0 +1,25 @@
+#%RAML 1.0 ResourceType
+
+usage: This resourceType should be used for any item of a collection of items
+description:An element of collection <<resourcePathName>>
+get:
+  description: Get one <<resourcePathName>>
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<resourcePathName | !uppercamelcase | !singularize>>
+patch:
+  description: Create a new <<resourcePathName | !singularize>>
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<resourcePathName | !uppercamelcase | !singularize>>
+delete:
+  description: Delete one <<resourcePathName | !singularize>>
+  responses:
+    200:
+      body:
+        application/json:
+          type: <<resourcePathName | !uppercamelcase | !singularize>>
