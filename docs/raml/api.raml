@@ -21,6 +21,8 @@ types:
   Recipe: !include dataTypes/recipe.raml
   Ingredient: !include dataTypes/ingredient.raml
   Menu: !include dataTypes/menu.raml
+  DayOfWeek: !include dataTypes/dayOfWeek.raml
+  ShoppingList: !include dataTypes/shoppingList.raml
 
 /ingredients:
   type: collection
@@ -46,12 +48,25 @@ types:
     type: collection
 
 /shopping:
+  /list:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: ShoppingList
   /day:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: object
+              properties:
+                dayOfWeek: DayOfWeek
     put:
       body:
         application/json:
           type: object
           properties:
-            dayOfWeek:
-              type: string
-              enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+            dayOfWeek: DayOfWeek

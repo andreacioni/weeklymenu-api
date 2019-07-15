@@ -1,0 +1,11 @@
+#%RAML 1.0 DataType
+
+type: object
+properties:
+  ObjectId: string
+  ingredients:
+    type: array
+    items: !include ingredient.raml
+  ingredientNotes:
+    type: array
+    items:

@@ -1,0 +1,16 @@
+#%RAML 1.0 DataType
+
+type: object
+properties:
+  ObjectId: string
+  ingredients:
+    type: array
+    items: !include ingredient.raml
+  checked:
+    type: array
+    items: string
+    description: the ids of checked ingredients in the list
+  notes:
+    type: array
+    items: string #TODO object not string
+    description: the notes associated to an ingredient in the list
