@@ -3,9 +3,6 @@
 type: object
 properties:
   ObjectId: string
-  ingredients:
+  items:
     type: array
-    items: !include ingredient.raml
-  ingredientNotes:
-    type: array
-    items:
+    items: !include checkableIngredient.raml

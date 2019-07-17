@@ -46,9 +46,18 @@ types:
       date:
         type: date-only
     type: collection
+  /generate:
+    description: Generate new menu for the next week
+    get:
+      responses:
+        201:
+         body:
+           application/json:
+             type: Menu[]
 
 /shopping:
   /list:
+    description: Retrieve shopping list
     get:
       responses:
         200:
@@ -56,6 +65,8 @@ types:
             application/json:
               type: ShoppingList
   /day:
+    description: Get or set the designed day of the week
+     that indicates when the user is used to go to shopping
     get:
       responses:
         200:
