@@ -9,20 +9,158 @@ securitySchemes:
 
 #Resource Types definition
 resourceTypes:
-  collection: !include resourceTypes/collection.raml
-  element: !include resourceTypes/element.raml
+  collection:
+    usage: This resourceType should be used for any collection of items
+    description: The collection of <<resourcePathName>>
+    get:
+      description: Get all <<resourcePathName>>, optionally filtered
+      responses:
+        200:
+          body:
+            application/json:
+              type: array
+              items: <<resourcePathName | !uppercamelcase>>
+    post:
+      description: Create a new <<resourcePathName | !singularize>>
+      responses:
+        201:
+          body:
+            application/json:
+              type: <<resourcePathName | !uppercamelcase | !singularize>>
+
+  element:
+    usage: This resourceType should be used for any item of a collection of items
+    description: An element of collection <<resourcePathName>>
+    get:
+      description: Get one <<resourcePathName>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<resourcePathName | !uppercamelcase | !singularize>>
+    patch:
+      description: Create a new <<resourcePathName | !singularize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<resourcePathName | !uppercamelcase | !singularize>>
+    delete:
+      description: Delete one <<resourcePathName | !singularize>>
+      responses:
+        200:
+          body:
+            application/json:
+              type: <<resourcePathName | !uppercamelcase | !singularize>>
+
 
 #Traits definition
 traits:
-  pageable: !include traits/pageable.raml
+  pageable:
+    usage: Apply this trait to a GET method that supports pagination.
+    queryParameters:
+      offset?:
+        type: integer
+        default: 10
+        minimum: 0
+        description: The `offset` parameter specifies the first entry to return from a collection.
+      limit?:
+        type: integer
+        default: 50
+        minimum: 1
+        description: The `limit` parameter restricts the number of entries returned.
+      page?:
+        type: integer
+        default: 1
+        minimum: 1
+    description: The `page` parameter specifies the page of results to return.
+
 
 #Types definition
 types:
-  Recipe: !include dataTypes/recipe.raml
-  Ingredient: !include dataTypes/ingredient.raml
-  Menu: !include dataTypes/menu.raml
-  DayOfWeek: !include dataTypes/dayOfWeek.raml
-  ShoppingList: !include dataTypes/shoppingList.raml
+  User:
+    type: object
+    properties:
+      ObjectId: string
+      username: string
+      name: string
+      docs:
+        description: The documents ids (ObjectIds) associated to the user
+        type: array
+        items: string
+
+  Tag:
+    type: object
+    properties:
+      ObjectId: string
+      name: string
+
+  Ingredient:
+    type: object
+    properties:
+      ObjectId: string
+      name: string
+      description: string
+      note: string
+      availabilityMonths:
+        type: array
+        items: integer
+      tags:
+        type: array
+        items: Tag
+
+  Recipe:
+    type: object
+    properties:
+      ObjectId: string
+      name: string
+      description: string
+      note: string
+      availabilityMonths:
+        type: array
+        items: integer
+      ingredients:
+        type: array
+        items: Ingredient
+
+  Meal:
+    type: string
+    enum: ["breakfast", "launch", "dinner"]
+
+  Menu:
+    type: object
+    properties:
+      ObjectId: string
+      date: date-only
+      meal: Meal
+      recipes:
+        type: array
+        items: Recipe
+
+  DayOfWeek:
+    type: string
+    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+  ShoppingList:
+    type: object
+    properties:
+      ObjectId: string
+      items:
+        type: array
+        items:
+          type: Ingredient
+          properties:
+            checked: boolean
+            shoppingNote: string
+
+/users:
+  /register:
+    description: Register new user
+    post:
+
+  /me:
+    securedBy: basic
+    description: Retrieve informaion of the current user
 
 /ingredients:
   type: collection
@@ -64,6 +202,8 @@ types:
           body:
             application/json:
               type: ShoppingList
+    /{itemId}:
+      type: element
   /day:
     description: Get or set the designed day of the week
      that indicates when the user is used to go to shopping
