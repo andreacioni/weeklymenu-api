@@ -1,16 +1,46 @@
 import os
+import argparse
+import logging
 
-from flask import Flask
-from flask_pymongo import PyMongo
+from weekly_menu import app, db, api
 
-# create the flask object
-app = Flask(__name__)
+LOG_MAX_SIZE = 10000000
+LOG_BACKUP_COUNT = 3
 
-# add mongo url to flask config, so that flask_pymongo can use it to make connection
-app.config['MONGO_URI'] = os.environ.get('DB')
-mongo = PyMongo(app)
+#Parsing arguments
+parser = argparse.ArgumentParser('{} - v.{}'.format(app.name, app.version))
+parser.add_argument('host',
+                    help='host')
+parser.add_argument('port',
+                    type=int,
+                    help='host')
+parser.add_argument('--mongodb_uri',
+                    required=True,
+                    help='the uri of the MongoDB database')
+parser.add_argument('--log_file',
+                    default=None,
+                    help='if defined, indicates the file used by the application to log')
+parser.add_argument('-l', '--log_level',
+                    metavar='log_level',
+                    default='WARN',
+                    choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+                    help='file containing the configuration for autobot istance')
 
-# use the modified encoder class to handle ObjectId & datetime object while jsonifying the response.
-app.json_encoder = JSONEncoder
+args = parser.parse_args()
 
-from app.controllers import *
+# Sutup logger
+if args.log_file is None:
+    logging.basicConfig(
+        level=logging.getLevelName(args.log_level)
+    )
+else:
+    logging.basicConfig(
+        handlers=[logging.handlers.RotatingFileHandler(args.log_file, maxBytes=LOG_MAX_SIZE, backupCount=LOG_BACKUP_COUNT)], 
+        level=logging.getLevelName(args.log_level)
+    )
+
+#Setup connection to MongoDB
+mongoClient = db.MongoDB(args.mongodb_uri)
+mongoClient.test_connection()
+
+#Setup and serve API

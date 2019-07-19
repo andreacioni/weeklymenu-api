@@ -9,10 +9,8 @@ class MongoDB(object):
     def __init__(self, url: str):
         self._logger.info("Connecting to MongoDD instance at: %s", url)
         self._mongo_client = MongoClient(url)
-        
-        self.test_connection()  
     
-    def test_connection(self) -> bool:
+    def test_connection(self):
         self._mongo_client.admin.command('ismaster')
 
     def get_client(self) -> MongoClient:
