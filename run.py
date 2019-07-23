@@ -40,7 +40,7 @@ else:
     )
 
 #Setup connection to MongoDB
-mongoClient = db.MongoDB(args.mongodb_uri)
-mongoClient.test_connection()
+db.connect(args.mongodb_uri)
 
 #Setup and serve API
+api.serve(args.host, args.port, False)
