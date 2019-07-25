@@ -2,6 +2,8 @@ import os
 import argparse
 import logging
 
+from flask_mongoengine import MongoEngine
+
 from weekly_menu import app, db, api
 
 LOG_MAX_SIZE = 10000000
@@ -43,4 +45,4 @@ else:
 db.connect(args.mongodb_uri)
 
 #Setup and serve API
-api.serve(args.host, args.port, False)
+api.serve(args.host, args.port, True)
