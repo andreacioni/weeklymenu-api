@@ -23,7 +23,7 @@ def serve(host: str, port: int, debug=False):
     add_resources(api)
 
     logging.info("Serving API (debug: %s)", debug)
-    app.run(host=host, port=port, debug=debug)
+    
 
 def add_resources(api: Api):
     api.add_resource(Ingredients, BASE_PATH + '/ingredients')

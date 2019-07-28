@@ -1,7 +1,10 @@
+import os
+
 from flask import Flask
 
 from flask_mongoengine import MongoEngine
 
+app = Flask(__name__)
 mongo = MongoEngine()
 
 def create_app(object_name):
@@ -12,7 +15,6 @@ def create_app(object_name):
         object_name: the python path of the config object,
                      e.g. project.config.ProdConfig
     """
-    app = Flask(__name__)
     app.config.from_object(object_name)
 
     mongo.init_app(app)
@@ -23,4 +25,4 @@ def create_app(object_name):
     auth_create_module(app)
     api_create_module(app)
 
-    return app
+    return app  

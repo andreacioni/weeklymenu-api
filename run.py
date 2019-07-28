@@ -4,21 +4,13 @@ import logging
 
 from flask_mongoengine import MongoEngine
 
-from weekly_menu import app, db, api
+from weekly_menu import webapp, name as app_name, version as app_version
 
 LOG_MAX_SIZE = 10000000
 LOG_BACKUP_COUNT = 3
 
 #Parsing arguments
-parser = argparse.ArgumentParser('{} - v.{}'.format(app.name, app.version))
-parser.add_argument('host',
-                    help='host')
-parser.add_argument('port',
-                    type=int,
-                    help='host')
-parser.add_argument('--mongodb_uri',
-                    required=True,
-                    help='the uri of the MongoDB database')
+parser = argparse.ArgumentParser('{} - v.{}'.format(app_name, app_version))
 parser.add_argument('--log_file',
                     default=None,
                     help='if defined, indicates the file used by the application to log')
@@ -41,8 +33,6 @@ else:
         level=logging.getLevelName(args.log_level)
     )
 
-#Setup connection to MongoDB
-db.connect(args.mongodb_uri)
-
-#Setup and serve API
-api.serve(args.host, args.port, True)
+#Setup and run application
+app = webapp.create_app('config')
+app.run(host=app.config['API_HOST'], port=app.config['API_PORT'])
