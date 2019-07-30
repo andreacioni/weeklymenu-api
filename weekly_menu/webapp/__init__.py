@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, request, jsonify
 
 from flask_mongoengine import MongoEngine
 
@@ -25,4 +25,9 @@ def create_app(object_name):
     auth_create_module(app)
     api_create_module(app)
 
-    return app  
+    return app
+
+@app.before_request
+def before_request():
+    if ((request.content_length¶ != 0) and (not request.is_json)):
+        return jsonify({'msg': 'payload does not contains json data'}), 400

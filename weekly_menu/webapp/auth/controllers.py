@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 
 from . import authenticate
+from .schemas import UserSchema
 
 auth_blueprint = Blueprint(
     'auth',
@@ -11,9 +12,6 @@ auth_blueprint = Blueprint(
 
 @auth_blueprint.route('/token', methods=['POST'])
 def get_token():
-    if not request.is_json:
-        return jsonify({'msg': 'Missing JSON in request'}), 400
-
     username = request.json.get('username', None)
     password = request.json.get('password', None)
 
@@ -29,3 +27,8 @@ def get_token():
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=user.id)
     return jsonify(access_token=access_token), 200
+
+
+@auth_blueprint.route('/register', method=['POST'])
+def register_user():
+    UserSchema
