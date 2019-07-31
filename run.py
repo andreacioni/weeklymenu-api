@@ -35,4 +35,4 @@ else:
 
 #Setup and run application
 app = webapp.create_app('config')
-app.run(host=app.config['API_HOST'], port=app.config['API_PORT'])
+app.run(host=app.config['API_HOST'], port=app.config['API_PORT'], debug=app.config['DEBUG'])

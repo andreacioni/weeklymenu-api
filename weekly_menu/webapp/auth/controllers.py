@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from marshmallow_mongoengine import schema
 
 from . import authenticate
 from .schemas import UserSchema
@@ -29,6 +30,11 @@ def get_token():
     return jsonify(access_token=access_token), 200
 
 
-@auth_blueprint.route('/register', method=['POST'])
+@auth_blueprint.route('/register', methods=['POST'])
 def register_user():
-    UserSchema
+    data, errors = UserSchema().load(request.get_json())
+
+    if len(errors) != 0:
+        return jsonify({'msg' : 'dhe'}), 400
+    else:
+        return jsonify({'msg' : data}), 200
