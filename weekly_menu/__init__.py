@@ -1,4 +1,3 @@
-from .app import name, version
 from .webapp import create_app
 
 __name__ = 'Weekly Menu'

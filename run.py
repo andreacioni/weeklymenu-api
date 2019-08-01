@@ -4,7 +4,7 @@ import logging
 
 from flask_mongoengine import MongoEngine
 
-from weekly_menu import __name__, __version__
+from weekly_menu import create_app, __name__, __version__
 
 LOG_MAX_SIZE = 10000000
 LOG_BACKUP_COUNT = 3
@@ -34,5 +34,5 @@ else:
     )
 
 #Setup and run application
-app = webapp.create_app('config')
+app = create_app('config')
 app.run(host=app.config['API_HOST'], port=app.config['API_PORT'], debug=app.config['DEBUG'])
