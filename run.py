@@ -4,13 +4,13 @@ import logging
 
 from flask_mongoengine import MongoEngine
 
-from weekly_menu import webapp, name as app_name, version as app_version
+from weekly_menu import __name__, __version__
 
 LOG_MAX_SIZE = 10000000
 LOG_BACKUP_COUNT = 3
 
 #Parsing arguments
-parser = argparse.ArgumentParser('{} - v.{}'.format(app_name, app_version))
+parser = argparse.ArgumentParser('{} - v.{}'.format(__name__, __version__))
 parser.add_argument('--log_file',
                     default=None,
                     help='if defined, indicates the file used by the application to log')

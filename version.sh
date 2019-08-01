@@ -27,7 +27,7 @@ FILE=setup.py
 CURRENT_VERSION=$(cat $FILE | grep version | awk '{print $1}' | cut -d '"' -f 2)
 TO_UPDATE=(
     setup.py
-    weekly-menu/app.py
+    weekly_menu/__init__.py
 )
 
 echo "Current version is: $CURRENT_VERSION. Enter new version:"
