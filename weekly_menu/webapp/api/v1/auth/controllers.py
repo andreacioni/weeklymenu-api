@@ -3,12 +3,13 @@ from flask_jwt_extended import create_access_token
 from marshmallow_mongoengine import schema
 
 from . import authenticate
+from .. import BASE_PATH
 from .schemas import UserSchema
 
 auth_blueprint = Blueprint(
     'auth',
     __name__,
-    url_prefix='/auth'
+    url_prefix = BASE_PATH + '/auth'
 )
 
 @auth_blueprint.route('/token', methods=['POST'])

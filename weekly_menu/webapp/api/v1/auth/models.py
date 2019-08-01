@@ -1,4 +1,4 @@
-from .. import mongo
+from ... import mongo
 
 class User(mongo.Document):
     username = mongo.StringField(unique=True, min_length=4, max_length=64)

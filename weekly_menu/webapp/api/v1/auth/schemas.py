@@ -1,6 +1,6 @@
 import marshmallow_mongoengine as me
 
-from .. import mongo
+from ... import mongo
 
 from .models import User
 

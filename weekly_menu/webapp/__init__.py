@@ -2,10 +2,7 @@ import os
 
 from flask import Flask, request, jsonify
 
-from flask_mongoengine import MongoEngine
-
 app = Flask(__name__)
-mongo = MongoEngine()
 
 def create_app(object_name):
     """
@@ -17,13 +14,9 @@ def create_app(object_name):
     """
     app.config.from_object(object_name)
 
-    mongo.init_app(app)
+    from .api import create_module as create_api_module
 
-    from .auth import create_module as auth_create_module
-    from .api import create_module as api_create_module
-
-    auth_create_module(app)
-    api_create_module(app)
+    create_api_module(app)
 
     return app
 
