@@ -4,6 +4,7 @@ from marshmallow_mongoengine import schema
 
 from . import authenticate
 from .. import BASE_PATH
+from ... import validate_payload
 from .schemas import UserSchema
 
 auth_blueprint = Blueprint(
@@ -32,10 +33,6 @@ def get_token():
 
 
 @auth_blueprint.route('/register', methods=['POST'])
+@validate_payload(UserSchema())
 def register_user():
-    data, errors = UserSchema().load(request.get_json())
-
-    if len(errors) != 0:
-        return jsonify({'msg' : 'dhe'}), 400
-    else:
-        return jsonify({'msg' : data}), 200
+    pass
