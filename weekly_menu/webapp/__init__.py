@@ -24,3 +24,5 @@ def create_app(object_name):
 def before_request():
     if ((request.data != b'') and (not request.is_json)):
         return jsonify({'msg': 'payload does not contains json data'}), 400
+
+

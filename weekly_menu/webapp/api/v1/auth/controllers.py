@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow_mongoengine import schema
+from werkzeug.exceptions import BadRequest
 
 from . import authenticate
 from .. import BASE_PATH
@@ -34,5 +35,5 @@ def get_token():
 
 @auth_blueprint.route('/register', methods=['POST'])
 @validate_payload(UserSchema())
-def register_user(*args, **kwargs):
-    return jsonify(kwargs['payload']), 200
+def register_user(payload):
+    return jsonify(payload), 200
