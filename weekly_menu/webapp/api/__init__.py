@@ -28,7 +28,6 @@ def validate_payload(model_schema: ModelSchema):
             if len(errors) != 0:
                 return BadRequest('Unexpected payload format', response=jsonify({'msg':'invalid payload supplied'})), 400
 
-
             kwargs['payload'] = data
             
             return func(*args, **kwargs)
