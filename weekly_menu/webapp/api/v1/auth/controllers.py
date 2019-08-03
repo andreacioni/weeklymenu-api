@@ -34,5 +34,5 @@ def get_token():
 
 @auth_blueprint.route('/register', methods=['POST'])
 @validate_payload(UserSchema())
-def register_user():
-    pass
+def register_user(*args, **kwargs):
+    return jsonify(kwargs['payload']), 200

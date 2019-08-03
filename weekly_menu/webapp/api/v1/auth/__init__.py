@@ -1,7 +1,7 @@
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 
-from .models import User
+from ...models import User
 
 jwt = JWTManager()
 bcrypt = Bcrypt()
