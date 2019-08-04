@@ -19,7 +19,7 @@ def create_module(app):
 
     api.init_app(app)
 
-def validate_payload(model_schema: ModelSchema):
+def validate_payload(model_schema: ModelSchema, kwname='payload'):
     def decorate(func):
         def wrapper(*args, **kwargs):
             data, errors = model_schema.load(request.get_json())
@@ -27,7 +27,7 @@ def validate_payload(model_schema: ModelSchema):
             if len(errors) != 0:
                 raise InvalidPayloadSupplied('invalid payload supplied', errors)
 
-            kwargs['payload'] = data
+            kwargs[kwname] = data
             
             return func(*args, **kwargs)
         return wrapper

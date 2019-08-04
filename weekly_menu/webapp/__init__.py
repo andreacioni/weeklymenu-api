@@ -1,8 +1,10 @@
 import os
 
 from flask import Flask, request, jsonify
+from mongoengine.errors import NotUniqueError
 
 from .api.exceptions import BaseRESTException
+
 
 app = Flask(__name__)
 
