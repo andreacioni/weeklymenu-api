@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, request, jsonify
 
+from .api.exceptions import BaseRESTException
+
 app = Flask(__name__)
 
 def create_app(object_name):
@@ -26,3 +28,10 @@ def before_request():
         return jsonify({'msg': 'payload does not contains json data'}), 400
 
 
+@app.errorhandler(BaseRESTException)
+def handle_rest_exception(error: BaseRESTException):
+    return jsonify({
+            'error': error.error,
+            'descritpion': error.description,
+            'details': error.details
+    }), error.code
