@@ -14,3 +14,10 @@ def create_module(app, api):
     create_ingredients_module(app, api)
     create_menu_module(app, api)
     create_recipes_module(app, api)
+
+def mongopage_to_json(pagination):
+    from flask import jsonify
+    return jsonify({
+        "results": pagination.items,
+        "pages": pagination.pages
+    })

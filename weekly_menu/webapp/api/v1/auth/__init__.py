@@ -26,3 +26,6 @@ def authenticate(username, password):
         return None
     
     return user
+
+def encode_password(password: str) -> str:
+    return bcrypt.generate_password_hash(str(password))

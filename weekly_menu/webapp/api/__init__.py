@@ -1,3 +1,4 @@
+from functools import wraps
 from flask import request, jsonify
 from .exceptions import InvalidPayloadSupplied
 from marshmallow_mongoengine import ModelSchema
@@ -21,6 +22,7 @@ def create_module(app):
 
 def validate_payload(model_schema: ModelSchema, kwname='payload'):
     def decorate(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             data, errors = model_schema.load(request.get_json())
 

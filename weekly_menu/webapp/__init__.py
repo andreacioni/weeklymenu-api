@@ -1,10 +1,12 @@
 import os
+import logging
 
 from flask import Flask, request, jsonify
 from mongoengine.errors import NotUniqueError
 
 from .api.exceptions import BaseRESTException
 
+_logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -29,11 +31,20 @@ def before_request():
     if ((request.data != b'') and (not request.is_json)):
         return jsonify({'msg': 'payload does not contains json data'}), 400
 
+@app.errorhandler(Exception)
+def handle_generic_exception(e: Exception):
+        _logger.error(e)
+        e = BaseRESTException(description=e.args[0], details=e.args[1:])
+        return jsonify({
+            'error': e.error,
+            'descritpion': e.description,
+            'details': e.details
+        }), e.code
 
 @app.errorhandler(BaseRESTException)
-def handle_rest_exception(error: BaseRESTException):
+def handle_rest_exception(e: BaseRESTException):
     return jsonify({
-            'error': error.error,
-            'descritpion': error.description,
-            'details': error.details
-    }), error.code
+            'error': e.error,
+            'descritpion': e.description,
+            'details': e.details
+    }), e.code

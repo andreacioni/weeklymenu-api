@@ -1,13 +1,13 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from marshmallow_mongoengine import schema
-from werkzeug.exceptions import BadRequest
 
-from . import authenticate
-from .schemas import UserSchema
+from . import authenticate, encode_password
+from .schemas import UserSchema, PostGetSchema
 from .. import BASE_PATH
 from ... import validate_payload
 from ...models import User
+from ...exceptions import InvalidCredentials
 
 auth_blueprint = Blueprint(
     'auth',
@@ -16,26 +16,21 @@ auth_blueprint = Blueprint(
 )
 
 @auth_blueprint.route('/token', methods=['POST'])
-def get_token():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
-
-    if not username:
-        return jsonify({'msg': 'Missing username parameter'}), 400
-    if not password:
-        return jsonify({'msg': 'Missing password parameter'}), 400
+@validate_payload(PostGetSchema(), 'user')
+def get_token(user: PostGetSchema):
+    user = authenticate(user['username'], user['password'])
     
-    user = authenticate(username, password)
     if not user:
-        return jsonify({'msg': 'Bad username or password'}), 401
+        raise InvalidCredentials("Provided credentials doesn't match for specific user")
 
     # Identity can be any data that is json serializable
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=user.username)
     return jsonify(access_token=access_token), 200
 
 
 @auth_blueprint.route('/register', methods=['POST'])
 @validate_payload(UserSchema(), 'user')
 def register_user(user: User):
+    user.password = encode_password(user.password)
     user.save()
     return jsonify(user), 200
