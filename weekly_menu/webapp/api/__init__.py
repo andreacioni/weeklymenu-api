@@ -1,11 +1,14 @@
 from functools import wraps
 from flask import request, jsonify
-from .exceptions import InvalidPayloadSupplied
+from .exceptions import InvalidPayloadSupplied, BadRequest
 from marshmallow_mongoengine import ModelSchema
-from flask_restful import Api
+from flask_restful import Api, reqparse
 from flask_mongoengine import MongoEngine
 
 API_PREFIX = '/api'
+
+#Pagination
+DEFAULT_PAGE_SIZE=10
 
 api = Api()
 mongo = MongoEngine()
@@ -35,3 +38,40 @@ def validate_payload(model_schema: ModelSchema, kwname='payload'):
         return wrapper
     
     return decorate
+
+def paginated(func):
+    pagination_reqparse = reqparse.RequestParser()
+    pagination_reqparse.add_argument(
+        'page',
+        type=int,
+        location=['args'],
+        required=False,
+        default=1
+    )
+    pagination_reqparse.add_argument(
+        'per_page',
+        type=int,
+        location=['args'],
+        required=False,
+        default=DEFAULT_PAGE_SIZE
+    )
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        page_args = pagination_reqparse.parse_args()
+        page = page_args['page']
+        per_page = page_args['per_page']
+
+        if page <= 0:
+            raise BadRequest('page argument must be greater than zero')
+
+        if per_page <= 0:
+            raise BadRequest('per_page argument must be greater than zero')
+
+        kwargs['req_args'] = {
+            'page': page,
+            'per_page': per_page
+        }
+
+        return func(*args, **kwargs)
+
+    return wrapper

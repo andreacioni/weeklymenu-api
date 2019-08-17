@@ -20,6 +20,10 @@ class BaseRESTException(Exception):
     def __repr__(self):
         return "<RESTException: error: '{}'; description: '{}', details: '{}'".format(self.error, self.description, self.details)
 
+class BadRequest(BaseRESTException):
+    def __init__(self, description=None, details=None):
+        super().__init__(400, 'BAD_REQUEST', description, details)
+
 class InvalidPayloadSupplied(BaseRESTException):
     def __init__(self, description=None, details=None):
         super().__init__(400, 'BAD_REQUEST', description, details)

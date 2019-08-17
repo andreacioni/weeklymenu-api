@@ -19,5 +19,6 @@ def mongopage_to_json(pagination):
     from flask import jsonify
     return jsonify({
         "results": pagination.items,
-        "pages": pagination.pages
+        "pages": pagination.pages,
+        'per_page': pagination.per_page
     })
