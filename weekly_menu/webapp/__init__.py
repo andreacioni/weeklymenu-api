@@ -1,5 +1,6 @@
 import os
 import logging
+import traceback
 
 from flask import Flask, request, jsonify
 
@@ -32,7 +33,7 @@ def before_request():
 
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception):
-        _logger.error(e)
+        print(traceback.format_exc())
         e = BaseRESTException(description=e.args[0], details=e.args[1:])
         return jsonify({
             'error': e.error,

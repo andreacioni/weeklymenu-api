@@ -9,6 +9,5 @@ class Ingredient(mongo.Document):
         mongo.ReferenceField('Tag')
     )
 
-
     def __repr__(self):
            return "<Ingredient '{}'>".format(self.name)

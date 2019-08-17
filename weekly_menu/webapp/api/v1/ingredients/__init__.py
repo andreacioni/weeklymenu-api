@@ -6,5 +6,6 @@ def create_module(app, api):
     
     api.add_resource(
         Ingredients,
-        BASE_PATH + '/ingredients'
+        BASE_PATH + '/ingredients',
+        BASE_PATH + '/ingredients/<int:ing_id>'
     )

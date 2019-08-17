@@ -11,6 +11,7 @@ API_PREFIX = '/api'
 DEFAULT_PAGE_SIZE=10
 
 api = Api()
+
 mongo = MongoEngine()
 
 def create_module(app):
@@ -21,7 +22,14 @@ def create_module(app):
 
     create_api_v1(app, api)
 
+    #Using workaround from here to handle inerith exception handling from flask: https://github.com/flask-restful/flask-restful/issues/280#issuecomment-280648790
+    handle_exceptions = app.handle_exception
+    handle_user_exception = app.handle_user_exception
     api.init_app(app)
+    app.handle_user_exception = handle_exceptions
+    app.handle_user_exception = handle_user_exception
+
+    
 
 def validate_payload(model_schema: ModelSchema, kwname='payload'):
     def decorate(func):
@@ -72,6 +80,11 @@ def paginated(func):
             'per_page': per_page
         }
 
-        return func(*args, **kwargs)
+        page = func(*args, **kwargs)
+
+        return jsonify({
+        "results": page.items,
+        "pages": page.pages
+    })
 
     return wrapper
