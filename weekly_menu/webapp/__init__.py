@@ -2,7 +2,6 @@ import os
 import logging
 
 from flask import Flask, request, jsonify
-from mongoengine.errors import NotUniqueError
 
 from .api.exceptions import BaseRESTException
 
