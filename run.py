@@ -11,6 +11,9 @@ LOG_BACKUP_COUNT = 3
 
 #Parsing arguments
 parser = argparse.ArgumentParser('{} - v.{}'.format(__name__, __version__))
+parser.add_argument('-c', '--config_file',
+                    default='config',
+                    help='configuration file (must end with .py)')
 parser.add_argument('--log_file',
                     default=None,
                     help='if defined, indicates the file used by the application to log')
@@ -34,5 +37,5 @@ else:
     )
 
 #Setup and run application
-app = create_app('config')
+app = create_app(args.config_file)
 app.run(host=app.config['API_HOST'], port=app.config['API_PORT'], debug=app.config['DEBUG'])

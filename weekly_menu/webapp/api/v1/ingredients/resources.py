@@ -27,7 +27,7 @@ class Ingredients(Resource):
         try:
             ingredient.save()
         except NotUniqueError as nue:
-            raise DuplicateEntry(description="duplicate entry found for an ingredient", details=nue.args)
+            raise DuplicateEntry(description="duplicate entry found for an ingredient", details=nue.args or [])
         
         return ingredient, 201
 
