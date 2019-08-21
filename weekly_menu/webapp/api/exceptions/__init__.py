@@ -38,4 +38,4 @@ class InvalidCredentials(BaseRESTException):
 
 class DuplicateEntry(BaseRESTException):
     def __init__(self, description=None, details=None):
-        super().__init__(401, 'DUPLICATE_ENTRY', description, details)
+        super().__init__(409, 'DUPLICATE_ENTRY', description, details)

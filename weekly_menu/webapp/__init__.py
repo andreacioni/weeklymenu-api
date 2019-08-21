@@ -3,6 +3,7 @@ import logging
 import traceback
 
 from flask import Flask, request, jsonify
+from werkzeug.exceptions import NotFound
 
 from .api.exceptions import BaseRESTException
 
@@ -34,7 +35,10 @@ def before_request():
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception):
         print(traceback.format_exc())
-        e = BaseRESTException(description=e.args[0], details=e.args[1:])
+        if len(e.args) > 0:
+          e = BaseRESTException(description=e.args[0], details=e.args[1:])
+        else:
+          e = BaseRESTException()
         return jsonify({
             'error': e.error,
             'descritpion': e.description,
@@ -48,3 +52,11 @@ def handle_rest_exception(e: BaseRESTException):
             'descritpion': e.description,
             'details': e.details
     }), e.code
+
+@app.errorhandler(NotFound)
+def handle_notfound(e):
+        return jsonify({
+            'error': 'NOT_FOUND',
+            'descritpion': 'resource was not found on this server',
+            'details': []
+    }), 404
