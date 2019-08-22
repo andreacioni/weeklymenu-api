@@ -39,3 +39,10 @@ class IngredientInstance(Resource):
         if ingredient_id != None:
             Ingredient.objects(id=ingredient_id).get_or_404().delete()
             return "", 204
+    
+    @jwt_required
+    @validate_payload(IngredientSchema(), 'ingredient')
+    def patch(self, ingredient, ingredient_id=''):
+        if ingredient_id != None:
+            Ingredient.objects(id=ingredient_id).get_or_404().update(ingredient)
+            return jsonify(ingredient), 200

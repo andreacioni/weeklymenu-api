@@ -3,7 +3,7 @@ import logging
 import traceback
 
 from flask import Flask, request, jsonify
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, MethodNotAllowed
 
 from .api.exceptions import BaseRESTException
 
@@ -60,3 +60,11 @@ def handle_notfound(e):
             'descritpion': 'resource was not found on this server',
             'details': []
     }), 404
+
+@app.errorhandler(MethodNotAllowed)
+def handle_method_not_allowed(e):
+        return jsonify({
+            'error': 'METHOD_NOT_ALLOWED',
+            'descritpion': 'method not allowed on selected resource',
+            'details': []
+    }), 404    
