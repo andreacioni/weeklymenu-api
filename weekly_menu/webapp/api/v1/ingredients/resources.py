@@ -33,3 +33,9 @@ class IngredientInstance(Resource):
     def get(self, ingredient_id=''):
         if ingredient_id != None:
             return jsonify(Ingredient.objects(id=ingredient_id).get_or_404())
+    
+    @jwt_required
+    def delete(self, ingredient_id=''):
+        if ingredient_id != None:
+            Ingredient.objects(id=ingredient_id).get_or_404().delete()
+            return "", 204
