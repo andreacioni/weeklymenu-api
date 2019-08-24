@@ -8,7 +8,7 @@ from mongoengine.fields import ObjectIdField
 
 from .schemas import RecipeSchema
 from ...models import Recipe
-from ... import validate_payload, paginated, mongo
+from ... import validate_payload, paginated, mongo, update_document
 from ...exceptions import DuplicateEntry, BadRequest
 
 class RecipeList(Resource):
@@ -24,7 +24,7 @@ class RecipeList(Resource):
         try:
             recipe.save()
         except NotUniqueError as nue:
-            raise DuplicateEntry(description="duplicate entry found for an recipe", details=nue.args or [])
+            raise DuplicateEntry(description="duplicate entry found for a recipe", details=nue.args or [])
         
         return jsonify(recipe), 201
 
@@ -41,8 +41,9 @@ class RecipeInstance(Resource):
             return "", 204
     
     @jwt_required
-    @validate_payload(RecipeSchema(), 'recipe')
-    def patch(self, recipe, recipe_id=''):
+    @validate_payload(RecipeSchema(), 'new_recipe')
+    def patch(self, new_recipe: Recipe, recipe_id=''):
         if recipe_id != None:
-            Recipe.objects(id=recipe_id).get_or_404().update(recipe)
-            return jsonify(recipe), 200
+            old_recipe = Recipe.objects(id=recipe_id).get_or_404().update(recipe)
+            new_recipe = update_document(old_recipe, new_recipe)
+            return jsonify(new_recipe), 200

@@ -88,3 +88,11 @@ def paginated(func):
     })
 
     return wrapper
+
+def update_document(old_doc: mongo.Document, new_doc: mongo.Document):
+    for field in old_doc.__class__._fields:
+        if field != 'id':
+            old_doc[field] = new_doc[field]
+    
+    old_doc.save()
+    return old_doc

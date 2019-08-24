@@ -10,5 +10,5 @@ def create_module(app, api):
     )
     api.add_resource(
         RecipeInstance,
-        BASE_PATH + '/recipes/<string:reciper_id>'
+        BASE_PATH + '/recipes/<string:recipe_id>'
     )

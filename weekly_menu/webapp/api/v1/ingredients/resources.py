@@ -8,7 +8,7 @@ from mongoengine.fields import ObjectIdField
 
 from .schemas import IngredientSchema
 from ...models import Ingredient
-from ... import validate_payload, paginated, mongo
+from ... import validate_payload, paginated, mongo, update_document
 from ...exceptions import DuplicateEntry, BadRequest
 
 class IngredientsList(Resource):
@@ -41,8 +41,9 @@ class IngredientInstance(Resource):
             return "", 204
     
     @jwt_required
-    @validate_payload(IngredientSchema(), 'ingredient')
-    def patch(self, ingredient, ingredient_id=''):
+    @validate_payload(IngredientSchema(), 'new_ingredient')
+    def patch(self, new_ingredient: Ingredient, ingredient_id=''):
         if ingredient_id != None:
-            Ingredient.objects(id=ingredient_id).get_or_404().update(ingredient)
-            return jsonify(ingredient), 200
+            old_ingredient = Ingredient.objects(id=ingredient_id).get_or_404()
+            new_ingredient = update_document(old_ingredient, new_ingredient)
+            return jsonify(new_ingredient), 200
