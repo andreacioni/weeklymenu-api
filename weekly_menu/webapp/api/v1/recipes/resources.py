@@ -26,13 +26,13 @@ class RecipeList(Resource):
         except NotUniqueError as nue:
             raise DuplicateEntry(description="duplicate entry found for a recipe", details=nue.args or [])
         
-        return jsonify(recipe), 201
+        return recipe, 201
 
 class RecipeInstance(Resource):
     @jwt_required
     def get(self, recipe_id=''):
         if recipe_id != None:
-            return jsonify(Recipe.objects(id=recipe_id).get_or_404())
+            return Recipe.objects(id=recipe_id).get_or_404()
     
     @jwt_required
     def delete(self, recipe_id=''):
