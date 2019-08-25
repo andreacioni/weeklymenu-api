@@ -46,4 +46,4 @@ class IngredientInstance(Resource):
         if ingredient_id != None:
             old_ingredient = Ingredient.objects(id=ingredient_id).get_or_404()
             new_ingredient = update_document(old_ingredient, new_ingredient)
-            return jsonify(new_ingredient), 200
+            return new_ingredient, 200

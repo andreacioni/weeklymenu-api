@@ -46,4 +46,4 @@ class RecipeInstance(Resource):
         if recipe_id != None:
             old_recipe = Recipe.objects(id=recipe_id).get_or_404().update(recipe)
             new_recipe = update_document(old_recipe, new_recipe)
-            return jsonify(new_recipe), 200
+            return new_recipe, 200

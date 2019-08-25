@@ -1,5 +1,6 @@
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, make_response
+from json import dumps
 from .exceptions import InvalidPayloadSupplied, BadRequest
 from marshmallow_mongoengine import ModelSchema
 from flask_restful import Api, reqparse
@@ -29,7 +30,11 @@ def create_module(app):
     app.handle_user_exception = handle_exceptions
     app.handle_user_exception = handle_user_exception
 
-    
+@api.representation('application/json')
+def output_json(data, code, headers=None):
+    resp = make_response(jsonify(data), code)
+    resp.headers.extend(headers or {})
+    return resp
 
 def validate_payload(model_schema: ModelSchema, kwname='payload'):
     def decorate(func):
