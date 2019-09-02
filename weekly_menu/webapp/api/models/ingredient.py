@@ -1,6 +1,6 @@
 from .. import mongo
 
-class Ingredient(mongo.Document):
+class Ingredient(mongo.EmbeddedDocument):
     name = mongo.StringField(required=True, unique=True)
     description = mongo.StringField()
     node = mongo.StringField()

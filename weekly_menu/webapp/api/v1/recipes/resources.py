@@ -44,6 +44,6 @@ class RecipeInstance(Resource):
     @validate_payload(RecipeSchema(), 'new_recipe')
     def patch(self, new_recipe: Recipe, recipe_id=''):
         if recipe_id != None:
-            old_recipe = Recipe.objects(id=recipe_id).get_or_404().update(recipe)
+            old_recipe = Recipe.objects(id=recipe_id).get_or_404()
             new_recipe = update_document(old_recipe, new_recipe)
             return new_recipe, 200
