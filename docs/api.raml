@@ -81,38 +81,28 @@ types:
   User:
     type: object
     properties:
-      ObjectId: string
       username: string
       name: string
-      docs:
-        description: The documents ids (ObjectIds) associated to the user
-        type: array
-        items: string
-
-  Tag:
-    type: object
-    properties:
-      ObjectId: string
-      name: string
+      email: string
+      shoppingDay: DayOfWeek
 
   Ingredient:
     type: object
     properties:
-      ObjectId: string
       name: string
       description: string
       note: string
+      freezed: boolean
       availabilityMonths:
         type: array
         items: integer
-      tags:
+      tags: 
         type: array
-        items: Tag
+        items: string
 
   Recipe:
     type: object
     properties:
-      ObjectId: string
       name: string
       description: string
       note: string
@@ -130,7 +120,6 @@ types:
   Menu:
     type: object
     properties:
-      ObjectId: string
       date: date-only
       meal: Meal
       recipes:
@@ -138,8 +127,9 @@ types:
         items: Recipe
 
   DayOfWeek:
-    type: string
-    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    type: integer
+    minimum: 1
+    maximum: 7
 
   ShoppingList:
     type: object
