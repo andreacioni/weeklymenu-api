@@ -1,6 +1,6 @@
 from .. import mongo
 
-class Recipe(mongo.Document):
+class Recipe(mongo.EmbeddedDocument):
     name = mongo.StringField(required=True, unique=True)
     description = mongo.StringField()
     note = mongo.StringField()
@@ -11,5 +11,6 @@ class Recipe(mongo.Document):
     tags = mongo.ListField(
         mongo.StringField()
     )
+    
     def __repr__(self):
            return "<Recipe '{}'>".format(self.name)

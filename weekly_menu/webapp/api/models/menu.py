@@ -1,11 +1,12 @@
 from .. import mongo
 
 class Menu(mongo.Document):
+    name = mongo.StringField(unique=True, required=True)
     date = mongo.DateTimeField(required=True)
-    meal = mongo.ReferenceField('Meal')
+    meal = mongo.StringField('Meal')
     recipes = mongo.ListField(
         mongo.ReferenceField('Recipe')
     )
 
     def __repr__(self):
-           return "<Tag '{}'>".format(self.name)
+           return "<Menu '{}'>".format(self.name)

@@ -32,7 +32,7 @@ class RecipeInstance(Resource):
     @jwt_required
     def get(self, recipe_id=''):
         if recipe_id != None:
-            return Recipe.objects(id=recipe_id).get_or_404().select_related(9)
+            return Recipe.objects(id=recipe_id).get_or_404()
     
     @jwt_required
     def delete(self, recipe_id=''):

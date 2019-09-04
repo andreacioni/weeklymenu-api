@@ -84,7 +84,11 @@ types:
       username: string
       name: string
       email: string
-      shoppingDay: DayOfWeek
+      shoppingDay:
+        type: array
+        items: DayOfWeek
+        minItems: 1
+        maxItems: 7
 
   Ingredient:
     type: object
@@ -143,14 +147,19 @@ types:
             checked: boolean
             shoppingNote: string
 
-/users:
+/auth:
   /register:
     description: Register new user
     post:
+  /token:
+    description: Retrieve a token given user credentials
+    post:
 
+/users:
   /me:
     securedBy: basic
     description: Retrieve informaion of the current user
+    get:
 
 /ingredients:
   type: collection
