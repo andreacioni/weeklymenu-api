@@ -1,6 +1,6 @@
 from .. import mongo
 
-class Recipe(mongo.EmbeddedDocument):
+class Recipe(mongo.Document):
     name = mongo.StringField(required=True, unique=True)
     description = mongo.StringField()
     note = mongo.StringField()

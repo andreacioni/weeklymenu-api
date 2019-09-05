@@ -1,10 +1,13 @@
 from functools import wraps
 from flask import request, jsonify, make_response
 from json import dumps
-from .exceptions import InvalidPayloadSupplied, BadRequest
 from marshmallow_mongoengine import ModelSchema
 from flask_restful import Api, reqparse
 from flask_mongoengine import MongoEngine
+from flask_jwt_extended import get_jwt_identity
+from mongoengine.queryset.visitor import Q
+
+from .exceptions import InvalidPayloadSupplied, BadRequest, Forbidden
 
 API_PREFIX = '/api'
 
@@ -14,6 +17,8 @@ DEFAULT_PAGE_SIZE=10
 api = Api()
 
 mongo = MongoEngine()
+
+from .models import User
 
 def create_module(app):
 
@@ -51,6 +56,21 @@ def validate_payload(model_schema: ModelSchema, kwname='payload'):
         return wrapper
     
     return decorate
+
+def laod_user_info(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        
+        user = User.objects(Q(username=get_jwt_identity())).get()
+
+        if user == None:
+            raise Forbidden()
+
+        kwargs['user_info'] = user
+        
+        return func(*args, **kwargs)
+    return wrapper
+    
 
 def paginated(func):
     pagination_reqparse = reqparse.RequestParser()

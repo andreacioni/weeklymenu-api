@@ -34,7 +34,11 @@ class UserNotFound(BaseRESTException):
 
 class InvalidCredentials(BaseRESTException):
     def __init__(self, description=None):
-        super().__init__(401, 'BAD_CREDENTIALS', description) 
+        super().__init__(401, 'BAD_CREDENTIALS', description)
+
+class Forbidden(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(401, 'FORBIDDEN', 'current user canno\'t access the requested resource')  
 
 class DuplicateEntry(BaseRESTException):
     def __init__(self, description=None, details=None):
