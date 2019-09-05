@@ -10,15 +10,15 @@ class User(mongo.Document):
     )
 
     ingredients_docs = mongo.ListField(
-        mongo.ReferenceField('Ingredient')
+        mongo.ReferenceField('Ingredient', reverse_delete_rule=4)
     )
 
     recipes_docs = mongo.ListField(
-        mongo.ReferenceField('Recipe')
+        mongo.ReferenceField('Recipe', reverse_delete_rule=4)
     )
 
     menu_docs = mongo.ListField(
-        mongo.ReferenceField('Menu')
+        mongo.ReferenceField('Menu', reverse_delete_rule=4)
     )
 
     meta = {

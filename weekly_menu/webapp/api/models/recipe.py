@@ -6,7 +6,7 @@ class Recipe(mongo.Document):
     note = mongo.StringField()
     availabilityMonths = mongo.ListField(mongo.IntField(min_value=1, max_value=12), max_length=12)
     ingredients = mongo.ListField(
-        mongo.ReferenceField('Ingredient')
+        mongo.ReferenceField('Ingredient', reverse_delete_rule=4)
     )
     tags = mongo.ListField(
         mongo.StringField()

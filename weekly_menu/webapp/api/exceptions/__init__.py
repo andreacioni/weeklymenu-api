@@ -38,7 +38,7 @@ class InvalidCredentials(BaseRESTException):
 
 class Forbidden(BaseRESTException):
     def __init__(self, description=None):
-        super().__init__(401, 'FORBIDDEN', 'current user canno\'t access the requested resource')  
+        super().__init__(401, 'FORBIDDEN', 'current user can\'t access the requested resource')  
 
 class DuplicateEntry(BaseRESTException):
     def __init__(self, description=None, details=None):

@@ -3,7 +3,7 @@ from flask import request, jsonify, make_response
 from json import dumps
 from marshmallow_mongoengine import ModelSchema
 from flask_restful import Api, reqparse
-from flask_mongoengine import MongoEngine
+from flask_mongoengine import MongoEngine, DoesNotExist
 from flask_jwt_extended import get_jwt_identity
 from mongoengine.queryset.visitor import Q
 
@@ -61,9 +61,9 @@ def laod_user_info(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         
-        user = User.objects(Q(username=get_jwt_identity())).get()
-
-        if user == None:
+        try:
+            user = User.objects(Q(username=get_jwt_identity())).get()
+        except DoesNotExist:
             raise Forbidden()
 
         kwargs['user_info'] = user

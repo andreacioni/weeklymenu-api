@@ -17,7 +17,7 @@ class IngredientsList(Resource):
     @paginated
     @laod_user_info
     def get(self, req_args, user_info: User):
-        page = Ingredient.objects.paginate(page=req_args['page'], per_page=req_args['per_page'])
+        page = Ingredient.objects(id__in=[ing.id for ing in user_info.ingredients_docs]).paginate(page=req_args['page'], per_page=req_args['per_page'])
         return page
     
     @jwt_required
@@ -40,18 +40,21 @@ class IngredientInstance(Resource):
     @laod_user_info
     def get(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            return Ingredient.objects(Q(id=ingredient_id) & Q(id__in=user_info.ingredients_docs)).get_or_404()
+            return Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
     
     @jwt_required
-    def delete(self, ingredient_id=''):
+    @laod_user_info
+    def delete(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            Ingredient.objects(id=ingredient_id).get_or_404().delete()
+            Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404().delete()
+            
             return "", 204
     
     @jwt_required
     @validate_payload(IngredientSchema(), 'new_ingredient')
-    def patch(self, new_ingredient: Ingredient, ingredient_id=''):
+    @laod_user_info
+    def patch(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            old_ingredient = Ingredient.objects(id=ingredient_id).get_or_404()
+            old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
             new_ingredient = update_document(old_ingredient, new_ingredient)
             return new_ingredient, 200
