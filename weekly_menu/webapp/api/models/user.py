@@ -21,6 +21,8 @@ class User(mongo.Document):
         mongo.ReferenceField('Menu', reverse_delete_rule=4)
     )
 
+    shopping_list_doc = mongo.ReferenceField('ShoppingList', reverse_delete_rule=4)
+
     meta = {
         'collection' : 'users'
     }

@@ -5,7 +5,7 @@ class Menu(mongo.Document):
     date = mongo.DateTimeField(required=True)
     meal = mongo.StringField('Meal')
     recipes = mongo.ListField(
-        mongo.ReferenceField('Recipe')
+        mongo.ReferenceField('Recipe', reverse_delete_rule=4)
     )
 
     def __repr__(self):
