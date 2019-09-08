@@ -10,18 +10,18 @@ class User(mongo.Document):
     )
 
     ingredients_docs = mongo.ListField(
-        mongo.ReferenceField('Ingredient', reverse_delete_rule=4)
+        mongo.ReferenceField('Ingredient', reverse_delete_rule=mongo.PULL)
     )
 
     recipes_docs = mongo.ListField(
-        mongo.ReferenceField('Recipe', reverse_delete_rule=4)
+        mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL)
     )
 
     menu_docs = mongo.ListField(
-        mongo.ReferenceField('Menu', reverse_delete_rule=4)
+        mongo.ReferenceField('Menu', reverse_delete_rule=mongo.PULL)
     )
 
-    shopping_list_doc = mongo.ReferenceField('ShoppingList', reverse_delete_rule=4)
+    shopping_list_doc = mongo.ReferenceField('ShoppingList', reverse_delete_rule=mongo.PULL)
 
     meta = {
         'collection' : 'users'

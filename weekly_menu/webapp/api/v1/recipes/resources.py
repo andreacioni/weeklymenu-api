@@ -45,7 +45,7 @@ class RecipeInstance(Resource):
     @laod_user_info
     def delete(self, user_info: User, recipe_id=''):
         if recipe_id != None:
-            Recipe.objects(id=recipe_id).get_or_404().delete()
+            Recipe.objects(Q(id=recipe_id) & Q(id__in=[rec.id for rec in user_info.recipes_docs])).get_or_404().delete()
             return "", 204
     
     @jwt_required
@@ -53,6 +53,6 @@ class RecipeInstance(Resource):
     @laod_user_info
     def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         if recipe_id != None:
-            old_recipe = Recipe.objects(id=recipe_id).get_or_404()
+            old_recipe = Recipe.objects(Q(id=recipe_id) & Q(id__in=[rec.id for rec in user_info.recipes_docs])).get_or_404()
             new_recipe = update_document(old_recipe, new_recipe)
             return new_recipe, 200

@@ -3,7 +3,7 @@ from ..models import Ingredient
 
 class ShoppingItem(mongo.EmbeddedDocument):
     checked = mongo.BooleanField(required=True, default=False)
-    ingredient = mongo.ReferenceField('Ingredient', reverse_delete_rule=mongo.CASCADE)
+    ingredient = mongo.ReferenceField('Ingredient')
     supermarketSection = mongo.StringField()
 
 class ShoppingList(mongo.Document):

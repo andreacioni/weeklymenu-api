@@ -8,7 +8,7 @@ from mongoengine.fields import ObjectIdField
 from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema
-from ...models import Ingredient, User
+from ...models import Ingredient, User, Recipe
 from ... import validate_payload, paginated, mongo, update_document, laod_user_info
 from ...exceptions import DuplicateEntry, BadRequest
 
@@ -46,8 +46,15 @@ class IngredientInstance(Resource):
     @laod_user_info
     def delete(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404().delete()
-            
+            ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
+
+            #Removing references in embedded documents is not automatic (see: https://github.com/MongoEngine/mongoengine/issues/1592)
+            Recipe.objects(Q(id__in=[rec.id for rec in user_info.recipes_docs])).update(pull__ingredients__ingredient=ingredient.id)
+            #TODO shopping list
+            #ShoppingList.objects(Q(id__in=[shop_list.id for shop_list in user_info.shopping_list_doc])).update(pull__items__ingredient=ingredient.id)
+
+            ingredient.delete()
+
             return "", 204
     
     @jwt_required
