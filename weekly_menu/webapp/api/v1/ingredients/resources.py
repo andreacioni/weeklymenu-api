@@ -8,7 +8,7 @@ from mongoengine.fields import ObjectIdField
 from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema
-from ...models import Ingredient, User, Recipe
+from ...models import Ingredient, User, Recipe, ShoppingList
 from ... import validate_payload, paginated, mongo, update_document, laod_user_info
 from ...exceptions import DuplicateEntry, BadRequest
 
@@ -50,8 +50,7 @@ class IngredientInstance(Resource):
 
             #Removing references in embedded documents is not automatic (see: https://github.com/MongoEngine/mongoengine/issues/1592)
             Recipe.objects(Q(id__in=[rec.id for rec in user_info.recipes_docs])).update(pull__ingredients__ingredient=ingredient.id)
-            #TODO shopping list
-            #ShoppingList.objects(Q(id__in=[shop_list.id for shop_list in user_info.shopping_list_doc])).update(pull__items__ingredient=ingredient.id)
+            ShoppingList.objects(Q(id__in=[shop_list.id for shop_list in user_info.shopping_list_doc])).update(pull__items__ingredient=ingredient.id)
 
             ingredient.delete()
 

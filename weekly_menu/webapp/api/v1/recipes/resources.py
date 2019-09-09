@@ -17,7 +17,7 @@ class RecipeList(Resource):
     @paginated
     @laod_user_info
     def get(self, req_args, user_info: User):
-        page = Recipe.objects.paginate(page=req_args['page'], per_page=req_args['per_page'])
+        page = Recipe.objects(id__in=[rec.id for rec in user_info.recipes_docs]).paginate(page=req_args['page'], per_page=req_args['per_page'])
         return page
     
     @jwt_required
