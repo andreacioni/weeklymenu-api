@@ -6,7 +6,7 @@ from . import authenticate, encode_password
 from .schemas import UserSchema, PostGetSchema
 from .. import BASE_PATH
 from ... import validate_payload
-from ...models import User
+from ...models import User, ShoppingList
 from ...exceptions import InvalidCredentials
 
 auth_blueprint = Blueprint(
@@ -31,6 +31,9 @@ def get_token(user: PostGetSchema):
 @auth_blueprint.route('/register', methods=['POST'])
 @validate_payload(UserSchema(), 'user')
 def register_user(user: User):
+    new_shoppint_list = ShoppingList()
+    new_shoppint_list.save()
+    user.shopping_list_doc = new_shoppint_list
     user.password = encode_password(user.password)
     user.save()
     return jsonify(user), 200
