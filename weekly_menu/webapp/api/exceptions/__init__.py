@@ -40,6 +40,10 @@ class Forbidden(BaseRESTException):
     def __init__(self, description=None):
         super().__init__(401, 'FORBIDDEN', 'current user can\'t access the requested resource')  
 
+class Conflict(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(409, 'CONFLICT', description)  
+
 class DuplicateEntry(BaseRESTException):
     def __init__(self, description=None, details=None):
         super().__init__(409, 'DUPLICATE_ENTRY', description, details)
