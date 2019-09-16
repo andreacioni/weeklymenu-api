@@ -47,3 +47,7 @@ class Conflict(BaseRESTException):
 class DuplicateEntry(BaseRESTException):
     def __init__(self, description=None, details=None):
         super().__init__(409, 'DUPLICATE_ENTRY', description, details)
+
+class NotFound(BaseRESTException):
+    def __init__(self, description=None, details=None):
+        super().__init__(404, 'NOT_FOUND', description, details)

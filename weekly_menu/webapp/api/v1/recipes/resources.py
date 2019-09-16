@@ -10,7 +10,7 @@ from mongoengine.queryset.visitor import Q
 from .schemas import RecipeSchema
 from ...models import Recipe, User
 from ... import validate_payload, paginated, mongo, update_document, laod_user_info
-from ...exceptions import DuplicateEntry, BadRequest
+from ...exceptions import DuplicateEntry, BadRequest, NotFound
 
 class RecipeList(Resource):
     @jwt_required
@@ -53,6 +53,10 @@ class RecipeInstance(Resource):
     @laod_user_info
     def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         if recipe_id != None:
-            old_recipe = Recipe.objects(Q(id=recipe_id) & Q(id__in=[rec.id for rec in user_info.recipes_docs])).get_or_404()
-            new_recipe = update_document(old_recipe, new_recipe)
-            return new_recipe, 200
+            for rec in user_info.recipes_docs:
+                if recipe_id == str(rec.id):
+                    old_recipe = rec
+                    new_recipe = update_document(old_recipe, new_recipe)
+                    return new_recipe, 200
+
+            return NotFound("no recipe found for id {}".format(recipe_id))
