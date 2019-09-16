@@ -16,11 +16,7 @@ class User(mongo.Document):
     recipes_docs = mongo.ListField(
         mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL)
     )
-
-    menu_docs = mongo.ListField(
-        mongo.ReferenceField('Menu', reverse_delete_rule=mongo.PULL)
-    )
-
+    
     shopping_list_doc = mongo.ReferenceField('ShoppingList', reverse_delete_rule=mongo.PULL)
 
     meta = {

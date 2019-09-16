@@ -181,14 +181,18 @@ types:
 /menus:
   type: collection
   is:  [pageable]
+  queryParameters:
+      from:
+        type: string
+        description: search menus from this date (format: YYYY-MM-DD)
+      to:
+        type: string
+        description: search menus to this date (format: YYYY-MM-DD)
+      of:
+        type: string
+        description: search menus just for this date (format: YYYY-MM-DD)
   /{menuId}:
     type: element
-  /{date}:
-    uriParameters:
-      date:
-        type: string
-        description: date in format YYYY-MM-DD
-    type: collection
   /generate:
     description: Generate new menu for the next week
     get:
