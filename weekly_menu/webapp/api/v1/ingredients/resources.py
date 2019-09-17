@@ -9,20 +9,20 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema
 from ...models import Ingredient, User, Recipe, ShoppingList
-from ... import validate_payload, paginated, mongo, update_document, laod_user_info
+from ... import validate_payload, paginated, mongo, update_document, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest
 
 class IngredientsList(Resource):
     @jwt_required
     @paginated
-    @laod_user_info
+    @load_user_info
     def get(self, req_args, user_info: User):
         page = Ingredient.objects(id__in=[ing.id for ing in user_info.ingredients_docs]).paginate(page=req_args['page'], per_page=req_args['per_page'])
         return page
     
     @jwt_required
     @validate_payload(IngredientSchema(), 'ingredient')
-    @laod_user_info
+    @load_user_info
     def post(self, ingredient: Ingredient, user_info: User):
 
         try:
@@ -37,13 +37,13 @@ class IngredientsList(Resource):
 
 class IngredientInstance(Resource):
     @jwt_required
-    @laod_user_info
+    @load_user_info
     def get(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
             return Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
     
     @jwt_required
-    @laod_user_info
+    @load_user_info
     def delete(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
             ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
@@ -58,7 +58,7 @@ class IngredientInstance(Resource):
     
     @jwt_required
     @validate_payload(IngredientSchema(), 'new_ingredient')
-    @laod_user_info
+    @load_user_info
     def patch(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
         if ingredient_id != None:
             old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()

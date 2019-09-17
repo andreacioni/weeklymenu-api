@@ -57,7 +57,7 @@ def validate_payload(model_schema: ModelSchema, kwname='payload'):
     
     return decorate
 
-def laod_user_info(func):
+def load_user_info(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         
