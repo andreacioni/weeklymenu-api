@@ -19,7 +19,7 @@ def create_app(object_name):
         object_name: the python path of the config object,
                      e.g. project.config.ProdConfig
     """
-    app.config.from_object(object_name)
+    app.config.from_object('configs.' + object_name)
 
     from .api import create_module as create_api_module
 
