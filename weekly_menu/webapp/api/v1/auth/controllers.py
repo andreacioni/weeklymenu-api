@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token
 from marshmallow_mongoengine import schema
 
 from . import authenticate, encode_password
-from .schemas import UserSchema, PostUserTokenSchema
+from .schemas import PostRegisterUserSchema, PostUserTokenSchema
 from .. import BASE_PATH
 from ... import validate_payload
 from ...models import User, ShoppingList
@@ -29,14 +29,16 @@ def get_token(user: PostUserTokenSchema):
 
 
 @auth_blueprint.route('/register', methods=['POST'])
-@validate_payload(PostUserTokenSchema(), 'user_meta')
-def register_user(user_meta: PostUserTokenSchema):
+@validate_payload(PostRegisterUserSchema(), 'user_meta')
+def register_user(user_meta: PostRegisterUserSchema):
     user = User()
-    user.username  = user_meta.username
+    user.username = user_meta['username']
+    user.password = encode_password(user_meta['password'])
+    user.email = user_meta['email']
 
     new_shoppint_list = ShoppingList()
     new_shoppint_list.save()
     user.shopping_list_doc = new_shoppint_list
-    user.password = encode_password(user.password)
+    
     user.save()
     return jsonify(user), 200
