@@ -8,8 +8,8 @@ from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, Shoppi
 from weekly_menu.webapp.api.v1.auth import encode_password
 
 TEST_USERNAME = 'test'
-TEST_PASSWORD = 'a@b.it'
-TEST_EMAIL = 'pippofranco'
+TEST_PASSWORD = 'pippo@franco.it'
+TEST_EMAIL = 'pippo@franco123'
 
 @pytest.fixture(autouse=True)
 def clear_db():
@@ -29,15 +29,15 @@ def app():
 def client(app):
     return app.test_client()
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def auth_headers(app):
   user = User()
   user.username = TEST_USERNAME
   user.email = TEST_EMAIL
-  user.password = encode_password(TEST_EMAIL)
+  user.password = encode_password(TEST_PASSWORD)
   user.save()
 
-  valid_token = jwt.encode({'username':'username'}, app.config['SECRET_KEY']).decode('utf-8')
+  valid_token = jwt.encode({'username':TEST_USERNAME}, app.config['SECRET_KEY']).decode('utf-8')
   headers = {
       'Authorization': 'Bearer {}'.format(valid_token)
   }
