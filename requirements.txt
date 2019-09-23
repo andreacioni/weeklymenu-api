@@ -7,3 +7,4 @@ flask_bcrypt==0.7.1
 marshmallow-mongoengine==0.9.1
 marshmallow==2.19.5
 pytest==5.0.1
+coverage==4.5.2
