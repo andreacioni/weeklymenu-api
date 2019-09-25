@@ -17,7 +17,7 @@ def test_bad_request_registration(client: FlaskClient):
 
 def test_user_creation(client: FlaskClient):
   response = client.post('/api/v1/auth/register', json={
-    'username':TEST_USERNAME, 
+    'username':TEST_USERNAME + "a", 
     'password':TEST_PASSWORD,
     'email':TEST_EMAIL
     })
@@ -25,14 +25,14 @@ def test_user_creation(client: FlaskClient):
   assert response.status_code == 200
 
   response = client.post('/api/v1/auth/token', json={
-    'username':TEST_USERNAME, 
+    'username':TEST_USERNAME + "a", 
     'password':'wrong-password'
   })
 
   assert response.status_code == 401
 
   response = client.post('/api/v1/auth/token', json={
-    'username':TEST_USERNAME, 
+    'username':TEST_USERNAME + "a", 
     'password':TEST_PASSWORD
   })
 

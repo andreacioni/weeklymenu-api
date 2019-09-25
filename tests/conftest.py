@@ -30,16 +30,20 @@ def client(app):
     return app.test_client()
 
 @pytest.fixture(scope='session')
-def auth_headers(app):
-  user = User()
-  user.username = TEST_USERNAME
-  user.email = TEST_EMAIL
-  user.password = encode_password(TEST_PASSWORD)
-  user.save()
+def auth_headers(client: FlaskClient):
+  response = client.post('/api/v1/auth/register', json={
+    'username':TEST_USERNAME, 
+    'password':TEST_PASSWORD,
+    'email':TEST_EMAIL
+    })
+  
+  response = client.post('/api/v1/auth/token', json={
+    'username':TEST_USERNAME, 
+    'password':TEST_PASSWORD
+    })
 
-  valid_token = jwt.encode({'username':TEST_USERNAME}, app.config['SECRET_KEY']).decode('utf-8')
   headers = {
-      'Authorization': 'Bearer {}'.format(valid_token)
+      'Authorization': 'Bearer {}'.format(response.json['access_token'])
   }
 
   return headers

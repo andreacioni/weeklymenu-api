@@ -12,5 +12,5 @@ def test_not_authorized(client: FlaskClient):
 def test_create_ingredient(client: FlaskClient, auth_headers):
   response = client.get('/api/v1/ingredients', headers=auth_headers)
 
-  assert response.status_code == 200
+  assert response.status_code == 200 and len(response.json['results']) == 0
 
