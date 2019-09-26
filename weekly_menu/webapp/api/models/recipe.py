@@ -14,6 +14,8 @@ class Recipe(mongo.Document):
     servs = mongo.IntField(min_value=1)
     estimatedCookingTime = mongo.IntField(min_value=1)
     estimatedPreparationTime = mongo.IntField(min_value=1)
+    rating = mongo.IntField(min_value=1, max_value=5)
+    recipeUrl = mongo.StringField()
     tags = mongo.ListField(
         mongo.StringField()
     )
