@@ -5,7 +5,13 @@ baseUri: http://api.samplehost.com
 
 #Security scheme
 securitySchemes:
-  basic: !include securitySchemes/basic.raml
+  bearer:
+    description: |
+      Basically, you need to set the header 'Authorization' to 'Bearer <API_KEY>'. If you're having trouble with this, email support@stripe.com
+    type: x-bearer
+    describedBy: 
+      headers: 
+        Authorization: 
 
 #Resource Types definition
 resourceTypes:
@@ -97,6 +103,11 @@ types:
       description: string
       note: string
       freezed: boolean
+      rating:
+        type: integer
+        minimum: 1
+        maximum: 5
+      recipeUrl: string
       availabilityMonths:
         type: array
         items: integer
@@ -162,25 +173,30 @@ types:
 
 /users:
   /me:
-    securedBy: basic
     description: Retrieve informaion of the current user
+    securedBy: bearer
     get:
 
 /ingredients:
   type: collection
   is:  [pageable]
+  securedBy: bearer
   /{ingredientId}:
     type: element
+    securedBy: bearer
 
 /recipes:
   type: collection
   is:  [pageable]
+  securedBy: bearer
   /{recipeId}:
     type: element
+    securedBy: bearer
 
 /menus:
   type: collection
   is:  [pageable]
+  securedBy: bearer
   queryParameters:
       from:
         type: string
@@ -193,8 +209,10 @@ types:
         description: search menus just for this date (format: YYYY-MM-DD)
   /{menuId}:
     type: element
+    securedBy: bearer
   /generate:
     description: Generate new menu for the next week
+    securedBy: bearer
     get:
       responses:
         201:
@@ -205,6 +223,7 @@ types:
 /shopping:
   /list:
     description: Retrieve shopping list
+    securedBy: bearer
     get:
       responses:
         200:
@@ -215,6 +234,7 @@ types:
       type: element
   /day:
     description: Get or set the designed day(s) of the week that indicates when the user is used to go to shopping
+    securedBy: bearer
     get:
       responses:
         200:
