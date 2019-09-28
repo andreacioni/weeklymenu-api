@@ -15,7 +15,7 @@ TEST_EMAIL = 'pippo@franco123'
 def clear_db():
   yield
   #Clear all collections
-  User.drop_collection()
+  #User.drop_collection()
   Recipe.drop_collection()
   Menu.drop_collection()
   Ingredient.drop_collection()
