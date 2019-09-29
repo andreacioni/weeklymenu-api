@@ -14,5 +14,5 @@ jobs:
           command: | 
             sudo pip install pipenv
             pipenv install
-            pip install -r requirements.txt
+            sudo pip install -r requirements.txt
             pytest
