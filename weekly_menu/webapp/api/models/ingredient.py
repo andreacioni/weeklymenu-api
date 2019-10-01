@@ -11,6 +11,8 @@ class Ingredient(mongo.Document):
     tags = mongo.ListField(
         mongo.StringField()
     )
+    
+    owner = mongo.ReferenceField('User', required=True)
 
     def __repr__(self):
            return "<Ingredient '{}'>".format(self.name)

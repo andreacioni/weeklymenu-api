@@ -17,7 +17,7 @@ class IngredientsList(Resource):
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        page = Ingredient.objects(id__in=[ing.id for ing in user_info.ingredients_docs]).paginate(page=req_args['page'], per_page=req_args['per_page'])
+        page = Ingredient.objects(owner=str(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
         return page
     
     @jwt_required
@@ -25,13 +25,13 @@ class IngredientsList(Resource):
     @load_user_info
     def post(self, ingredient: Ingredient, user_info: User):
 
+        #Associate user id
+        ingredient.owner = user_info.id
+
         try:
             ingredient.save()
         except NotUniqueError as nue:
             raise DuplicateEntry(description="duplicate entry found for an ingredient", details=nue.args or [])
-
-        user_info.ingredients_docs.append(ingredient)
-        user_info.save()
         
         return ingredient, 201
 
@@ -40,17 +40,17 @@ class IngredientInstance(Resource):
     @load_user_info
     def get(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            return Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
+            return Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
     
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
+            ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
             #Removing references in embedded documents is not automatic (see: https://github.com/MongoEngine/mongoengine/issues/1592)
             Recipe.objects(Q(id__in=[rec.id for rec in user_info.recipes_docs])).update(pull__ingredients__ingredient=ingredient.id)
-            ShoppingList.objects(Q(id__in=[shop_list.id for shop_list in user_info.shopping_list_doc])).update(pull__items__ingredient=ingredient.id)
+            ShoppingList.objects(Q(id=user_info.shopping_list_doc.id)).update(pull__items__ingredient=ingredient.id)
 
             ingredient.delete()
 
@@ -61,6 +61,6 @@ class IngredientInstance(Resource):
     @load_user_info
     def patch(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(id__in=[ing.id for ing in user_info.ingredients_docs])).get_or_404()
+            old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
             new_ingredient = update_document(old_ingredient, new_ingredient)
             return new_ingredient, 200
