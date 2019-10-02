@@ -9,5 +9,7 @@ class ShoppingListItem(mongo.EmbeddedDocument):
 class ShoppingList(mongo.Document):
     items = mongo.EmbeddedDocumentListField('ShoppingListItem')
 
+    owner = mongo.ReferenceField('User', required=True)
+
     def __repr__(self):
            return "<ShoppingList '{}'>".format(self.items)

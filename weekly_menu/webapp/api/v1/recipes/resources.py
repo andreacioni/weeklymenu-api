@@ -17,20 +17,18 @@ class RecipeList(Resource):
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        page = Recipe.objects(id__in=[rec.id for rec in user_info.recipes_docs]).paginate(page=req_args['page'], per_page=req_args['per_page'])
+        page = Recipe.objects(owner=str(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
         return page
     
     @jwt_required
     @validate_payload(RecipeSchema(), 'recipe')
     @load_user_info
     def post(self, recipe: Recipe, user_info: User):
+        recipe.owner = user_info.id
         try:
             recipe.save()
         except NotUniqueError as nue:
             raise DuplicateEntry(description="duplicate entry found for a recipe", details=nue.args or [])
-        
-        user_info.recipes_docs.append(recipe)
-        user_info.save()
 
         return recipe, 201
 
@@ -39,13 +37,13 @@ class RecipeInstance(Resource):
     @load_user_info
     def get(self, user_info: User, recipe_id=''):
         if recipe_id != None:
-            return Recipe.objects(Q(id=recipe_id) & Q(id__in=[rec.id for rec in user_info.recipes_docs])).get_or_404()
+            return Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
     
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, recipe_id=''):
         if recipe_id != None:
-            Recipe.objects(Q(id=recipe_id) & Q(id__in=[rec.id for rec in user_info.recipes_docs])).get_or_404().delete()
+            Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404().delete()
             return "", 204
     
     @jwt_required

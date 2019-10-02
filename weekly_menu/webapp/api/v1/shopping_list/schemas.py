@@ -6,6 +6,10 @@ from ... import mongo
 from ...models import ShoppingList, ShoppingListItem
 
 class ShoppingListSchema(me.ModelSchema):
+
+    #Overriding owner property
+    owner = fields.String(required=False)
+
     class Meta:
         model = ShoppingList
 

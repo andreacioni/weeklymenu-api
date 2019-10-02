@@ -49,8 +49,8 @@ class IngredientInstance(Resource):
             ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
             #Removing references in embedded documents is not automatic (see: https://github.com/MongoEngine/mongoengine/issues/1592)
-            Recipe.objects(Q(id__in=[rec.id for rec in user_info.recipes_docs])).update(pull__ingredients__ingredient=ingredient.id)
-            ShoppingList.objects(Q(id=user_info.shopping_list_doc.id)).update(pull__items__ingredient=ingredient.id)
+            Recipe.objects(owner=user_info.id).update(pull__ingredients__ingredient=ingredient.id)
+            ShoppingList.objects(owner=user_info.id).update(pull__items__ingredient=ingredient.id)
 
             ingredient.delete()
 

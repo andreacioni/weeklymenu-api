@@ -54,7 +54,7 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
   #Remove one ingredient
   response = delete_ingredient(client, response.json['results'][0]['_id']['$oid'], auth_headers)
 
-  assert response.status_code == 200
+  assert response.status_code == 204
 
   response = get_all_ingredients(client, auth_headers)
 

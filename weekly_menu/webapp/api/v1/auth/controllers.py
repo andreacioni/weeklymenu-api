@@ -35,15 +35,6 @@ def register_user(user_meta: PostRegisterUserSchema):
     user.username = user_meta['username']
     user.password = encode_password(user_meta['password'])
     user.email = user_meta['email']
-
-    new_shoppint_list = ShoppingList()
-    new_shoppint_list.save()
-    user.shopping_list_doc = new_shoppint_list
-    
-    try:
-        user.save()
-    except Exception as e:
-        new_shoppint_list.delete()
-        raise e
+    user.save()
     
     return jsonify(user), 200
