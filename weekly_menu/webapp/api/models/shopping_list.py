@@ -11,5 +11,9 @@ class ShoppingList(mongo.Document):
 
     owner = mongo.ReferenceField('User', required=True)
 
+    meta = {
+        'collection' : 'shopping_lists'
+    }
+
     def __repr__(self):
            return "<ShoppingList '{}'>".format(self.items)

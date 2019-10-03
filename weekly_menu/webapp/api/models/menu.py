@@ -9,5 +9,9 @@ class Menu(mongo.Document):
     )
     user = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY) #It could be useful to have an history of user's menu also when they leave
 
+    meta = {
+        'collection' : 'menu'
+    }
+
     def __repr__(self):
            return "<Menu '{}'>".format(self.name)

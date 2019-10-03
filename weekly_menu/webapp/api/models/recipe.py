@@ -21,6 +21,10 @@ class Recipe(mongo.Document):
     )
 
     owner = mongo.ReferenceField('User', required=True)
+
+    meta = {
+        'collection' : 'recipes'
+    }
     
     def __repr__(self):
            return "<Recipe '{}'>".format(self.name)

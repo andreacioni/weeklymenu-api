@@ -14,5 +14,9 @@ class Ingredient(mongo.Document):
     
     owner = mongo.ReferenceField('User', required=True)
 
+    meta = {
+        'collection' : 'ingredients'
+    }
+
     def __repr__(self):
            return "<Ingredient '{}'>".format(self.name)
