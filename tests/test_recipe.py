@@ -4,13 +4,16 @@ from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
 
-from test_ingredient import create_ingredient
+from test_ingredient import create_ingredient, delete_ingredient
 
 def create_recipe(client, json, auth_headers):
   return client.post('/api/v1/recipes', json=json, headers=auth_headers)
 
 def update_recipe(client, recipe_id, json, auth_headers):
   return client.patch('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
+
+def get_recipe(client, recipe_id, auth_headers):
+  return client.get('/api/v1/recipes/{}'.format(recipe_id), headers=auth_headers)
 
 def get_all_recipes(client, auth_headers, page=1, per_page=10):
   return client.get('/api/v1/recipes?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
@@ -93,6 +96,46 @@ def test_duplicate_recipe_not_allowed(client: FlaskClient, auth_headers):
   }, auth_headers)
   
   assert response.status_code == 409
+
+def test_ingredient_remove_from_recipe(client: FlaskClient, auth_headers):
+  tuna = create_ingredient(client, {
+    'name' : 'Tuna'
+  }, auth_headers).json
+
+  tomatoes = create_ingredient(client, {
+    'name' : 'Tomatoes'
+  }, auth_headers).json
+
+  response = create_recipe(client, {
+    'name': 'Tuna and tomatoes',
+    'ingredients' : [
+      {
+        'ingredient' : tuna['_id']['$oid']
+      },{
+        'ingredient' : tomatoes['_id']['$oid']
+      }],
+    'servs': 3
+  }, auth_headers)
+
+  assert response.status_code == 201 and len(response.json['ingredients']) == 2
+
+  recipe = response.json
+
+  delete_ingredient(client, tuna['_id']['$oid'], auth_headers)
+
+  recipe = get_recipe(client, recipe['_id']['$oid'], auth_headers).json
+
+  assert len(recipe['ingredients']) == 1
+
+  delete_ingredient(client, tomatoes['_id']['$oid'], auth_headers)
+
+  recipe = get_recipe(client, recipe['_id']['$oid'], auth_headers).json
+
+  assert len(recipe['ingredients']) == 0
+
+
+  
+
 
 
 

@@ -91,8 +91,7 @@ def test_duplicate_ingredient_not_allowed(client: FlaskClient, auth_headers):
   }, auth_headers)
   
   assert response.status_code == 409
-
-
+  
 
 
 
