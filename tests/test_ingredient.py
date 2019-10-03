@@ -66,8 +66,6 @@ def test_update_ingredient(client: FlaskClient, auth_headers):
     'description': 'this is a tuna'
   } , auth_headers)
 
-  print(auth_headers)
-
   assert response.status_code == 201 and response.json['name'] == 'Tuna' and response.json['description'] == 'this is a tuna'
 
   response = update_ingredient(client, response.json['_id']['$oid'], {
@@ -77,6 +75,24 @@ def test_update_ingredient(client: FlaskClient, auth_headers):
   }, auth_headers)
   
   assert response.status_code == 200 and response.json['description'] == 'always a tuna' and response.json['note'] == 'note about tuna'
+
+def test_duplicate_ingredient_not_allowed(client: FlaskClient, auth_headers):
+  response = create_ingredient(client, {
+    'name': 'Tuna',
+    'description': 'this is a tuna'
+  } , auth_headers)
+
+  assert response.status_code == 201
+
+  response = create_ingredient(client, {
+    'name': 'Tuna',
+    'description': 'always a tuna',
+    'note': 'note about tuna'
+  }, auth_headers)
+  
+  assert response.status_code == 409
+
+
 
 
 

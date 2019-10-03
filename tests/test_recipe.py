@@ -79,7 +79,20 @@ def test_update_recipe(client: FlaskClient, auth_headers):
   
   assert response.status_code == 200 and response.json['servs'] == 3
 
+def test_duplicate_recipe_not_allowed(client: FlaskClient, auth_headers):
+  response = create_recipe(client, {
+    'name': 'Tuna and tomatoes',
+    'servs': 2
+  } , auth_headers)
 
+  assert response.status_code == 201
+
+  response = create_recipe(client, {
+    'name': 'Tuna and tomatoes',
+    'servs': 3
+  }, auth_headers)
+  
+  assert response.status_code == 409
 
 
 
