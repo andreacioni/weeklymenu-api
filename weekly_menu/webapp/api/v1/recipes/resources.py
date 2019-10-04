@@ -24,11 +24,9 @@ class RecipeList(Resource):
     @validate_payload(RecipeSchema(), 'recipe')
     @load_user_info
     def post(self, recipe: Recipe, user_info: User):
-
-        if recipe.owner != user_info.id:
-            raise Forbidden()
-
+        #Associate user id
         recipe.owner = user_info.id
+        
         try:
             recipe.save()
         except NotUniqueError as nue:

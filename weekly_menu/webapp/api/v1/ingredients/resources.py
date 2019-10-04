@@ -24,10 +24,6 @@ class IngredientsList(Resource):
     @validate_payload(IngredientSchema(), 'ingredient')
     @load_user_info
     def post(self, ingredient: Ingredient, user_info: User):
-
-        if ingredient.owner != user_info.id:
-            raise Forbidden()
-
         #Associate user id
         ingredient.owner = user_info.id
 

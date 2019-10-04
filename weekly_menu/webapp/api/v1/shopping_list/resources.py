@@ -21,9 +21,9 @@ class ShoppingListResource(Resource):
     @load_user_info
     @validate_payload(ShoppingListSchema(), 'shopping_list')
     def post(self, user_info: User, shopping_list: ShoppingList): 
-        if shopping_list.owner != user_info.id:
-            raise Forbidden()
-
+        #Associate user id
+        shopping_list.owner = user_info.id
+        
         shopping_list.save()
 
         return shopping_list, 201

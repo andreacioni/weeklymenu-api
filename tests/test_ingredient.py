@@ -92,6 +92,11 @@ def test_duplicate_ingredient_not_allowed(client: FlaskClient, auth_headers):
   
   assert response.status_code == 409
   
+def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
+  
+  response = create_ingredient(client, {
+    'name': 'Garlic',
+    'owner': '123abc'
+  }, auth_headers)
 
-
-
+  assert response.status_code == 201 and str(response.json['owner']) != '123abc'
