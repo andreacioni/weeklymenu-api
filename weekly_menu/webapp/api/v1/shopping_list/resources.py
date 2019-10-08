@@ -11,7 +11,10 @@ from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, update_document, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
 
-class ShoppingListResource(Resource):
+class UserShoppingLists(Resource):
+    pass
+
+class UserShoppingList(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, shopping_list_id: str): 
@@ -28,7 +31,7 @@ class ShoppingListResource(Resource):
 
         return shopping_list, 201
 
-class ShoppingListItemsResource(Resource):
+class UserShoppingListItems(Resource):
     @jwt_required
     @load_user_info
     @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')

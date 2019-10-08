@@ -7,6 +7,7 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     supermarketSection = mongo.StringField()
 
 class ShoppingList(mongo.Document):
+    name = mongo.StringField()
     items = mongo.EmbeddedDocumentListField('ShoppingListItem')
 
     owner = mongo.ReferenceField('User', required=True)

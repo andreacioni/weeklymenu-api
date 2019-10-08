@@ -2,14 +2,19 @@ from .. import BASE_PATH
 
 def create_module(app, api):
     
-    from .resources import ShoppingListResource, ShoppingListItemsResource
+    from .resources import UserShoppingLists, UserShoppingList, UserShoppingListItems
     
     api.add_resource(
-        ShoppingListResource,
-        BASE_PATH + '/shopping-list/<string:shopping_list_id>'
+        UserShoppingLists,
+        BASE_PATH + '/shopping-lists'
     )
 
     api.add_resource(
-        ShoppingListItemsResource,
-        BASE_PATH + '/shopping-list/<string:shopping_list_id>/items'
+        UserShoppingList,
+        BASE_PATH + '/shopping-lists/<string:shopping_list_id>'
+    )
+
+    api.add_resource(
+        UserShoppingListItem,
+        BASE_PATH + '/shopping-lists/<string:shopping_list_id>/items'
     )
