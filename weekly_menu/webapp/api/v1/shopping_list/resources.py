@@ -12,13 +12,11 @@ from ... import validate_payload, paginated, mongo, update_document, load_user_i
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
 
 class UserShoppingLists(Resource):
-    pass
-
-class UserShoppingList(Resource):
     @jwt_required
+    @paginated
     @load_user_info
-    def get(self, user_info: User, shopping_list_id: str): 
-        return ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404(), 200
+    def get(self, req_args, user_info: User): 
+        return ShoppingList.objects(owner=str(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
 
     @jwt_required
     @load_user_info
@@ -30,6 +28,12 @@ class UserShoppingList(Resource):
         shopping_list.save()
 
         return shopping_list, 201
+
+class UserShoppingList(Resource):
+    @jwt_required
+    @load_user_info
+    def get(self, user_info: User, shopping_list_id: str): 
+        return ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404(), 200
 
 class UserShoppingListItems(Resource):
     @jwt_required

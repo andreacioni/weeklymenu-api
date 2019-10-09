@@ -6,31 +6,64 @@ from flask.testing import FlaskClient
 
 from test_ingredient import create_ingredient, delete_ingredient
 
-def create_recipe(client, json, auth_headers):
-  return client.post('/api/v1/recipes', json=json, headers=auth_headers)
+def create_shopping_list(client, json, auth_headers):
+  return client.post('/api/v1/shopping-lists', json=json, headers=auth_headers)
 
-def update_recipe(client, recipe_id, json, auth_headers):
-  return client.patch('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
+def add_item_in_shopping_list(client, shopping_list_id, json, auth_headers):
+  return client.post('/api/v1/shopping-lists/{}/item'.format(shopping_list_id), json=json, headers=auth_headers)
 
-def get_recipe(client, recipe_id, auth_headers):
-  return client.get('/api/v1/recipes/{}'.format(recipe_id), headers=auth_headers)
+def get_shopping_list(client, shopping_list_id, auth_headers):
+  return client.get('/api/v1/shopping-lists/{}'.format(shopping_list_id), headers=auth_headers)
 
-def get_all_recipes(client, auth_headers, page=1, per_page=10):
-  return client.get('/api/v1/recipes?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
+def get_all_shopping_list(client, auth_headers, page=1, per_page=10):
+  return client.get('/api/v1/shopping-lists?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
 
 def test_not_authorized(client: FlaskClient):
-  response = get_all_recipes(client, {})
+  response = get_all_shopping_list(client, {})
   
   assert response.status_code == 401
 
-def test_create_recipe(client: FlaskClient, auth_headers):
-  response = get_all_recipes(client, auth_headers)
-
-  assert response.status_code == 200 and len(response.json['results']) == 0 and response.json['pages'] == 0
-
-  tuna_resp = create_ingredient(client, {
-    'name' : 'Tuna'
+def test_shooping_list_pagination(client: FlaskClient, auth_headers):
+  response = create_shopping_list(client, {
+    'name' : 'list1'
   }, auth_headers)
+
+  assert response.status_code == 201
+
+  response = get_all_shopping_list(client, auth_headers)
+
+  assert response.status_code == 200 and response.json['pages'] == 1 and len(response.json['results']) == 1
+
+  response = create_shopping_list(client, {
+    'name' : 'list2'
+  }, auth_headers)
+
+  assert response.status_code == 201
+
+  response = get_all_shopping_list(client, auth_headers)
+
+  assert response.status_code == 200 and response.json['pages'] == 1 and len(response.json['results']) == 2
+
+def test_create_shopping_list(client: FlaskClient, auth_headers):
+
+  ham = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers)
+
+  tuna = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers)
+
+  response = create_shopping_list(client, {
+    'name' : 'list1',
+    'items' : [
+      {
+        'ingredient'
+      }
+    ]
+  }, auth_headers)
+
+  assert response.status_code == 201
 
   tomato_resp = create_ingredient(client, {
     'name' : 'Tomatoes'
