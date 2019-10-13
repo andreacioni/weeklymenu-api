@@ -4,6 +4,7 @@ class Ingredient(mongo.Document):
     name = mongo.StringField(required=True, unique=True)
     description = mongo.StringField()
     note = mongo.StringField()
+    edible = mongo.BooleanField(required=True, default=True)
     freezed = mongo.BooleanField(default=False)
     availabilityMonths = mongo.ListField(
         mongo.IntField(min_value=1, max_value=12), max_length=12
