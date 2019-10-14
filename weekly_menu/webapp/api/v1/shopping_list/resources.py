@@ -51,3 +51,17 @@ class UserShoppingListItems(Resource):
         shopping_list.save()
 
         return shopping_list, 200
+    
+class UserShoppingListItem(Resource):
+    @jwt_required
+    @load_user_info
+    @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')
+    def patch(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
+
+        if shopping_list_item_id != str(shopping_list_item.id):
+            raise Conflict("can't update an item with different one")
+
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404().update(pull__items__item=ingredient.id)
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404().update(push__items=shopping_list_item)
+
+        return '', 204
