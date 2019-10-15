@@ -21,5 +21,5 @@ def create_module(app, api):
 
     api.add_resource(
         UserShoppingListItem,
-        BASE_PATH + '/shopping-lists/<string:shopping_list_id>/items/<string:shooping_list_item_id>'
+        BASE_PATH + '/shopping-lists/<string:shopping_list_id>/items/<string:shopping_list_item_id>'
     )
