@@ -221,8 +221,10 @@ types:
              type: Menu[]
 
 /shopping:
-  /list:
-    description: Retrieve shopping list
+  /lists:
+    type: collection
+    is: [pageable]
+    description: Retrieve shopping lists for current user
     securedBy: bearer
     get:
       responses:
@@ -230,8 +232,12 @@ types:
           body:
             application/json:
               type: ShoppingList
-    /{itemId}:
+    /{listId}:
+      securedBy: bearer
       type: element
+      /items:
+        securedBy: bearer
+
   /day:
     description: Get or set the designed day(s) of the week that indicates when the user is used to go to shopping
     securedBy: bearer

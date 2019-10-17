@@ -17,13 +17,15 @@ class MenuList(Resource):
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        page = Menu.objects(user=user_info).paginate(page=req_args['page'], per_page=req_args['per_page'])
-        return page
+        return Menu.objects(owner=(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
     
     @jwt_required
     @validate_payload(MenuSchema(), 'menu')
     @load_user_info
     def post(self, menu: Menu, user_info: User):
+        #Associate user id
+        menu.owner = user_info.id
+        
         try:
             menu.save()
         except NotUniqueError as nue:
@@ -35,12 +37,12 @@ class MenuInstance(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, menu_id=''):
-        return Menu.objects(Q(user=user_info) & Q(id=menu_id)).get_or_404()
+        return Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
     
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, menu_id=''):
-        Menu.objects(Q(user=user_info) & Q(id=menu_id)).get_or_404().delete()
+        Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404().delete()
         return "", 204
     
     @jwt_required
@@ -48,6 +50,6 @@ class MenuInstance(Resource):
     @load_user_info
     def patch(self, new_menu: Ingredient, user_info: User, menu_id=''):
         if menu_id != None:
-            old_menu = Menu.objects(Q(user=user_info) & Q(id=menu_id)).get_or_404()
+            old_menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
             new_menu = update_document(old_menu, new_menu)
             return new_menu, 200

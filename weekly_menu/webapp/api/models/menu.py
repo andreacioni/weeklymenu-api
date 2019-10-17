@@ -7,7 +7,7 @@ class Menu(mongo.Document):
     recipes = mongo.ListField(
         mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL)
     )
-    user = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY) #It could be useful to have an history of user's menu also when they leave
+    owner = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY) #It could be useful to have an history of user's menu also when they leave
 
     meta = {
         'collection' : 'menu'
