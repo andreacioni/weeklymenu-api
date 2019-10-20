@@ -48,7 +48,7 @@ class MenuInstance(Resource):
     @jwt_required
     @validate_payload(MenuSchema(), 'new_menu')
     @load_user_info
-    def patch(self, new_menu: Ingredient, user_info: User, menu_id=''):
+    def put(self, new_menu: Ingredient, user_info: User, menu_id=''):
         if menu_id != None:
             old_menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
             new_menu = update_document(old_menu, new_menu)

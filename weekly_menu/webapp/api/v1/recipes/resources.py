@@ -51,7 +51,7 @@ class RecipeInstance(Resource):
     @jwt_required
     @validate_payload(RecipeSchema(), 'new_recipe')
     @load_user_info
-    def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
+    def put(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         if recipe_id != None:
             old_recipe = Recipe.objects(id=recipe_id).get_or_404()
             new_recipe = update_document(old_recipe, new_recipe)

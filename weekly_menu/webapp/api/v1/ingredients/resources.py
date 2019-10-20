@@ -9,7 +9,7 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema
 from ...models import Ingredient, User, Recipe, ShoppingList
-from ... import validate_payload, paginated, mongo, update_document, load_user_info
+from ... import validate_payload, get_payload, paginated, mongo, update_document, patch_document, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden
 
 class IngredientsList(Resource):
@@ -58,8 +58,15 @@ class IngredientInstance(Resource):
     @jwt_required
     @validate_payload(IngredientSchema(), 'new_ingredient')
     @load_user_info
-    def patch(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
-        if ingredient_id != None:
-            old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
-            new_ingredient = update_document(old_ingredient, new_ingredient)
-            return new_ingredient, 200
+    def put(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
+        old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+        new_ingredient = update_document(old_ingredient, new_ingredient)
+        return new_ingredient, 200
+
+    @jwt_required
+    @get_payload('new_ingredient')
+    @load_user_info
+    def patch(self, new_ingredient, user_info: User, ingredient_id=''):
+        old_ingredient = Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+        new_ingredient = patch_document(old_ingredient, new_ingredient)
+        return new_ingredient, 200

@@ -11,7 +11,7 @@ def create_menu(client, json, auth_headers):
   return client.post('/api/v1/menus', json=json, headers=auth_headers)
 
 def update_menu(client, menu_id, json, auth_headers):
-  return client.patch('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
+  return client.put('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
 
 def get_menu(client, menu_id, auth_headers):
   return client.get('/api/v1/menus/{}'.format(menu_id), headers=auth_headers)
@@ -129,10 +129,8 @@ def test_update_menu(client: FlaskClient, auth_headers):
   }, auth_headers).json
 
   assert len(shop_list['recipes']) == 2
-
-  return 
   
-  response = update_recipe_in_menu(client, shop_list['_id']['$oid'], tuna['_id']['$oid'],{
+  response = update_menu(client, {
       'recipe' : ham['_id']['$oid'],
       'checked' : True
   }, auth_headers)

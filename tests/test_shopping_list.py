@@ -13,7 +13,7 @@ def add_item_in_shopping_list(client, shopping_list_id, json, auth_headers):
   return client.post('/api/v1/shopping-lists/{}/items'.format(shopping_list_id), json=json, headers=auth_headers)
 
 def update_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
-  return client.patch('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), json=json, headers=auth_headers)
+  return client.put('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), json=json, headers=auth_headers)
 
 def get_shopping_list(client, shopping_list_id, auth_headers):
   return client.get('/api/v1/shopping-lists/{}'.format(shopping_list_id), headers=auth_headers)

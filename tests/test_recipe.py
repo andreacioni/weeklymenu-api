@@ -10,7 +10,7 @@ def create_recipe(client, json, auth_headers):
   return client.post('/api/v1/recipes', json=json, headers=auth_headers)
 
 def update_recipe(client, recipe_id, json, auth_headers):
-  return client.patch('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
+  return client.put('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
 
 def get_recipe(client, recipe_id, auth_headers):
   return client.get('/api/v1/recipes/{}'.format(recipe_id), headers=auth_headers)

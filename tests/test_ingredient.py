@@ -8,7 +8,10 @@ def create_ingredient(client, json, auth_headers):
   return client.post('/api/v1/ingredients', json=json, headers=auth_headers)
 
 def update_ingredient(client, ing_id, json, auth_headers):
-  return client.patch('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
+  return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
+
+def patch_ingredient(client, ing_id, json, auth_headers):
+  return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
 def delete_ingredient(client, ing_id, auth_headers):
   return client.delete('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
