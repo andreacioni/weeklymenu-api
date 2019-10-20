@@ -10,5 +10,8 @@ class MenuSchema(me.ModelSchema):
     #Overriding owner property
     owner = fields.String(required=False)
 
+    #Overriding datetimefield
+    date = fields.Date(required=True)
+
     class Meta:
         model = Menu
