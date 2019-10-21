@@ -11,7 +11,7 @@ def update_ingredient(client, ing_id, json, auth_headers):
   return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
 def patch_ingredient(client, ing_id, json, auth_headers):
-  return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
+  return client.patch('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
 def delete_ingredient(client, ing_id, auth_headers):
   return client.delete('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
@@ -103,3 +103,34 @@ def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_heade
   }, auth_headers)
 
   assert response.status_code == 201 and str(response.json['owner']) != '123abc'
+
+def test_partial_ingredient_update(client: FlaskClient, auth_headers):
+  
+  tuna = create_ingredient(client, {
+    'name': 'Tuna',
+    'description': 'always a tuna',
+    'note': 'note about tuna',
+    'availabilityMonths': [
+      1, 2
+    ]
+  }, auth_headers).json
+
+  assert tuna['description'] == 'always a tuna'
+
+  response = patch_ingredient(client, tuna['_id']['$oid'], {
+    'description' : 'is a really great tuna',
+    'availabilityMonths': [
+      12
+    ]
+  }, auth_headers)
+
+  assert response.status_code == 200 and response.json['description'] == 'is a really great tuna' and 12 in response.json['availabilityMonths']
+
+  response = patch_ingredient(client, tuna['_id']['$oid'], {
+    'description' : 'is a really great tuna',
+    'availabilityMonths': [
+      12, 13
+    ]
+  }, auth_headers)
+
+  assert response.status_code == 400

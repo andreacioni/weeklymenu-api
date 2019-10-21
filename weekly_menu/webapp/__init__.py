@@ -4,6 +4,7 @@ import traceback
 
 from flask import Flask, request, jsonify
 from werkzeug.exceptions import NotFound, MethodNotAllowed
+from mongoengine.errors import ValidationError
 
 from .api.exceptions import BaseRESTException
 
@@ -67,4 +68,12 @@ def handle_method_not_allowed(e):
             'error': 'METHOD_NOT_ALLOWED',
             'descritpion': 'method not allowed on selected resource',
             'details': []
-    }), 404    
+    }), 404
+
+@app.errorhandler(ValidationError)
+def handle_validation_error(e: ValidationError):
+        return jsonify({
+            'error': 'VALIDATION_ERROR',
+            'descritpion': e.message,
+            'details': [{err : e.errors[err][1].message} for err in e.errors]
+    }), 400

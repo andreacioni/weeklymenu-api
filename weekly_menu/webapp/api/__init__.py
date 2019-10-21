@@ -6,6 +6,7 @@ from flask_restful import Api, reqparse
 from flask_mongoengine import MongoEngine, DoesNotExist
 from flask_jwt_extended import get_jwt_identity
 from mongoengine.queryset.visitor import Q
+from mongoengine.errors import ValidationError
 
 from .exceptions import InvalidPayloadSupplied, BadRequest, Forbidden
 
