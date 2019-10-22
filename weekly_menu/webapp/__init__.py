@@ -75,5 +75,5 @@ def handle_validation_error(e: ValidationError):
         return jsonify({
             'error': 'VALIDATION_ERROR',
             'descritpion': e.message,
-            'details': [{err : e.errors[err][1].message} for err in e.errors]
+            'details': [{err : e.errors[err][1].message} for err in (e.errors or [])]
     }), 400

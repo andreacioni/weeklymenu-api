@@ -5,6 +5,7 @@ from flask_restful import Resource, abort, request
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
+from bson import ObjectId
 
 from .schemas import ShoppingListSchema, ShoppingListItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
@@ -61,6 +62,13 @@ class UserShoppingListItem(Resource):
         if shopping_list_item_id != str(shopping_list_item.item.id):
             raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__item=shopping_list_item)
+
+        return '', 204
+
+    @jwt_required
+    @load_user_info
+    def delete(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str):
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).update(pull__items__item=ObjectId(shopping_list_item_id))
 
         return '', 204

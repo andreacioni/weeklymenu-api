@@ -15,6 +15,9 @@ def add_item_in_shopping_list(client, shopping_list_id, json, auth_headers):
 def update_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
   return client.put('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), json=json, headers=auth_headers)
 
+def delete_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, auth_headers):
+  return client.delete('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), headers=auth_headers)
+
 def get_shopping_list(client, shopping_list_id, auth_headers):
   return client.get('/api/v1/shopping-lists/{}'.format(shopping_list_id), headers=auth_headers)
 
@@ -120,5 +123,34 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
   shop_list = get_shopping_list(client, shop_list['_id']['$oid'], auth_headers).json
 
   assert (shop_list['items'][0]['checked'] == True) and (shop_list['items'][1]['checked'] == True)
+
+def test_remove_shopping_list_item(client: FlaskClient, auth_headers):
+  ham = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers).json
+
+  tuna = create_ingredient(client, {
+    'name': 'tuna'
+  } , auth_headers).json
+
+  shop_list = create_shopping_list(client, {
+    'name' : 'list1',
+    'items' : [
+      {
+        'item' : ham['_id']['$oid']
+      },{
+        'item' : tuna['_id']['$oid']
+      }
+    ]
+  }, auth_headers).json
+
+  response = delete_item_in_shopping_list(client, shop_list['_id']['$oid'], tuna['_id']['$oid'], auth_headers)
+
+  assert response.status_code == 204
+
+  shop_list = get_shopping_list(client, shop_list['_id']['$oid'], auth_headers).json
+
+  assert ham['_id'] in [ it['item'] for it in shop_list['items'] ] and not (tuna['_id'] in [ it['item'] for it in shop_list['items'] ])
+
 
 
