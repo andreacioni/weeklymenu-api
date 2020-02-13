@@ -2,15 +2,24 @@ import os
 import logging
 import traceback
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, json
 from werkzeug.exceptions import NotFound, MethodNotAllowed
+from mongoengine.fields import ObjectId
 from mongoengine.errors import ValidationError
 
 from .api.exceptions import BaseRESTException
 
 _logger = logging.getLogger(__name__)
 
+class ObjectIdJSONEncoder(json.JSONEncoder): 
+    def default(self, o): # pylint: disable=E0202
+        if isinstance(o, ObjectId):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
 app = Flask(__name__)
+
+app.json_encoder = ObjectIdJSONEncoder
 
 def create_app(object_name):
     """
