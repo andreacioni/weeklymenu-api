@@ -18,8 +18,7 @@ def _dereference_ingredients(recipe: Recipe):
                           for ing in recipe.ingredients]
     recipe = recipe.to_mongo()
     for i in range(len(recipe_ingredients)):
-        recipe['ingredients'][i].update(recipe_ingredients[i])
-        del recipe['ingredients'][i]['ingredient']
+        recipe['ingredients'][i]['ingredient'] = recipe_ingredients[i]
     return recipe
 
 
@@ -74,4 +73,13 @@ class RecipeInstance(Resource):
         if recipe_id != None:
             old_recipe = Recipe.objects(id=recipe_id).get_or_404()
             new_recipe = update_document(old_recipe, new_recipe)
-            return new_recipe, 200
+            return new_recipe.to_mongo(), 200
+
+    @jwt_required
+    @load_user_info
+    def patch(self, user_info: User, recipe_id=''):
+        if recipe_id != None:
+            old_recipe = Recipe.objects(id=recipe_id).get_or_404()
+            new_recipe = update_document(old_recipe, new_recipe)
+            return new_recipe.to_mongo(), 200
+
