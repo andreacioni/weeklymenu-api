@@ -9,7 +9,7 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import MenuSchema
 from ...models import Ingredient, User, menu, ShoppingList, Menu
-from ... import validate_payload, paginated, mongo, update_document, load_user_info
+from ... import validate_payload, paginated, mongo, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest
 
 class MenuList(Resource):

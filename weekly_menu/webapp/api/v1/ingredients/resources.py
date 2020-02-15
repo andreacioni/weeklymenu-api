@@ -9,7 +9,7 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema
 from ...models import Ingredient, User, Recipe, ShoppingList
-from ... import validate_payload, get_payload, paginated, mongo, update_document, patch_document, load_user_info
+from ... import validate_payload, get_payload, paginated, mongo, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden
 
 class IngredientsList(Resource):

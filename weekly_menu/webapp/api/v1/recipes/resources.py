@@ -4,12 +4,12 @@ from flask import jsonify
 from flask_restful import Resource, abort, request
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import NotUniqueError
-from mongoengine.fields import ObjectIdField
+from mongoengine.fields import ObjectIdField, ObjectId
 from mongoengine.queryset.visitor import Q
 
 from .schemas import RecipeSchema
 from ...models import Recipe, User
-from ... import validate_payload, paginated, mongo, update_document, load_user_info
+from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest
 
 
@@ -70,16 +70,26 @@ class RecipeInstance(Resource):
     @validate_payload(RecipeSchema(), 'new_recipe')
     @load_user_info
     def put(self, new_recipe: Recipe, user_info: User, recipe_id=''):
-        if recipe_id != None:
-            old_recipe = Recipe.objects(id=recipe_id).get_or_404()
-            new_recipe = update_document(old_recipe, new_recipe)
-            return new_recipe.to_mongo(), 200
+        old_recipe = Recipe.objects(id=recipe_id).get_or_404()
+
+        result = put_document(Recipe, new_recipe, old_recipe)
+
+        if(result['n'] != 1):
+            BadRequest(description='no matching recipe with id: {}'.format(recipe_id))
+        
+        old_recipe.reload()
+        return old_recipe.to_mongo(), 200
 
     @jwt_required
+    @validate_payload(RecipeSchema(), 'new_recipe')
     @load_user_info
-    def patch(self, user_info: User, recipe_id=''):
-        if recipe_id != None:
-            old_recipe = Recipe.objects(id=recipe_id).get_or_404()
-            new_recipe = update_document(old_recipe, new_recipe)
-            return new_recipe.to_mongo(), 200
+    def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
+        old_recipe = Recipe.objects(id=recipe_id).get_or_404()
 
+        result = patch_document(Recipe, new_recipe, old_recipe)
+
+        if(result['n'] != 1):
+            BadRequest(description='no matching recipe with id: {}'.format(recipe_id))
+        
+        old_recipe.reload()
+        return old_recipe.to_mongo(), 200

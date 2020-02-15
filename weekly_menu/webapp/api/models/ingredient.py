@@ -1,7 +1,7 @@
 from .. import mongo
 
 class Ingredient(mongo.Document):
-    name = mongo.StringField(required=True, unique=True)
+    name = mongo.StringField(required=True)
     description = mongo.StringField()
     note = mongo.StringField()
     edible = mongo.BooleanField(required=True, default=True)

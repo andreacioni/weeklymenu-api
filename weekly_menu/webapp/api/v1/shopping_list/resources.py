@@ -9,7 +9,7 @@ from bson import ObjectId
 
 from .schemas import ShoppingListSchema, ShoppingListItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
-from ... import validate_payload, paginated, mongo, update_document, load_user_info
+from ... import validate_payload, paginated, mongo, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
 
 class UserShoppingLists(Resource):
