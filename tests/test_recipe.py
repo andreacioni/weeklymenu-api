@@ -9,7 +9,7 @@ from test_ingredient import create_ingredient, delete_ingredient
 def create_recipe(client, json, auth_headers):
   return client.post('/api/v1/recipes', json=json, headers=auth_headers)
 
-def update_recipe(client, recipe_id, json, auth_headers):
+def replace_recipe(client, recipe_id, json, auth_headers):
   return client.put('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
 
 def get_recipe(client, recipe_id, auth_headers):
@@ -50,11 +50,11 @@ def test_create_recipe(client: FlaskClient, auth_headers):
   assert response.status_code == 201 and response.json['name'] == 'Tuna and tomatoes'
 
   # Test fail duplicating ingredient
-  response = create_recipe(client, {
-    'name': 'Tuna and tomatoes'
-  } , auth_headers)
+  #response = create_recipe(client, {
+  #  'name': 'Tuna and tomatoes'
+  #} , auth_headers)
 
-  assert response.status_code == 409
+  #assert response.status_code == 409
 
   response = create_recipe(client, {
     'name': 'Pizza'
@@ -67,7 +67,7 @@ def test_create_recipe(client: FlaskClient, auth_headers):
 
   assert response.status_code == 200 and response.json['pages'] == 2
 
-def test_update_recipe(client: FlaskClient, auth_headers):
+def test_replace_recipe(client: FlaskClient, auth_headers):
   response = create_recipe(client, {
     'name': 'Tuna and tomatoes',
     'servs': 2
@@ -75,7 +75,7 @@ def test_update_recipe(client: FlaskClient, auth_headers):
 
   assert response.status_code == 201 and response.json['servs'] == 2
 
-  response = update_recipe(client, response.json['_id']['$oid'], {
+  response = replace_recipe(client, response.json['_id']['$oid'], {
     'name': 'Tuna and tomatoes',
     'servs': 3
   }, auth_headers)
@@ -100,46 +100,6 @@ def test_duplicate_recipe_allowed(client: FlaskClient, auth_headers):
   response = get_all_recipes(client, auth_headers)
 
   assert response.status_code == 200 and len(response.json['results']) == 2 and response.json['pages'] == 1
-
-
-def test_ingredient_remove_from_recipe(client: FlaskClient, auth_headers):
-  tuna = create_ingredient(client, {
-    'name' : 'Tuna'
-  }, auth_headers).json
-
-  tomatoes = create_ingredient(client, {
-    'name' : 'Tomatoes'
-  }, auth_headers).json
-
-  response = create_recipe(client, {
-    'name': 'Tuna and tomatoes',
-    'ingredients' : [
-      {
-        'ingredient' : tuna['_id']['$oid']
-      },{
-        'ingredient' : tomatoes['_id']['$oid']
-      }],
-    'servs': 3
-  }, auth_headers)
-
-  assert response.status_code == 201 and len(response.json['ingredients']) == 2
-
-  recipe = response.json
-
-  delete_ingredient(client, tuna['_id']['$oid'], auth_headers)
-
-  recipe = get_recipe(client, recipe['_id']['$oid'], auth_headers).json
-
-  assert len(recipe['ingredients']) == 1
-
-  delete_ingredient(client, tomatoes['_id']['$oid'], auth_headers)
-
-  recipe = get_recipe(client, recipe['_id']['$oid'], auth_headers).json
-
-  assert len(recipe['ingredients']) == 0
-
-
-  
 
 
 

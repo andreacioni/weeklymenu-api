@@ -17,7 +17,7 @@ def _retrieve_base_recipe(recipe_id: str, user_id: str) -> Recipe:
     return Recipe.objects(Q(owner=user_id) & Q(id=recipe_id)).get_or_404()
 
 
-class RecipeIngredientList(Resource):
+class RecipeIngredientsList(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, recipe_id=''):

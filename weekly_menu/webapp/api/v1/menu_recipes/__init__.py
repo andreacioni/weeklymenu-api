@@ -2,7 +2,7 @@ from .. import BASE_PATH
 
 def create_module(app, api):
     
-    from .resources import MenuRecipeList, MenuRecipesInstance
+    from .resources import MenuRecipesList, MenuRecipesInstance
     
     api.add_resource(
         MenuRecipesList,

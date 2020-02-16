@@ -17,7 +17,7 @@ def _retrieve_base_menu(menu_id: str, user_id: str) -> Recipe:
     return Recipe.objects(Q(owner=user_id) & Q(id=menu_id)).get_or_404()
 
 
-class MenuRecipeList(Resource):
+class MenuRecipesList(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, menu_id=''):
@@ -34,7 +34,7 @@ class MenuRecipeList(Resource):
         return menu_recipe, 201
 
 
-class MenuRecipeInstance(Resource):
+class MenuRecipesInstance(Resource):
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, menu_id='', ingredient_id=''):

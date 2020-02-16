@@ -14,7 +14,7 @@ from ...exceptions import DuplicateEntry, BadRequest
 
 def _dereference_recipes(menu: Menu):
     if menu.recipes != None:
-        menu_recipes = [recipe.recipes.to_mongo()
+        menu_recipes = [recipe.to_mongo()
                             for recipe in menu.recipes]
         menu = menu.to_mongo()
         for i in range(len(menu_recipes)):
