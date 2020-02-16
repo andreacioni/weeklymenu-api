@@ -4,42 +4,54 @@ from flask import jsonify
 from flask_restful import Resource, abort, request
 from flask_jwt_extended import jwt_required
 from mongoengine.errors import NotUniqueError
-from mongoengine.fields import ObjectIdField
+from mongoengine.fields import ObjectIdField, ObjectId
 from mongoengine.queryset.visitor import Q
 
-from .schemas import RecipeSchema
-from ...models import RecipeIngredient, User
-from ... import validate_payload, paginated, mongo, update_document, load_user_info
+from .schemas import RecipeIngredientSchema
+from ...models import Recipe, RecipeIngredient, User
+from ... import validate_payload, paginated, mongo, load_user_info, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest
+
+
+def _retrieve_base_recipe(recipe_id: str, user_id: str) -> Recipe:
+    return Recipe.objects(Q(owner=user_id) & Q(id=recipe_id)).get_or_404()
 
 
 class RecipeIngredientList(Resource):
     @jwt_required
     @load_user_info
-    def get(self, req_args, user_info: User):
-        page = Recipe.objects(owner=str(user_info.id)).paginate(
-            page=req_args['page'], per_page=req_args['per_page'])
-        page.items = [_dereference_ingredient(item) for item in page.items]
-        return page
+    def get(self, user_info: User, recipe_id=''):
+        recipe = _retrieve_base_recipe(recipe_id, str(user_info.id))
+        return [recipe_ingredient.to_mongo() for recipe_ingredient in recipe.ingredients] if recipe.ingredients != None else []
 
     @jwt_required
-    @validate_payload(RecipeSchema(), 'recipe')
+    @validate_payload(RecipeIngredientSchema(), 'recipe_ingredient')
     @load_user_info
-    def post(self, recipe: Recipe, user_info: User):
-        # Associate user id
-        recipe.owner = user_info.id
-
-        try:
-            recipe.save()
-        except NotUniqueError as nue:
-            raise DuplicateEntry(
-                description="duplicate entry found for a recipe", details=nue.args or [])
-
-        return recipe, 201
+    def post(self, recipe_id, recipe_ingredient: RecipeIngredient, user_info: User):
+        recipe = _retrieve_base_recipe(recipe_id, str(user_info.id))
+        recipe.ingredients.append(recipe_ingredient)
+        recipe.save()
+        return recipe_ingredient, 201
 
 
 class RecipeIngredientInstance(Resource):
     @jwt_required
+    @load_user_info
+    def delete(self, user_info: User, recipe_id='', ingredient_id=''):
+        recipe = _retrieve_base_recipe(recipe_id, str(user_info.id))
+        
+        if recipe.ingredients != None and len(recipe.ingredients) == 1:
+            raise BadRequest('no ingredients to delete for this recipe')
+
+        ingredient_id = ObjectId(ingredient_id)
+
+        recipe.ingredients = [recipe_ingredient for recipe_ingredient in recipe.ingredients if recipe_ingredient.ingredient.id != ingredient_id]
+
+        recipe.save()
+
+        return "", 204
+   
+    """ @jwt_required
     @load_user_info
     def get(self, user_info: User, recipe_id=''):
         if recipe_id != None:
@@ -49,18 +61,10 @@ class RecipeIngredientInstance(Resource):
             return _dereference_ingredient(recipe)
 
     @jwt_required
-    @load_user_info
-    def delete(self, user_info: User, recipe_id=''):
-        if recipe_id != None:
-            Recipe.objects(Q(id=recipe_id) & Q(
-                owner=str(user_info.id))).get_or_404().delete()
-            return "", 204
-
-    @jwt_required
     @validate_payload(RecipeSchema(), 'new_recipe')
     @load_user_info
     def put(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         if recipe_id != None:
             old_recipe = Recipe.objects(id=recipe_id).get_or_404()
             new_recipe = update_document(old_recipe, new_recipe)
-            return new_recipe, 200
+            return new_recipe, 200 """

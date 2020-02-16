@@ -127,6 +127,7 @@ def paginated(func):
 
         return jsonify({
             "results": page.items,
+            #TODO "results": [item.to_mongo() for item in page.items],
             "pages": page.pages
         })
 

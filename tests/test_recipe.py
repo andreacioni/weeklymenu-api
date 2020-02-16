@@ -82,7 +82,7 @@ def test_update_recipe(client: FlaskClient, auth_headers):
   
   assert response.status_code == 200 and response.json['servs'] == 3
 
-def test_duplicate_recipe_not_allowed(client: FlaskClient, auth_headers):
+def test_duplicate_recipe_allowed(client: FlaskClient, auth_headers):
   response = create_recipe(client, {
     'name': 'Tuna and tomatoes',
     'servs': 2
@@ -95,7 +95,12 @@ def test_duplicate_recipe_not_allowed(client: FlaskClient, auth_headers):
     'servs': 3
   }, auth_headers)
   
-  assert response.status_code == 409
+  assert response.status_code == 201
+
+  response = get_all_recipes(client, auth_headers)
+
+  assert response.status_code == 200 and len(response.json['results']) == 2 and response.json['pages'] == 1
+
 
 def test_ingredient_remove_from_recipe(client: FlaskClient, auth_headers):
   tuna = create_ingredient(client, {

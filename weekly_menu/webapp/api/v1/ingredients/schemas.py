@@ -19,3 +19,8 @@ class IngredientSchema(me.ModelSchema):
 
     class Meta:
         model = Ingredient
+
+class IngredientSchemaWithoutName(IngredientSchema):
+
+    #Overriding name property
+    name = fields.String(required=False)

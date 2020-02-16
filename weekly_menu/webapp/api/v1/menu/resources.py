@@ -9,15 +9,27 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import MenuSchema
 from ...models import Ingredient, User, menu, ShoppingList, Menu
-from ... import validate_payload, paginated, mongo, load_user_info
+from ... import validate_payload, paginated, mongo, load_user_info, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest
+
+def _dereference_recipes(menu: Menu):
+    if menu.recipes != None:
+        menu_recipes = [recipe.recipes.to_mongo()
+                            for recipe in menu.recipes]
+        menu = menu.to_mongo()
+        for i in range(len(menu_recipes)):
+            menu['recipes'][i] = menu_recipes[i]
+    return menu
 
 class MenuList(Resource):
     @jwt_required
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        return Menu.objects(owner=(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
+        page = Menu.objects(owner=str(user_info.id)).paginate(
+            page=req_args['page'], per_page=req_args['per_page'])
+        page.items = [_dereference_recipes(item) for item in page.items]
+        return page
     
     @jwt_required
     @validate_payload(MenuSchema(), 'menu')
@@ -37,7 +49,9 @@ class MenuInstance(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, menu_id=''):
-        return Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
+        menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
+
+        return _dereference_recipes(menu)
     
     @jwt_required
     @load_user_info
@@ -49,7 +63,26 @@ class MenuInstance(Resource):
     @validate_payload(MenuSchema(), 'new_menu')
     @load_user_info
     def put(self, new_menu: Ingredient, user_info: User, menu_id=''):
-        if menu_id != None:
-            old_menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
-            new_menu = update_document(old_menu, new_menu)
-            return new_menu, 200
+        old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
+
+        result = put_document(Menu, new_menu, old_menu)
+
+        if(result['n'] != 1):
+            BadRequest(description='no matching menu with id: {}'.format(menu_id))
+        
+        old_menu.reload()
+        return old_menu, 200
+
+    @jwt_required
+    @validate_payload(MenuSchema(), 'new_menu')
+    @load_user_info
+    def patch(self, new_menu: Menu, user_info: User, menu_id=''):
+        old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
+
+        result = patch_document(Menu, new_menu, old_menu)
+
+        if(result['n'] != 1):
+            BadRequest(description='no matching menu with id: {}'.format(menu_id))
+        
+        old_menu.reload()
+        return old_menu, 200

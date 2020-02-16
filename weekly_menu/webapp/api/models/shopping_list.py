@@ -2,13 +2,13 @@ from .. import mongo
 from ..models import Ingredient
 
 class ShoppingListItem(mongo.EmbeddedDocument):
-    checked = mongo.BooleanField(required=True, default=False)
+    checked = mongo.BooleanField(required=True)
     item = mongo.ReferenceField('Ingredient')
     supermarketSection = mongo.StringField()
 
 class ShoppingList(mongo.Document):
     name = mongo.StringField(unique=True)
-    items = mongo.EmbeddedDocumentListField('ShoppingListItem')
+    items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
     owner = mongo.ReferenceField('User', required=True)
 

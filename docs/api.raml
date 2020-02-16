@@ -192,6 +192,12 @@ types:
   /{recipeId}:
     type: element
     securedBy: bearer
+    /ingredients:
+      type: collection
+      securedBy: bearer
+        /{ingredientId}:
+          type: element
+          securedBy: bearer
 
 /menus:
   type: collection
@@ -210,6 +216,12 @@ types:
   /{menuId}:
     type: element
     securedBy: bearer
+    /recipes:
+      type: collection
+      securedBy: bearer
+        /{recipeId}:
+          type: element
+          securedBy: bearer
   /generate:
     description: Generate new menu for the next week
     securedBy: bearer

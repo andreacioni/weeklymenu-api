@@ -3,7 +3,7 @@ from .. import mongo
 
 class RecipeIngredient(mongo.EmbeddedDocument):
     quantity = mongo.FloatField()
-    required = mongo.BooleanField(required=True)
+    required = mongo.BooleanField()
     ingredient = mongo.ReferenceField('Ingredient', required=True)
 
 
