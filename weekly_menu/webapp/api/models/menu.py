@@ -1,8 +1,8 @@
 from .. import mongo
 
 class Menu(mongo.Document):
-    name = mongo.StringField(required=True)
-    date = mongo.DateTimeField(required=True)
+    name = mongo.StringField()
+    date = mongo.DateField(required=True)
     meal = mongo.StringField('Meal')
     recipes = mongo.ListField(
         mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL), default=None

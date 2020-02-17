@@ -4,8 +4,9 @@ import traceback
 
 from flask import Flask, request, jsonify, json
 from werkzeug.exceptions import NotFound, MethodNotAllowed
-from mongoengine.fields import ObjectId
+from mongoengine.fields import ObjectId, DateField
 from mongoengine.errors import ValidationError
+from datetime import datetime
 
 from .api.exceptions import BaseRESTException
 
@@ -15,6 +16,8 @@ class ObjectIdJSONEncoder(json.JSONEncoder):
     def default(self, o): # pylint: disable=E0202
         if isinstance(o, ObjectId):
             return str(o)
+        if isinstance(o, datetime):
+            return o.strftime("%Y-%m-%d")
         return json.JSONEncoder.default(self, o)
 
 app = Flask(__name__)

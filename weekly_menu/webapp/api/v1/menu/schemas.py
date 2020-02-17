@@ -5,12 +5,13 @@ from marshmallow import Schema, fields, validates_schema, ValidationError
 from ... import mongo
 from ...models import Menu
 
+
 class MenuSchema(me.ModelSchema):
 
-    #Overriding owner property
+    # Overriding owner property
     owner = fields.String(required=False)
 
-    #Overriding datetimefield
+    # Overriding datetimefield
     date = fields.Date(required=True)
 
     @validates_schema(pass_original=True)
@@ -21,3 +22,8 @@ class MenuSchema(me.ModelSchema):
 
     class Meta:
         model = Menu
+
+
+class MenuWithoutDateSchema(MenuSchema):
+
+    date = fields.Date(required=False)

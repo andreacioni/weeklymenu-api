@@ -17,7 +17,7 @@ def replace_menu(client, menu_id, json, auth_headers):
 
 
 def patch_menu(client, menu_id, json, auth_headers):
-    return client.put('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
+    return client.patch('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
 
 
 def get_menu(client, menu_id, auth_headers):
@@ -121,9 +121,9 @@ def test_create_menu(client: FlaskClient, auth_headers):
 
     assert response.status_code == 201
 
-    response = get_menu(client, response.json['_id']['$oid'], auth_headers)
+    response = get_menu(client, response.json['_id'], auth_headers)
 
-    assert response.status_code == 200
+    assert response.status_code == 200 and response.json['date'] == '2019-10-11'
 
 
 def test_update_menu(client: FlaskClient, auth_headers):
@@ -161,7 +161,7 @@ def test_update_menu(client: FlaskClient, auth_headers):
         ]
     }, auth_headers).json
 
-    shop_list = create_menu(client, {
+    menu_response = create_menu(client, {
         'name': 'Menu 1',
         'date': '2019-10-11',
         'recipes': [
@@ -170,34 +170,10 @@ def test_update_menu(client: FlaskClient, auth_headers):
         ]
     }, auth_headers).json
 
-    assert len(shop_list['recipes']) == 2
+    assert len(menu_response['recipes']) == 2 and menu_response['date'] == '2019-10-11'
 
-    response = patch_menu(client, {
-        'name': True
+    response = patch_menu(client, menu_response['_id'],  {
+        'date': '2019-10-12'
     }, auth_headers)
 
-    assert response.status_code == 409
-
-    response = update_recipe_in_menu(client, shop_list['_id']['$oid'], tuna['_id']['$oid'], {
-        'recipe': tuna['_id']['$oid'],
-        'checked': True
-    }, auth_headers)
-
-    assert response.status_code == 204
-
-    shop_list = get_menu(client, shop_list['_id']['$oid'], auth_headers).json
-
-    assert (shop_list['recipes'][0]['checked'] == False) and (
-        shop_list['recipes'][1]['checked'] == True)
-
-    response = update_recipe_in_menu(client, shop_list['_id']['$oid'], ham['_id']['$oid'], {
-        'recipe': ham['_id']['$oid'],
-        'checked': True
-    }, auth_headers)
-
-    assert response.status_code == 204
-
-    shop_list = get_menu(client, shop_list['_id']['$oid'], auth_headers).json
-
-    assert (shop_list['recipes'][0]['checked'] == True) and (
-        shop_list['recipes'][1]['checked'] == True)
+    assert response.status_code == 200 and response.json['_id'] == menu_response['_id'] and response.json['date'] == '2019-10-12'
