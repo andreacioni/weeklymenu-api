@@ -30,6 +30,16 @@ def test_not_authorized(client: FlaskClient):
 
     assert response.status_code == 401
 
+def test_owner_update(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'ham'
+    }, auth_headers)
+
+    response = patch_ingredient(client, response.json['_id']['$oid'], {
+        'owner': 'pippo'
+    }, auth_headers)
+
+    assert response.status_code >= 400
 
 def test_create_ingredient(client: FlaskClient, auth_headers):
     response = get_all_ingredients(client, auth_headers)
@@ -42,7 +52,7 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 201 and response.json[
-        'name'] == 'ham' and response.json['freezed'] == False
+        'name'] == 'ham'
 
     # TODO uniqueness in collection cannot be guarateeded across different users
     # Test fail duplicating ingredient

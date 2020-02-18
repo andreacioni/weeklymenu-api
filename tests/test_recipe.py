@@ -23,6 +23,9 @@ def test_not_authorized(client: FlaskClient):
   
   assert response.status_code == 401
 
+def test_owner_update(client: FlaskClient, auth_headers):
+    assert False
+
 def test_create_recipe(client: FlaskClient, auth_headers):
   response = get_all_recipes(client, auth_headers)
 

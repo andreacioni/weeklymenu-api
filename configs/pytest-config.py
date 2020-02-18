@@ -8,7 +8,7 @@ JSON_SORT_KEYS=False
 
 #MongoDb
 MONGODB_SETTINGS={
-    'host': 'mongodb://localhost:27017/test'
+    'host': 'mongomock://localhost:27017/test?socketTimeoutMS=1000'
 }
 
 #JWT

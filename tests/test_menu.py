@@ -33,6 +33,8 @@ def test_not_authorized(client: FlaskClient):
 
     assert response.status_code == 401
 
+def test_owner_update(client: FlaskClient, auth_headers):
+    assert False
 
 def test_menu_date_required(client: FlaskClient, auth_headers):
     response = create_menu(client, {

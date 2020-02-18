@@ -3,7 +3,7 @@ import marshmallow_mongoengine as me
 from marshmallow import Schema, fields, validates_schema, ValidationError
 
 from ... import mongo
-from ...models import Recipe
+from ...models import Recipe, RecipeIngredient
 
 class RecipeSchema(me.ModelSchema):
 
@@ -23,3 +23,8 @@ class RecipeSchemaWithoutName(RecipeSchema):
 
     #Overriding name property
     name = fields.String(required=False)
+
+class RecipeIngredientSchema(me.ModelSchema):
+
+    class Meta:
+        model = RecipeIngredient

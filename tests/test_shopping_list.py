@@ -64,9 +64,11 @@ def test_create_shopping_list(client: FlaskClient, auth_headers):
     'name' : 'list1',
     'items' : [
       {
-        'item' : ham['_id']['$oid']
+        'item' : ham['_id']['$oid'],
+        'checked': False
       },{
-        'item' : tuna['_id']['$oid']
+        'item' : tuna['_id']['$oid'],
+        'checked': False
       }
     ]
   }, auth_headers)
@@ -86,9 +88,11 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
     'name' : 'list1',
     'items' : [
       {
-        'item' : ham['_id']['$oid']
+        'item' : ham['_id']['$oid'],
+        'checked': False
       },{
-        'item' : tuna['_id']['$oid']
+        'item' : tuna['_id']['$oid'],
+        'checked': False
       }
     ]
   }, auth_headers).json
@@ -137,9 +141,11 @@ def test_remove_shopping_list_item(client: FlaskClient, auth_headers):
     'name' : 'list1',
     'items' : [
       {
-        'item' : ham['_id']['$oid']
+        'item' : ham['_id']['$oid'],
+        'checked' : True
       },{
-        'item' : tuna['_id']['$oid']
+        'item' : tuna['_id']['$oid'],
+        'checked' : True
       }
     ]
   }, auth_headers).json
