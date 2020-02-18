@@ -29,6 +29,36 @@ def test_not_authorized(client: FlaskClient):
   
   assert response.status_code == 401
 
+def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
+
+    response = create_shopping_list(client, {
+      'name' : 'list1',
+      'items' : [],
+      'owner' : 'pippo'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+def test_owner_update(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'ham'
+    }, auth_headers)
+
+    recipe_id = response.json['_id']['$oid']
+
+    # Try to update owner using an integer instead of a string
+    response = patch_recipe(client, response.json['_id']['$oid'], {
+        'owner': 1
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    # Try to update owner using a valid objectId (from recipe_id)
+    response = patch_recipe(client, recipe_id, {
+        'owner': recipe_id
+    }, auth_headers)
+
+    assert response.status_code == 403
 def test_shooping_list_pagination(client: FlaskClient, auth_headers):
   response = create_shopping_list(client, {
     'name' : 'list1'

@@ -51,3 +51,7 @@ class DuplicateEntry(BaseRESTException):
 class NotFound(BaseRESTException):
     def __init__(self, description=None, details=None):
         super().__init__(404, 'NOT_FOUND', description, details)
+
+class CannotUpdateResourceOwner(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(403, 'CANNOT_UPDATE_OWNER', description)

@@ -4,6 +4,7 @@ from marshmallow import Schema, fields, validates_schema, ValidationError
 
 from ... import mongo
 from ...models import Ingredient
+from ...exceptions import CannotUpdateResourceOwner
 
 
 class IngredientSchema(me.ModelSchema):
@@ -16,6 +17,11 @@ class IngredientSchema(me.ModelSchema):
         unknown = set(original_data) - set(self.fields)
         if unknown:
             raise ValidationError('Unknown field', unknown)
+
+    @validates_schema
+    def check_owner_overwrite(self, data):
+        if 'owner' in data:
+            raise CannotUpdateResourceOwner('Can\'t overwrite owner property')
 
     class Meta:
         model = Ingredient

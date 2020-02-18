@@ -33,8 +33,37 @@ def test_not_authorized(client: FlaskClient):
 
     assert response.status_code == 401
 
+def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
+
+    response = create_menu(client, {
+        'name': 'Menu1',
+        'date': '2019-12-13',
+        'owner' : '123456'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
 def test_owner_update(client: FlaskClient, auth_headers):
-    assert False
+    response = create_menu(client, {
+        'name': 'Menu1',
+        'date': '2019-12-13'
+    }, auth_headers)
+
+    menu_id = response.json['_id']
+
+    # Try to update owner using an integer instead of a string
+    response = patch_menu(client, menu_id, {
+        'owner': 1
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    # Try to update owner using a valid objectId (from menu)
+    response = patch_menu(client, menu_id, {
+        'owner': menu_id
+    }, auth_headers)
+
+    assert response.status_code == 403
 
 def test_menu_date_required(client: FlaskClient, auth_headers):
     response = create_menu(client, {

@@ -9,6 +9,9 @@ from test_ingredient import create_ingredient, delete_ingredient
 def create_recipe(client, json, auth_headers):
   return client.post('/api/v1/recipes', json=json, headers=auth_headers)
 
+def patch_recipe(client, recipe_id, json, auth_headers):
+  return client.patch('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
+
 def replace_recipe(client, recipe_id, json, auth_headers):
   return client.put('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
 
@@ -23,8 +26,35 @@ def test_not_authorized(client: FlaskClient):
   
   assert response.status_code == 401
 
+def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
+
+    response = create_recipe(client, {
+        'name': 'ham',
+        'owner': 'pippo'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
 def test_owner_update(client: FlaskClient, auth_headers):
-    assert False
+    response = create_ingredient(client, {
+        'name': 'ham'
+    }, auth_headers)
+
+    recipe_id = response.json['_id']['$oid']
+
+    # Try to update owner using an integer instead of a string
+    response = patch_recipe(client, response.json['_id']['$oid'], {
+        'owner': 1
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    # Try to update owner using a valid objectId (from recipe_id)
+    response = patch_recipe(client, recipe_id, {
+        'owner': recipe_id
+    }, auth_headers)
+
+    assert response.status_code == 403
 
 def test_create_recipe(client: FlaskClient, auth_headers):
   response = get_all_recipes(client, auth_headers)

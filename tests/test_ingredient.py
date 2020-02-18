@@ -30,16 +30,35 @@ def test_not_authorized(client: FlaskClient):
 
     assert response.status_code == 401
 
+def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
+
+    response = create_ingredient(client, {
+        'name': 'Garlic',
+        'owner': '123abc'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
 def test_owner_update(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
         'name': 'ham'
     }, auth_headers)
 
+    ingredient_id = response.json['_id']['$oid']
+
+    # Try to update owner using an integer instead of a string
     response = patch_ingredient(client, response.json['_id']['$oid'], {
-        'owner': 'pippo'
+        'owner': 1
     }, auth_headers)
 
-    assert response.status_code >= 400
+    assert response.status_code == 400
+
+    # Try to update owner using a valid objectId (from ingredient)
+    response = patch_ingredient(client, ingredient_id, {
+        'owner': ingredient_id
+    }, auth_headers)
+
+    assert response.status_code == 403
 
 def test_create_ingredient(client: FlaskClient, auth_headers):
     response = get_all_ingredients(client, auth_headers)
@@ -126,17 +145,6 @@ def test_duplicate_ingredient_allowed(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 and response.json['pages'] == 1 and len(
         response.json['results']) == 2
-
-
-def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
-
-    response = create_ingredient(client, {
-        'name': 'Garlic',
-        'owner': '123abc'
-    }, auth_headers)
-
-    assert response.status_code == 201 and str(
-        response.json['owner']) != '123abc'
 
 
 def test_partial_ingredient_update(client: FlaskClient, auth_headers):
