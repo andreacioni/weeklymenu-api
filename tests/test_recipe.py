@@ -12,6 +12,9 @@ def create_recipe(client, json, auth_headers):
 def patch_recipe(client, recipe_id, json, auth_headers):
   return client.patch('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
 
+def put_recipe(client, recipe_id, json, auth_headers):
+  return client.put('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
+
 def replace_recipe(client, recipe_id, json, auth_headers):
   return client.put('/api/v1/recipes/{}'.format(recipe_id), json=json, headers=auth_headers)
 
@@ -25,6 +28,28 @@ def test_not_authorized(client: FlaskClient):
   response = get_all_recipes(client, {})
   
   assert response.status_code == 401
+
+def test_create_with_supplied_id(client: FlaskClient, auth_headers):
+    response = create_recipe(client, {
+        'name': 'Menu',
+        'id': '5e4ae04561fe8235a5a18824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = patch_recipe(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Menu',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = put_recipe(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Menu',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
 
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
 

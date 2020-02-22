@@ -19,6 +19,8 @@ def replace_menu(client, menu_id, json, auth_headers):
 def patch_menu(client, menu_id, json, auth_headers):
     return client.patch('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
 
+def put_menu(client, menu_id, json, auth_headers):
+    return client.put('/api/v1/menus/{}'.format(menu_id), json=json, headers=auth_headers)
 
 def get_menu(client, menu_id, auth_headers):
     return client.get('/api/v1/menus/{}'.format(menu_id), headers=auth_headers)
@@ -32,6 +34,28 @@ def test_not_authorized(client: FlaskClient):
     response = get_all_menus(client, {})
 
     assert response.status_code == 401
+
+def test_create_with_supplied_id(client: FlaskClient, auth_headers):
+    response = create_menu(client, {
+        'name': 'Menu',
+        'id': '5e4ae04561fe8235a5a18824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = patch_menu(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Menu',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = put_menu(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Menu',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
 
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
 

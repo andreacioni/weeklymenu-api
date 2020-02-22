@@ -55,3 +55,7 @@ class NotFound(BaseRESTException):
 class CannotUpdateResourceOwner(BaseRESTException):
     def __init__(self, description=None):
         super().__init__(403, 'CANNOT_UPDATE_OWNER', description)
+
+class CannotSetResourceId(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(403, 'CANNOT_SET_ID', description)

@@ -12,6 +12,15 @@ from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
 
+def _dereference_item(shopping_list: ShoppingListItem):
+    if shopping_list.items != None:
+        shopping_list_items = [item.item.to_mongo()
+                            for item in shopping_list.items]
+        shopping_list = shopping_list.to_mongo()
+        for i in range(len(shopping_list_items)):
+            shopping_list['items'][i]['item'] = shopping_list_items[i]
+    return shopping_list
+
 class UserShoppingLists(Resource):
     @jwt_required
     @paginated
@@ -26,7 +35,11 @@ class UserShoppingLists(Resource):
         #Associate user id
         shopping_list.owner = user_info.id
         
-        shopping_list.save()
+        try:
+            shopping_list.save()
+        except NotUniqueError as nue:
+            raise DuplicateEntry(
+                description="duplicate entry found for a shopping list", details=nue.args or [])
 
         return shopping_list, 201
 
@@ -34,24 +47,42 @@ class UserShoppingList(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, shopping_list_id: str): 
-        return ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404(), 200
+        shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+
+        return _dereference_item(shopping_list)
+
+    @jwt_required
+    @load_user_info
+    def delete(self, user_info: User, shopping_list_id=''):
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(
+            owner=str(user_info.id))).get_or_404().delete()
+        return "", 204
+
+def _retrieve_base_shopping_list(shopping_list_id: str, user_id: str) -> ShoppingList:
+    return ShoppingList.objects(Q(owner=user_id) & Q(id=shopping_list_id)).get_or_404()
 
 class UserShoppingListItems(Resource):
+    @jwt_required
+    @load_user_info
+    def get(self, user_info: User, shopping_list_id=''):
+        shopping_list = _retrieve_base_shopping_list(shopping_list_id, str(user_info.id))
+        return [shopping_list.to_mongo() for shopping_list in shopping_list.ingredients] if shopping_list.ingredients != None else []
+
     @jwt_required
     @load_user_info
     @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')
     def post(self, user_info: User, shopping_list_id: str, shopping_list_item: ShoppingListItem):        
         shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
-        current_ingredients_in_list = [str(item.ingredient.id) for item in shopping_list.items]
+        #current_ingredients_in_list = [str(item.ingredient.id) for item in shopping_list.items]
 
-        if str(shopping_list_item.ingredient.id) in current_ingredients_in_list:
-            raise Conflict('ingredient already present inside shopping list')
+        #if str(shopping_list_item.ingredient.id) in current_ingredients_in_list:
+        #    raise Conflict('ingredient already present inside shopping list')
 
         shopping_list.items.append(shopping_list_item)
         shopping_list.save()
 
-        return shopping_list, 200
+        return shopping_list, 201
     
 class UserShoppingListItem(Resource):
     @jwt_required
@@ -59,10 +90,10 @@ class UserShoppingListItem(Resource):
     @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')
     def put(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
 
-        if shopping_list_item_id != str(shopping_list_item.item.id):
+        if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
             raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__item=shopping_list_item)
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
 
         return '', 204
 

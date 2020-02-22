@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, validates_schema, ValidationError
 
 from ... import mongo
 from ...models import Menu, Recipe
-from ...exceptions import CannotUpdateResourceOwner
+from ...exceptions import CannotUpdateResourceOwner, CannotSetResourceId
 
 
 class MenuSchema(me.ModelSchema):
@@ -25,6 +25,11 @@ class MenuSchema(me.ModelSchema):
     def check_owner_overwrite(self, data):
         if 'owner' in data:
             raise CannotUpdateResourceOwner('Can\'t overwrite owner property')
+
+    @validates_schema
+    def id_not_allowed(self, data):
+        if 'id' in data:
+            raise CannotSetResourceId()
 
     class Meta:
         model = Menu

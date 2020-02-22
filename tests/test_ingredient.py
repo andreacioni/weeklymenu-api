@@ -16,6 +16,9 @@ def replace_ingredient(client, ing_id, json, auth_headers):
 def patch_ingredient(client, ing_id, json, auth_headers):
     return client.patch('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
+def put_ingredient(client, ing_id, json, auth_headers):
+    return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
+
 
 def delete_ingredient(client, ing_id, auth_headers):
     return client.delete('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
@@ -30,6 +33,30 @@ def test_not_authorized(client: FlaskClient):
 
     assert response.status_code == 401
 
+
+def test_create_with_supplied_id(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'Garlic',
+        'id': '5e4ae04561fe8235a5a18824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = patch_ingredient(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Garlic',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+    response = put_ingredient(client, '1fe8235a5a5e4ae045618824', {
+        'name': 'Garlic',
+        'id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 403
+
+
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
 
     response = create_ingredient(client, {
@@ -38,6 +65,7 @@ def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_heade
     }, auth_headers)
 
     assert response.status_code == 403
+
 
 def test_owner_update(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
@@ -59,6 +87,7 @@ def test_owner_update(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 403
+
 
 def test_create_ingredient(client: FlaskClient, auth_headers):
     response = get_all_ingredients(client, auth_headers)
