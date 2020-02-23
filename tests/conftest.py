@@ -43,7 +43,9 @@ def auth_headers(client: FlaskClient):
     })
 
   headers = {
-      'Authorization': 'Bearer {}'.format(response.json['access_token'])
+      'Authorization': 'Bearer {}'.format(response.json['access_token']),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
   }
 
   return headers

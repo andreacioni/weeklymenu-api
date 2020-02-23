@@ -37,4 +37,4 @@ def register_user(user_meta: PostRegisterUserSchema):
     user.email = user_meta['email']
     user.save()
     
-    return jsonify(user), 200
+    return jsonify(user.to_mongo()), 200

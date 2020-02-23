@@ -72,10 +72,10 @@ def test_owner_update(client: FlaskClient, auth_headers):
         'name': 'ham'
     }, auth_headers)
 
-    ingredient_id = response.json['_id']['$oid']
+    ingredient_id = response.json['_id']
 
     # Try to update owner using an integer instead of a string
-    response = patch_ingredient(client, response.json['_id']['$oid'], {
+    response = patch_ingredient(client, response.json['_id'], {
         'owner': 1
     }, auth_headers)
 
@@ -125,7 +125,7 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
 
     # Remove one ingredient
     response = delete_ingredient(
-        client, response.json['results'][0]['_id']['$oid'], auth_headers)
+        client, response.json['results'][0]['_id'], auth_headers)
 
     assert response.status_code == 204
 
@@ -144,7 +144,7 @@ def test_replace_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 201 and response.json[
         'name'] == 'Tuna' and response.json['description'] == 'this is a tuna'
 
-    response = replace_ingredient(client, response.json['_id']['$oid'], {
+    response = replace_ingredient(client, response.json['_id'], {
         'name': 'Tuna',
         'description': 'always a tuna',
         'note': 'note about tuna'
@@ -189,7 +189,7 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
 
     assert tuna['description'] == 'always a tuna'
 
-    response = patch_ingredient(client, tuna['_id']['$oid'], {
+    response = patch_ingredient(client, tuna['_id'], {
         'description': 'is a really great tuna',
         'availabilityMonths': [
             12
@@ -199,7 +199,7 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
     assert response.status_code == 200 and response.json[
         'description'] == 'is a really great tuna' and 12 in response.json['availabilityMonths']
 
-    response = patch_ingredient(client, tuna['_id']['$oid'], {
+    response = patch_ingredient(client, tuna['_id'], {
         'description': 'is a really great tuna',
         'availabilityMonths': [
             12, 13

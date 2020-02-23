@@ -65,10 +65,10 @@ def test_owner_update(client: FlaskClient, auth_headers):
         'name': 'ham'
     }, auth_headers)
 
-    recipe_id = response.json['_id']['$oid']
+    recipe_id = response.json['_id']
 
     # Try to update owner using an integer instead of a string
-    response = patch_recipe(client, response.json['_id']['$oid'], {
+    response = patch_recipe(client, response.json['_id'], {
         'owner': 1
     }, auth_headers)
 
@@ -98,9 +98,9 @@ def test_create_recipe(client: FlaskClient, auth_headers):
     'name': 'Tuna and tomatoes',
     'ingredients' : [
       {
-      'ingredient': tuna_resp.json['_id']['$oid']
+      'ingredient': tuna_resp.json['_id']
       },{
-      'ingredient': tomato_resp.json['_id']['$oid']
+      'ingredient': tomato_resp.json['_id']
       }
     ]
   } , auth_headers)
@@ -133,7 +133,7 @@ def test_replace_recipe(client: FlaskClient, auth_headers):
 
   assert response.status_code == 201 and response.json['servs'] == 2
 
-  response = replace_recipe(client, response.json['_id']['$oid'], {
+  response = replace_recipe(client, response.json['_id'], {
     'name': 'Tuna and tomatoes',
     'servs': 3
   }, auth_headers)

@@ -147,9 +147,9 @@ def test_create_menu(client: FlaskClient, auth_headers):
         'name': 'Tuna And Ham',
         'ingredients': [
             {
-                'ingredient': ham['_id']['$oid']
+                'ingredient': ham['_id']
             }, {
-                'ingredient': tuna['_id']['$oid']
+                'ingredient': tuna['_id']
             }
         ]
     }, auth_headers).json
@@ -158,9 +158,9 @@ def test_create_menu(client: FlaskClient, auth_headers):
         'name': 'Ham And Cheese',
         'ingredients': [
             {
-                'ingredient': ham['_id']['$oid']
+                'ingredient': ham['_id']
             }, {
-                'ingredient': cheese['_id']['$oid']
+                'ingredient': cheese['_id']
             }
         ]
     }, auth_headers).json
@@ -169,8 +169,8 @@ def test_create_menu(client: FlaskClient, auth_headers):
         'name': 'Menu 1',
         'date': '2019-10-11',
         'recipes': [
-            tuna_and_ham['_id']['$oid'],
-            ham_and_cheese['_id']['$oid']
+            tuna_and_ham['_id'],
+            ham_and_cheese['_id']
         ]
     }, auth_headers)
 
@@ -198,9 +198,9 @@ def test_update_menu(client: FlaskClient, auth_headers):
         'name': 'Tuna And Ham',
         'ingredients': [
             {
-                'ingredient': ham['_id']['$oid']
+                'ingredient': ham['_id']
             }, {
-                'ingredient': tuna['_id']['$oid']
+                'ingredient': tuna['_id']
             }
         ]
     }, auth_headers).json
@@ -209,9 +209,9 @@ def test_update_menu(client: FlaskClient, auth_headers):
         'name': 'Ham And Cheese',
         'ingredients': [
             {
-                'ingredient': ham['_id']['$oid']
+                'ingredient': ham['_id']
             }, {
-                'ingredient': cheese['_id']['$oid']
+                'ingredient': cheese['_id']
             }
         ]
     }, auth_headers).json
@@ -220,8 +220,8 @@ def test_update_menu(client: FlaskClient, auth_headers):
         'name': 'Menu 1',
         'date': '2019-10-11',
         'recipes': [
-            tuna_and_ham['_id']['$oid'],
-            ham_and_cheese['_id']['$oid']
+            tuna_and_ham['_id'],
+            ham_and_cheese['_id']
         ]
     }, auth_headers).json
 

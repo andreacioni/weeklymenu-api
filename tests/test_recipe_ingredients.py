@@ -34,26 +34,26 @@ def test_create_recipe_ingredient(client: FlaskClient, auth_headers):
         'name': 'Tuna and tomatoes',
         'ingredients': [
             {
-                'ingredient': tuna_resp.json['_id']['$oid']
+                'ingredient': tuna_resp.json['_id']
             }, {
-                'ingredient': tomato_resp.json['_id']['$oid']
+                'ingredient': tomato_resp.json['_id']
             }
         ]
     }, auth_headers)
 
     assert len(recipe_resp.json['ingredients']) == 2
 
-    response = get_all_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], auth_headers)
+    response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
     
     assert response.status_code == 200 and len(response.json) == 2
 
-    response = add_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], {
-        'ingredient': oil_resp.json['_id']['$oid']
+    response = add_recipe_ingredient(client, recipe_resp.json['_id'], {
+        'ingredient': oil_resp.json['_id']
     }, auth_headers)
 
     assert response.status_code == 201
 
-    response = get_all_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], auth_headers)
+    response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
     
     assert response.status_code == 200 and len(response.json) == 3
 
@@ -71,23 +71,23 @@ def test_recipe_ingredient_delete(client: FlaskClient, auth_headers):
         'name': 'Tuna and tomatoes',
         'ingredients': [
             {
-                'ingredient': tuna_resp.json['_id']['$oid']
+                'ingredient': tuna_resp.json['_id']
             }, {
-                'ingredient': tomato_resp.json['_id']['$oid']
+                'ingredient': tomato_resp.json['_id']
             }
         ]
     }, auth_headers)
 
     assert len(recipe_resp.json['ingredients']) == 2
 
-    response = get_all_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], auth_headers)
+    response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
 
     assert response.status_code == 200 and len(response.json) == 2
 
-    response = remove_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], tomato_resp.json['_id']['$oid'], auth_headers)
+    response = remove_recipe_ingredient(client, recipe_resp.json['_id'], tomato_resp.json['_id'], auth_headers)
 
     assert response.status_code == 204
 
-    response = get_all_recipe_ingredient(client, recipe_resp.json['_id']['$oid'], auth_headers)
+    response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
 
     assert response.status_code == 200 and len(response.json) == 1

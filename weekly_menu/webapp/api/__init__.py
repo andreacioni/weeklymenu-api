@@ -38,6 +38,9 @@ def create_module(app):
 
 @api.representation('application/json')
 def output_json(data, code, headers=None):
+    if isinstance(data, mongo.Document):
+        data = data.to_mongo()
+    
     resp = make_response(jsonify(data), code)
     resp.headers.extend(headers or {})
     return resp
@@ -126,8 +129,8 @@ def paginated(func):
         page = func(*args, **kwargs)
 
         return jsonify({
-            "results": page.items,
-            #TODO "results": [item.to_mongo() for item in page.items],
+            #"results": page.items,
+            "results": [item.to_mongo() if isinstance(item, mongo.Document) else item for item in page.items],
             "pages": page.pages
         })
 

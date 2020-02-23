@@ -18,9 +18,8 @@ class IngredientsList(Resource):
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        page = Ingredient.objects(owner=str(user_info.id)).paginate(
+        return Ingredient.objects(owner=str(user_info.id)).paginate(
             page=req_args['page'], per_page=req_args['per_page'])
-        return page
 
     @jwt_required
     @validate_payload(IngredientSchema(), 'ingredient')

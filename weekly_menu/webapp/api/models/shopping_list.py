@@ -17,4 +17,4 @@ class ShoppingList(mongo.Document):
     }
 
     def __repr__(self):
-           return "<ShoppingList '{}'>".format(self.items)
+           return "<ShoppingList '{}'>".format(self.name)

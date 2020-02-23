@@ -43,7 +43,7 @@ class MenuList(Resource):
         except NotUniqueError as nue:
             raise DuplicateEntry(description="duplicate entry found for a menu", details=nue.args or [])
         
-        return menu.to_mongo(), 201
+        return menu, 201
 
 class MenuInstance(Resource):
     @jwt_required
@@ -71,7 +71,7 @@ class MenuInstance(Resource):
             BadRequest(description='no matching menu with id: {}'.format(menu_id))
         
         old_menu.reload()
-        return old_menu.to_mongo(), 200
+        return old_menu, 200
         
 
     @jwt_required
@@ -86,7 +86,7 @@ class MenuInstance(Resource):
             BadRequest(description='no matching menu with id: {}'.format(menu_id))
         
         old_menu.reload()
-        return old_menu.to_mongo(), 200
+        return old_menu, 200
 
 def _retrieve_base_menu(menu_id: str, user_id: str) -> Recipe:
     return Recipe.objects(Q(owner=user_id) & Q(id=menu_id)).get_or_404()

@@ -22,7 +22,7 @@ def test_user_creation(client: FlaskClient):
     'email':"pippo@pluto.com"
     })
 
-  user_id = response.json['_id']['$oid']
+  user_id = response.json['_id']
 
   assert response.status_code == 200
 
