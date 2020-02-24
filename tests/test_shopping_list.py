@@ -134,10 +134,12 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
     'items' : [
       {
         'item' : ham['_id'],
-        'checked': False
+        'checked': False,
+        'supermarketSection': 'Groceries'
       },{
         'item' : tuna['_id'],
-        'checked': False
+        'checked': False,
+        'supermarketSection': 'Groceries'
       }
     ]
   }, auth_headers).json
@@ -152,11 +154,10 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
   assert response.status_code == 409
 
   response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
-      'item' : tuna['_id'],
       'checked' : True
   }, auth_headers)
 
-  assert response.status_code == 204
+  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 
@@ -167,7 +168,7 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
       'checked' : True
   }, auth_headers)
 
-  assert response.status_code == 204
+  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 

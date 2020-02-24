@@ -38,6 +38,9 @@ def create_module(app):
 
 @api.representation('application/json')
 def output_json(data, code, headers=None):
+    """
+        NOTE: if a resource method is decorated with 'paginated' this method is not called
+    """
     if isinstance(data, mongo.Document):
         data = data.to_mongo()
     

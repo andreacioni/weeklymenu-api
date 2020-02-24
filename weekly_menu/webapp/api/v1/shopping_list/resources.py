@@ -95,7 +95,7 @@ class UserShoppingListItem(Resource):
 
         ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
 
-        return '', 204
+        return shopping_list_item, 200
 
     @jwt_required
     @load_user_info

@@ -91,3 +91,6 @@ def test_recipe_ingredient_delete(client: FlaskClient, auth_headers):
     response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
 
     assert response.status_code == 200 and len(response.json) == 1
+
+def test_update_recipe_ingredient(client: FlaskClient, auth_headers):
+    assert False
