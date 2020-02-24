@@ -40,3 +40,6 @@ class ShoppingListItemSchema(me.ModelSchema):
     
     class Meta:
         model = ShoppingListItem
+
+class ShoppingListItemWithoutRequiredItem(ShoppingListItemSchema):
+    item = fields.String(required=False)

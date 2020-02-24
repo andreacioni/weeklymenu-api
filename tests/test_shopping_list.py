@@ -12,8 +12,14 @@ def create_shopping_list(client, json, auth_headers):
 def add_item_in_shopping_list(client, shopping_list_id, json, auth_headers):
   return client.post('/api/v1/shopping-lists/{}/items'.format(shopping_list_id), json=json, headers=auth_headers)
 
-def update_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
+def get_shopping_list_item(client, shopping_list_id, shopping_list_item_id, auth_headers):
+  return client.get('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), headers=auth_headers)
+
+def replace_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
   return client.put('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), json=json, headers=auth_headers)
+
+def update_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
+  return client.patch('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), json=json, headers=auth_headers)
 
 def delete_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, auth_headers):
   return client.delete('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), headers=auth_headers)
@@ -120,6 +126,40 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
 
   assert response.status_code == 201
 
+def test_item_change_shopping_list(client: FlaskClient, auth_headers):
+  ham = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers).json
+
+  tuna = create_ingredient(client, {
+    'name': 'tuna'
+  } , auth_headers).json
+
+  shop_list = create_shopping_list(client, {
+    'name' : 'list1',
+    'items' : [
+      {
+        'item' : ham['_id'],
+        'checked' : False
+      },{
+        'item' : tuna['_id'],
+        'checked' : False
+      }
+    ]
+  }, auth_headers).json
+
+  response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
+      'item' : ham['_id'],
+      'checked' : True
+  }, auth_headers)
+
+  assert response.status_code == 200
+
+  response = get_shopping_list_item(client, shop_list['_id'], tuna['_id'], auth_headers)
+
+  assert response.status_code == 404
+
+
 def test_update_shopping_list(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
     'name': 'ham'
@@ -145,13 +185,14 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
   }, auth_headers).json
 
   assert shop_list['items'][0]['checked'] == False and shop_list['items'][1]['checked'] == False
+  
+  # NOTE replaced with test_item_change_shopping_list test
+  #response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
+  #    'item' : ham['_id'],
+  #    'checked' : True
+  #}, auth_headers)
 
-  response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
-      'item' : ham['_id'],
-      'checked' : True
-  }, auth_headers)
-
-  assert response.status_code == 409
+  #assert response.status_code == 409
 
   response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
       'checked' : True
@@ -169,6 +210,62 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
   }, auth_headers)
 
   assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
+
+  shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
+
+  assert (shop_list['items'][0]['checked'] == True) and (shop_list['items'][1]['checked'] == True)
+
+def test_replace_shopping_list(client: FlaskClient, auth_headers):
+  ham = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers).json
+
+  tuna = create_ingredient(client, {
+    'name': 'tuna'
+  } , auth_headers).json
+
+  shop_list = create_shopping_list(client, {
+    'name' : 'list1',
+    'items' : [
+      {
+        'item' : ham['_id'],
+        'checked': False,
+        'supermarketSection': 'Groceries'
+      },{
+        'item' : tuna['_id'],
+        'checked': False,
+        'supermarketSection': 'Groceries'
+      }
+    ]
+  }, auth_headers).json
+
+  assert shop_list['items'][0]['checked'] == False and shop_list['items'][1]['checked'] == False
+ 
+  # NOTE replaced with test_item_change_shopping_list test
+  #response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
+  #    'item' : ham['_id'],
+  #    'checked' : True
+  #}, auth_headers)
+
+  #assert response.status_code == 409
+
+  response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
+      'item' : tuna['_id'],
+      'checked' : True
+  }, auth_headers)
+
+  assert response.status_code == 200
+
+  shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
+
+  assert (shop_list['items'][0]['checked'] == False) and (shop_list['items'][1]['checked'] == True)
+
+  response = update_item_in_shopping_list(client, shop_list['_id'], ham['_id'],{
+      'item' : ham['_id'],
+      'checked' : True
+  }, auth_headers)
+
+  assert response.status_code == 200
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 

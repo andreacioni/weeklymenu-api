@@ -7,7 +7,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
 from bson import ObjectId
 
-from .schemas import ShoppingListSchema, ShoppingListItemSchema
+from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItem
 from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
@@ -85,13 +85,28 @@ class UserShoppingListItems(Resource):
         return shopping_list, 201
     
 class UserShoppingListItem(Resource):
+
+    @jwt_required
+    @load_user_info
+    @validate_payload(ShoppingListItemWithoutRequiredItem(), 'shopping_list_item')
+    def patch(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
+
+        # NOTE An item could be changed
+        #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
+        #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
+
+        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
+
+        return shopping_list_item, 200
+
     @jwt_required
     @load_user_info
     @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')
     def put(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
 
-        if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
-            raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
+        # NOTE An item could be changed
+        #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
+        #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
         ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
 
