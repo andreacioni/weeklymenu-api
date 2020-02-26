@@ -9,7 +9,7 @@ from bson import ObjectId
 
 from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItem
 from ...models import ShoppingList, ShoppingListItem, User
-from ... import validate_payload, paginated, mongo, load_user_info
+from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
 
 def _dereference_item(shopping_list: ShoppingListItem):
@@ -95,9 +95,15 @@ class UserShoppingListItem(Resource):
         #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
         #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
+        base_shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
 
-        return shopping_list_item, 200
+        for item_doc in base_shopping_list.items:
+            if str(item_doc.item.id) == shopping_list_item_id:
+                item_doc = patch_embedded_document(shopping_list_item, item_doc)
+
+        base_shopping_list.save()
+
+        return base_shopping_list, 200
 
     @jwt_required
     @load_user_info

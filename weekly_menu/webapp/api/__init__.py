@@ -139,6 +139,14 @@ def paginated(func):
 
     return wrapper
 
+def _update_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument, patch=True):
+    if patch == True:
+        for field in new_doc.__class__._fields:
+            if new_doc[field] != None:
+                old_doc[field] = new_doc[field]
+        return old_doc
+    else:
+        return new_doc
 
 def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, old_doc: mongo.Document, patch=True):
     # Remove generated id and link new doc with current owner
@@ -159,3 +167,9 @@ def put_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, 
 
 def patch_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, old_doc: mongo.Document):
     return _update_document(coll_class, new_doc, old_doc, patch=True)
+
+def put_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument):
+    return _update_embedded_document(new_doc, old_doc, patch=False)
+
+def patch_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument):
+    return _update_embedded_document(new_doc, old_doc, patch=True)
