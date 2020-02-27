@@ -7,10 +7,10 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.fields import ObjectIdField, ObjectId
 from mongoengine.queryset.visitor import Q
 
-from .schemas import RecipeSchema, RecipeSchemaWithoutName, RecipeIngredientSchema
+from .schemas import RecipeSchema, RecipeSchemaWithoutName, RecipeIngredientSchema, RecipeIngredientWithoutRequiredIngredientSchema
 from ...models import Recipe, User, RecipeIngredient
-from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info
-from ...exceptions import DuplicateEntry, BadRequest
+from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info, patch_embedded_document
+from ...exceptions import DuplicateEntry, BadRequest, Conflict
 
 
 def _dereference_ingredients(recipe: Recipe):
@@ -109,12 +109,19 @@ class RecipeIngredientsList(Resource):
     @load_user_info
     def post(self, recipe_id, recipe_ingredient: RecipeIngredient, user_info: User):
         recipe = _retrieve_base_recipe(recipe_id, str(user_info.id))
+
+        # Check if an ingredient is already present in a recipe
+        current_ingredients_in_recipe = [str(ing.ingredient.id) for ing in recipe.ingredients]
+        if str(recipe_ingredient.ingredient.id) in current_ingredients_in_recipe:
+            raise Conflict('ingredient already present inside shopping list')
+
         recipe.ingredients.append(recipe_ingredient)
         recipe.save()
         return recipe_ingredient, 201
 
 
 class RecipeIngredientInstance(Resource):
+
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, recipe_id='', ingredient_id=''):
@@ -130,3 +137,31 @@ class RecipeIngredientInstance(Resource):
         recipe.save()
 
         return "", 204
+
+    @jwt_required
+    @load_user_info
+    @validate_payload(RecipeIngredientWithoutRequiredIngredientSchema(), 'recipe_ingredient')
+    def patch(self, user_info: User, recipe_id: str, recipe_ingredient_id: str, recipe_ingredient: RecipeIngredient):
+        recipe = _retrieve_base_recipe(recipe_id, str(user_info.id))
+        
+        for ing_doc in recipe.ingredients:
+            if str(ing_doc.ingredient.id) == recipe_ingredient_id:
+                ing_doc = patch_embedded_document(recipe_ingredient, ing_doc)
+                break
+
+        recipe.save()
+
+        return recipe, 200
+
+    @jwt_required
+    @load_user_info
+    @validate_payload(RecipeIngredientSchema(), 'recipe_ingredient')
+    def put(self, user_info: User, recipe_id: str, recipe_ingredient_id: str, recipe_ingredient: RecipeIngredient):
+
+        # NOTE An item could be changed
+        #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
+        #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
+
+        Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id)) & Q(items__item=recipe_ingredient_id)).update(set__items__S=recipe_ingredient)
+
+        return recipe_ingredient, 200

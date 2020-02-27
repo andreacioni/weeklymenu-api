@@ -126,6 +126,13 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
 
   assert response.status_code == 201
 
+  response = add_item_in_shopping_list(client, shop_list['_id'], {
+        'item' : tuna['_id'],
+        'checked': False
+  }, auth_headers)
+
+  assert response.status_code == 409
+
 def test_item_change_shopping_list(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
     'name': 'ham'

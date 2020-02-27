@@ -39,3 +39,6 @@ class RecipeIngredientSchema(me.ModelSchema):
 
     class Meta:
         model = RecipeIngredient
+
+class RecipeIngredientWithoutRequiredIngredientSchema(RecipeIngredientSchema):
+    ingredient = fields.String(required=False)

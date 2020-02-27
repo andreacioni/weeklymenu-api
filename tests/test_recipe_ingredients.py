@@ -53,6 +53,12 @@ def test_create_recipe_ingredient(client: FlaskClient, auth_headers):
 
     assert response.status_code == 201
 
+    response = add_recipe_ingredient(client, recipe_resp.json['_id'], {
+        'ingredient': oil_resp.json['_id']
+    }, auth_headers)
+
+    assert response.status_code == 409
+
     response = get_all_recipe_ingredient(client, recipe_resp.json['_id'], auth_headers)
     
     assert response.status_code == 200 and len(response.json) == 3

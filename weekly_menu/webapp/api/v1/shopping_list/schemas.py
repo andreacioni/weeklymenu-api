@@ -41,5 +41,5 @@ class ShoppingListItemSchema(me.ModelSchema):
     class Meta:
         model = ShoppingListItem
 
-class ShoppingListItemWithoutRequiredItem(ShoppingListItemSchema):
+class ShoppingListItemWithoutRequiredItemSchema(ShoppingListItemSchema):
     item = fields.String(required=False)

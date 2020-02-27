@@ -7,7 +7,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
 from bson import ObjectId
 
-from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItem
+from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
@@ -74,10 +74,10 @@ class UserShoppingListItems(Resource):
     def post(self, user_info: User, shopping_list_id: str, shopping_list_item: ShoppingListItem):        
         shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
-        #current_ingredients_in_list = [str(item.ingredient.id) for item in shopping_list.items]
-
-        #if str(shopping_list_item.ingredient.id) in current_ingredients_in_list:
-        #    raise Conflict('ingredient already present inside shopping list')
+        # NOTE Check if an ingredient is already present in a specific list
+        current_ingredients_in_list = [str(it.item.id) for it in shopping_list.items]
+        if str(shopping_list_item.item.id) in current_ingredients_in_list:
+            raise Conflict('ingredient already present inside shopping list')
 
         shopping_list.items.append(shopping_list_item)
         shopping_list.save()
@@ -88,7 +88,7 @@ class UserShoppingListItem(Resource):
 
     @jwt_required
     @load_user_info
-    @validate_payload(ShoppingListItemWithoutRequiredItem(), 'shopping_list_item')
+    @validate_payload(ShoppingListItemWithoutRequiredItemSchema(), 'shopping_list_item')
     def patch(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
 
         # NOTE An item could be changed
@@ -100,6 +100,7 @@ class UserShoppingListItem(Resource):
         for item_doc in base_shopping_list.items:
             if str(item_doc.item.id) == shopping_list_item_id:
                 item_doc = patch_embedded_document(shopping_list_item, item_doc)
+                break
 
         base_shopping_list.save()
 
