@@ -164,7 +164,7 @@ def test_item_change_shopping_list(client: FlaskClient, auth_headers):
 
   response = get_shopping_list_item(client, shop_list['_id'], tuna['_id'], auth_headers)
 
-  assert response.status_code == 404
+  assert response.status_code == 404 and response.json['error'] == 'NOT_FOUND'
 
 
 def test_update_shopping_list(client: FlaskClient, auth_headers):
@@ -205,7 +205,7 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
       'checked' : True
   }, auth_headers)
 
-  assert response.status_code == 200 and response.json['items'][1]['supermarketSection'] == 'Groceries'
+  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 
@@ -216,7 +216,7 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
       'checked' : True
   }, auth_headers)
 
-  assert response.status_code == 200 and response.json['items'][0]['supermarketSection'] == 'Groceries'
+  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 

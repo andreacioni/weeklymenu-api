@@ -82,7 +82,7 @@ def handle_method_not_allowed(e):
             'error': 'METHOD_NOT_ALLOWED',
             'descritpion': 'method not allowed on selected resource',
             'details': []
-    }), 404
+    }), 405
 
 @app.errorhandler(ValidationError)
 def handle_validation_error(e: ValidationError):

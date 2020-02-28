@@ -10,7 +10,7 @@ from bson import ObjectId
 from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document
-from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict
+from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict, NotFound
 
 def _dereference_item(shopping_list: ShoppingListItem):
     if shopping_list.items != None:
@@ -88,6 +88,19 @@ class UserShoppingListItem(Resource):
 
     @jwt_required
     @load_user_info
+    def get(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str):
+
+        base_shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
+
+        for item_doc in base_shopping_list.items:
+            if str(item_doc.item.id) == shopping_list_item_id:
+                return item_doc, 200
+
+
+        raise NotFound(description='can\'t find ingredient with id {} in list {}'.format(shopping_list_id, shopping_list_item_id))
+
+    @jwt_required
+    @load_user_info
     @validate_payload(ShoppingListItemWithoutRequiredItemSchema(), 'shopping_list_item')
     def patch(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str, shopping_list_item: ShoppingListItem):
 
@@ -99,12 +112,12 @@ class UserShoppingListItem(Resource):
 
         for item_doc in base_shopping_list.items:
             if str(item_doc.item.id) == shopping_list_item_id:
-                item_doc = patch_embedded_document(shopping_list_item, item_doc)
+                shopping_list_item = item_doc = patch_embedded_document(shopping_list_item, item_doc)
                 break
 
         base_shopping_list.save()
 
-        return base_shopping_list, 200
+        return shopping_list_item, 200
 
     @jwt_required
     @load_user_info
