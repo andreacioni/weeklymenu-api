@@ -23,7 +23,7 @@ def clear_db():
 
 @pytest.fixture(scope='session')
 def app():
-  return create_app('pytest-config')
+  return create_app('pytest')
 
 @pytest.fixture(scope='session')
 def client(app):

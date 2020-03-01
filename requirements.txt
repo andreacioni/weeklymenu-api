@@ -1,4 +1,5 @@
 flask==1.1.1
+gunicorn==20.0.4
 flask_restful==0.3.7
 dnspython==1.16.0
 flask-mongoengine==0.9.5
