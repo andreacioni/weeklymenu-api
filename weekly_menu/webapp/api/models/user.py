@@ -15,16 +15,6 @@ class User(mongo.Document):
         mongo.IntField(min_value=1, max_value=7)
     )
 
-    ingredients_docs = mongo.ListField(
-        mongo.ReferenceField('Ingredient', reverse_delete_rule=mongo.PULL)
-    )
-
-    recipes_docs = mongo.ListField(
-        mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL)
-    )
-    
-    shopping_list_doc = mongo.ReferenceField('ShoppingList', reverse_delete_rule=mongo.PULL)
-
     meta = {
         'collection' : 'users'
     }

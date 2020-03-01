@@ -2,14 +2,29 @@ import os
 import logging
 import traceback
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, json
 from werkzeug.exceptions import NotFound, MethodNotAllowed
+from mongoengine.fields import ObjectId, DateField, Binary
+from mongoengine.errors import ValidationError
+from datetime import datetime
 
 from .api.exceptions import BaseRESTException
 
 _logger = logging.getLogger(__name__)
 
+class ObjectIdJSONEncoder(json.JSONEncoder): 
+    def default(self, o): # pylint: disable=E0202
+        if isinstance(o, ObjectId):
+            return str(o)
+        if isinstance(o, datetime):
+            return o.strftime("%Y-%m-%d")
+        if isinstance(o, Binary):
+            return str(o)
+        return json.JSONEncoder.default(self, o)
+
 app = Flask(__name__)
+
+app.json_encoder = ObjectIdJSONEncoder
 
 def create_app(object_name):
     """
@@ -67,4 +82,12 @@ def handle_method_not_allowed(e):
             'error': 'METHOD_NOT_ALLOWED',
             'descritpion': 'method not allowed on selected resource',
             'details': []
-    }), 404    
+    }), 405
+
+@app.errorhandler(ValidationError)
+def handle_validation_error(e: ValidationError):
+        return jsonify({
+            'error': 'VALIDATION_ERROR',
+            'descritpion': e.message,
+            'details': [{err : e.errors[err][1].message} for err in (e.errors or [])]
+    }), 400

@@ -1,16 +1,23 @@
 from .. import mongo
 
 class Ingredient(mongo.Document):
-    name = mongo.StringField(required=True, unique=True)
+    name = mongo.StringField(required=True)
     description = mongo.StringField()
     note = mongo.StringField()
-    freezed = mongo.BooleanField(default=False)
+    edible = mongo.BooleanField()
+    freezed = mongo.BooleanField()
     availabilityMonths = mongo.ListField(
-        mongo.IntField(min_value=1, max_value=12), max_length=12
+        mongo.IntField(min_value=1, max_value=12), max_length=12, default=None
     )
     tags = mongo.ListField(
-        mongo.StringField()
+        mongo.StringField(), default=None
     )
+    
+    owner = mongo.ReferenceField('User', required=True)
+
+    meta = {
+        'collection' : 'ingredients'
+    }
 
     def __repr__(self):
            return "<Ingredient '{}'>".format(self.name)

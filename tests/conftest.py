@@ -23,7 +23,7 @@ def clear_db():
 
 @pytest.fixture(scope='session')
 def app():
-  return create_app('pytest-config')
+  return create_app('pytest')
 
 @pytest.fixture(scope='session')
 def client(app):
@@ -43,7 +43,9 @@ def auth_headers(client: FlaskClient):
     })
 
   headers = {
-      'Authorization': 'Bearer {}'.format(response.json['access_token'])
+      'Authorization': 'Bearer {}'.format(response.json['access_token']),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
   }
 
   return headers

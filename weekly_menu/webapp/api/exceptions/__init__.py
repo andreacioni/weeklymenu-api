@@ -38,7 +38,7 @@ class InvalidCredentials(BaseRESTException):
 
 class Forbidden(BaseRESTException):
     def __init__(self, description=None):
-        super().__init__(401, 'FORBIDDEN', 'current user can\'t access the requested resource')  
+        super().__init__(403, 'FORBIDDEN', 'current user can\'t access the requested resource')  
 
 class Conflict(BaseRESTException):
     def __init__(self, description=None):
@@ -51,3 +51,11 @@ class DuplicateEntry(BaseRESTException):
 class NotFound(BaseRESTException):
     def __init__(self, description=None, details=None):
         super().__init__(404, 'NOT_FOUND', description, details)
+
+class CannotUpdateResourceOwner(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(403, 'CANNOT_UPDATE_OWNER', description)
+
+class CannotSetResourceId(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(403, 'CANNOT_SET_ID', description)
