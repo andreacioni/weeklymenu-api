@@ -1,7 +1,9 @@
 import pprint
+import re
 
+from datetime import datetime
 from flask import jsonify
-from flask_restful import Resource, abort, request
+from flask_restful import Resource, abort, request, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from mongoengine.errors import NotUniqueError
 from mongoengine.fields import ObjectIdField, ObjectId
@@ -22,11 +24,34 @@ def _dereference_recipes(menu: Menu):
     return menu
 
 class MenuList(Resource):
+
+    menu_query_reqparse = reqparse.RequestParser()
+    menu_query_reqparse.add_argument(
+        'day',
+        type=str,
+        location=['args'],
+        help='day must be in the form yyyy-MM-dd',
+        trim=True,
+        required=False
+    )
+
     @jwt_required
     @paginated
     @load_user_info
     def get(self, req_args, user_info: User):
-        page = Menu.objects(owner=str(user_info.id)).paginate(
+        req_args = {**MenuList.menu_query_reqparse.parse_args(), **req_args} 
+
+        base_query = Q(owner=str(user_info.id))
+
+        if req_args['day'] is not None and bool(re.search('^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', req_args['day'])):
+            try:
+                searched_day = datetime.strptime(req_args['day'], '%Y-%m-%d')
+            except ValueError as ex:
+                raise BadRequest('invalid day parameter supplied: {}'.format(ex))
+            
+            base_query = base_query & Q(date=searched_day)
+
+        page = Menu.objects(base_query).paginate(
             page=req_args['page'], per_page=req_args['per_page'])
         page.items = [_dereference_recipes(item) for item in page.items]
         return page
