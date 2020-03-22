@@ -114,8 +114,8 @@ class MenuInstance(Resource):
         old_menu.reload()
         return old_menu, 200
 
-def _retrieve_base_menu(menu_id: str, user_id: str) -> Recipe:
-    return Recipe.objects(Q(owner=user_id) & Q(id=menu_id)).get_or_404()
+def _retrieve_base_menu(menu_id: str, user_id: str) -> Menu:
+    return Menu.objects(Q(owner=user_id) & Q(id=menu_id)).get_or_404()
 
 
 class MenuRecipesList(Resource):
@@ -128,11 +128,17 @@ class MenuRecipesList(Resource):
     @jwt_required
     @validate_payload(MenuRecipeSchema(), 'menu_recipe')
     @load_user_info
-    def post(self, menu_id, menu_recipe: Recipe, user_info: User):
+    def post(self, menu_id, menu_recipe, user_info: User):
         menu = _retrieve_base_menu(menu_id, str(user_info.id))
-        menu.recipes.append(menu_recipe)
+        recipe = Recipe.objects(Q(owner=str(user_info.id)) & Q(id=menu_recipe['recipe_id'])).get_or_404()
+        
+        if menu.recipes:
+            menu.recipes.append(recipe.id)
+        else:
+            menu.recipes = [recipe.id]
+        
         menu.save()
-        return menu_recipe, 201
+        return menu.recipes, 200
 
 
 class MenuRecipesInstance(Resource):

@@ -38,7 +38,7 @@ class MenuWithoutDateSchema(MenuSchema):
 
     date = fields.Date(required=False)
 
-class MenuRecipeSchema(me.ModelSchema):
+class MenuRecipeSchema(Schema):
 
-    class Meta:
-        model = Recipe
+    recipe_id = fields.String()
+
