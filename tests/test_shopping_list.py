@@ -306,7 +306,7 @@ def test_remove_shopping_list_item(client: FlaskClient, auth_headers):
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 
-  assert ham['_id'] in [ it['item']['_id'] for it in shop_list['items'] ] and not (tuna['_id'] in [ it['item']['_id'] for it in shop_list['items'] ])
+  assert ham['_id'] in [ it['item'] for it in shop_list['items'] ] and not (tuna['_id'] in [ it['item'] for it in shop_list['items'] ])
 
 
 

@@ -28,7 +28,7 @@ class MenuList(Resource):
     def get(self, req_args, user_info: User):
         page = Menu.objects(owner=str(user_info.id)).paginate(
             page=req_args['page'], per_page=req_args['per_page'])
-        page.items = [_dereference_recipes(item) for item in page.items]
+        #page.items = [_dereference_recipes(item) for item in page.items]
         return page
     
     @jwt_required
@@ -51,7 +51,8 @@ class MenuInstance(Resource):
     def get(self, user_info: User, menu_id=''):
         menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
 
-        return _dereference_recipes(menu)
+        #return _dereference_recipes(menu)
+        return menu
     
     @jwt_required
     @load_user_info

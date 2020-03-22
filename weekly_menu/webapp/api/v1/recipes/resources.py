@@ -30,7 +30,7 @@ class RecipeList(Resource):
     def get(self, req_args, user_info: User):
         page = Recipe.objects(owner=str(user_info.id)).paginate(
             page=req_args['page'], per_page=req_args['per_page'])
-        page.items = [_dereference_ingredients(item) for item in page.items]
+        #page.items = [_dereference_ingredients(item) for item in page.items]
         return page
 
     @jwt_required
@@ -56,7 +56,8 @@ class RecipeInstance(Resource):
         recipe = Recipe.objects(Q(id=recipe_id) & Q(
             owner=str(user_info.id))).get_or_404()
 
-        return _dereference_ingredients(recipe)
+        #return _dereference_ingredients(recipe)
+        return recipe
 
     @jwt_required
     @load_user_info

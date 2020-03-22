@@ -49,7 +49,8 @@ class UserShoppingList(Resource):
     def get(self, user_info: User, shopping_list_id: str): 
         shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
-        return _dereference_item(shopping_list)
+        #return _dereference_item(shopping_list)
+        return shopping_list
 
     @jwt_required
     @load_user_info
