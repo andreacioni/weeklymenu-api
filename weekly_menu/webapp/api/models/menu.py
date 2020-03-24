@@ -3,7 +3,7 @@ from .. import mongo
 class Menu(mongo.Document):
     name = mongo.StringField()
     date = mongo.DateField(required=True)
-    meal = mongo.StringField('Meal')
+    meal = mongo.StringField()
     recipes = mongo.ListField(
         mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL), default=None
     )
