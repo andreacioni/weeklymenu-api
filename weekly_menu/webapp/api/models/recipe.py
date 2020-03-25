@@ -22,7 +22,7 @@ class Recipe(mongo.Document):
     estimatedPreparationTime = mongo.IntField(min_value=1)
     rating = mongo.IntField(min_value=1, max_value=3)
     cost = mongo.IntField(min_value=1, max_value=3)
-    difficulty = mongo.String()
+    difficulty = mongo.StringField()
     recipeUrl = mongo.StringField()
     tags = mongo.ListField(
         mongo.StringField(), default=None
