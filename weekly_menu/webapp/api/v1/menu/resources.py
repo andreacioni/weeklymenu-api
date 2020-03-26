@@ -43,11 +43,14 @@ class MenuList(Resource):
 
         base_query = Q(owner=str(user_info.id))
 
-        if req_args['day'] is not None and bool(re.search('^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', req_args['day'])):
-            try:
-                searched_day = datetime.strptime(req_args['day'], '%Y-%m-%d')
-            except ValueError as ex:
-                raise BadRequest('invalid day parameter supplied: {}'.format(ex))
+        if req_args['day'] is not None:
+            if bool(re.search('^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', req_args['day'])):
+                try:
+                    searched_day = datetime.strptime(req_args['day'], '%Y-%m-%d')
+                except ValueError as ex:
+                    raise BadRequest('invalid day parameter supplied: {}'.format(ex))
+            else:
+                raise BadRequest('invalid day format')
             
             base_query = base_query & Q(date=searched_day)
 
