@@ -5,6 +5,7 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     quantity = mongo.FloatField()
     unitOfMeasure = mongo.StringField(max_length=10)
     required = mongo.BooleanField()
+    freezed = mongo.BooleanField()
     ingredient = mongo.ReferenceField('Ingredient', required=True)
 
 
@@ -24,6 +25,7 @@ class Recipe(mongo.Document):
     cost = mongo.IntField(min_value=1, max_value=3)
     difficulty = mongo.StringField()
     recipeUrl = mongo.StringField()
+    imgUrl = mongo.StringField()
     tags = mongo.ListField(
         mongo.StringField(), default=None
     )
