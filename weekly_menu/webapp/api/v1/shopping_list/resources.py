@@ -7,9 +7,9 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
 from bson import ObjectId
 
-from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema
+from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema, ShoppingListItemWithoutRequiredItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
-from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document
+from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict, NotFound
 
 def _dereference_item(shopping_list: ShoppingListItem):
@@ -58,6 +58,34 @@ class UserShoppingList(Resource):
         ShoppingList.objects(Q(id=shopping_list_id) & Q(
             owner=str(user_info.id))).get_or_404().delete()
         return "", 204
+
+    @jwt_required
+    @validate_payload(ShoppingListSchema(), 'new_list')
+    @load_user_info
+    def put(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
+        old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+
+        result = put_document(ShoppingList, new_list, old_list)
+
+        if(result['n'] != 1):
+            raise BadRequest(description='no matching shopping list with id: {}'.format(shopping_list_id))
+        
+        old_list.reload()
+        return old_list, 200
+    
+    @jwt_required
+    @validate_payload(ShoppingListSchema(), 'new_list')
+    @load_user_info
+    def patch(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
+        old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+
+        result = patch_document(ShoppingList, new_list, old_list)
+
+        if(result['n'] != 1):
+            raise BadRequest(description='no matching shopping list with id: {}'.format(shopping_list_id))
+        
+        old_list.reload()
+        return old_list, 200
 
 def _retrieve_base_shopping_list(shopping_list_id: str, user_id: str) -> ShoppingList:
     return ShoppingList.objects(Q(owner=user_id) & Q(id=shopping_list_id)).get_or_404()

@@ -14,6 +14,7 @@ def create_module(app, api):
         BASE_PATH + '/shopping-lists/<string:shopping_list_id>'
     )
 
+    # TODO remove if not used
     api.add_resource(
         UserShoppingListItems,
         BASE_PATH + '/shopping-lists/<string:shopping_list_id>/items'

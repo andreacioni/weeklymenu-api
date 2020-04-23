@@ -30,6 +30,9 @@ def get_shopping_list(client, shopping_list_id, auth_headers):
 def get_all_shopping_list(client, auth_headers, page=1, per_page=10):
   return client.get('/api/v1/shopping-lists?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
 
+def patch_shopping_list(client, shopping_list_id, json, auth_headers):
+  return client.patch('/api/v1/shopping-lists/{}'.format(shopping_list_id), json=json, headers=auth_headers)
+
 def test_not_authorized(client: FlaskClient):
   response = get_all_shopping_list(client, {})
   
@@ -166,8 +169,48 @@ def test_item_change_shopping_list(client: FlaskClient, auth_headers):
 
   assert response.status_code == 404 and response.json['error'] == 'NOT_FOUND'
 
-
 def test_update_shopping_list(client: FlaskClient, auth_headers):
+  ham = create_ingredient(client, {
+    'name': 'ham'
+  } , auth_headers).json
+
+  tuna = create_ingredient(client, {
+    'name': 'tuna'
+  } , auth_headers).json
+
+  shop_list = create_shopping_list(client, {
+    'name' : 'list1',
+    'items' : [
+      {
+        'item' : ham['_id'],
+        'checked': False,
+        'supermarketSection': 'Groceries'
+      },{
+        'item' : tuna['_id'],
+        'checked': False,
+        'supermarketSection': 'Groceries'
+      }
+    ]
+  }, auth_headers).json
+
+  assert shop_list['items'][0]['checked'] == False and shop_list['items'][1]['checked'] == False
+
+  response = patch_shopping_list(client, shop_list['_id'], {
+      'items' : [
+        {
+          'item' : ham['_id'],
+          'checked': True,
+          'supermarketSection': 'Groceries'
+        },{
+          'item' : tuna['_id'],
+          'checked': False,
+          'supermarketSection': 'Groceries'
+        }
+      ]
+  }, auth_headers)
+
+  assert response.status_code == 200 and response.json['items'][0]['checked'] == True and response.json['items'][1]['checked'] == False
+def test_update_shopping_list_item(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
     'name': 'ham'
   } , auth_headers).json
@@ -222,7 +265,7 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
 
   assert (shop_list['items'][0]['checked'] == True) and (shop_list['items'][1]['checked'] == True)
 
-def test_replace_shopping_list(client: FlaskClient, auth_headers):
+def test_replace_shopping_list_item(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
     'name': 'ham'
   } , auth_headers).json

@@ -13,6 +13,7 @@ def create_module(app, api):
         BASE_PATH + '/recipes/<string:recipe_id>'
     )
 
+    # TODO remove if not used
     api.add_resource(
         RecipeIngredientsList,
         BASE_PATH + '/recipes/<string:recipe_id>/ingredients'

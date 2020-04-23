@@ -71,7 +71,7 @@ class IngredientInstance(Resource):
         result = put_document(Ingredient, new_ingredient, old_ingredient)
 
         if(result['n'] != 1):
-            BadRequest(
+            raise BadRequest(
                 description='no matching ingredient with id: {}'.format(ingredient_id))
 
         old_ingredient.reload()
@@ -87,7 +87,7 @@ class IngredientInstance(Resource):
         result = patch_document(Ingredient, new_ingredient, old_ingredient)
 
         if(result['n'] != 1):
-            BadRequest(
+            raise BadRequest(
                 description='no matching ingredient with id: {}'.format(ingredient_id))
 
         old_ingredient.reload()
