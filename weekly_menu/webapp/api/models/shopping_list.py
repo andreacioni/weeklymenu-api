@@ -5,6 +5,7 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     checked = mongo.BooleanField(required=True)
     item = mongo.ReferenceField('Ingredient', required=True)
     supermarketSection = mongo.StringField()
+    listPosition = mongo.IntField(min_value=0)
 
 class ShoppingList(mongo.Document):
     name = mongo.StringField(unique=True)
