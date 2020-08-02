@@ -3,10 +3,6 @@
 echo "Check if checkout on master"
 CURRENT_BRANCH=$(git rev-parse --symbolic-full-name --abbrev-ref HEAD)
 
-echo "Testing app"...
-
-python3 -m pytest ./tests
-
 echo "Current branch is: $CURRENT_BRANCH"
 
 if [ $CURRENT_BRANCH != "master" ]; then
@@ -14,9 +10,21 @@ if [ $CURRENT_BRANCH != "master" ]; then
     exit 1
 fi
 
+echo "Testing app"...
+
+source venv/bin/activate
+
+python3 -m pytest ./tests
+
+if [ $? != 0 ]; then
+    echo "Test: FAILED"
+    exit 1
+fi
+echo "Test: PASSED"
+
 echo "Updating pypi tools..."
 
-python3 -m pip install --user --upgrade setuptools wheel twine
+python3 -m pip install --upgrade setuptools wheel twine
 
 echo "Cleaning temp directories..."
 

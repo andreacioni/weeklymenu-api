@@ -36,5 +36,10 @@ def register_user(user_meta: PostRegisterUserSchema):
     user.password = encode_password(user_meta['password'])
     user.email = user_meta['email']
     user.save()
+
+    # Create a new shopping list for the newly created user
+    shop_list = ShoppingList()
+    shop_list.owner = user.id
+    shop_list.save()
     
     return jsonify(user.to_mongo()), 200
