@@ -1,0 +1,14 @@
+language: python
+python:
+  - "3.7"
+services:
+  - mongodb
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
+  - pip install -e .
+before_script:
+  - mongo test --eval 'db.createUser({user:"travis",pwd:"test",roles:["readWrite"]});'
+# command to run tests
+script:
+  - pytest
