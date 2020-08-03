@@ -1,5 +1,6 @@
 import pytest
 import jwt
+import os
 
 from flask.testing import FlaskClient
 from weekly_menu import create_app
@@ -23,7 +24,8 @@ def clear_db():
 
 @pytest.fixture(scope='session')
 def app():
-  return create_app('pytest')
+  config_name = os.environ.get('CONFIG_NAME', 'pytest')
+  return create_app(config_name)
 
 @pytest.fixture(scope='session')
 def client(app):
