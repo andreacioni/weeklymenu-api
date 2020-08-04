@@ -12,6 +12,10 @@ TEST_USERNAME = 'test'
 TEST_PASSWORD = 'pippo@franco.it'
 TEST_EMAIL = 'pippo@franco123'
 
+TEST_USERNAME_2 = 'test2'
+TEST_PASSWORD_2 = 'pippo2@franco.it'
+TEST_EMAIL_2 = 'pippo2@franco123'
+
 @pytest.fixture(autouse=True)
 def clear_db():
   yield
@@ -33,15 +37,23 @@ def client(app):
 
 @pytest.fixture(scope='session')
 def auth_headers(client: FlaskClient):
+  return register_and_login(client, TEST_USERNAME, TEST_PASSWORD, TEST_EMAIL)
+
+@pytest.fixture(scope='session')
+def auth_headers_2(client: FlaskClient):
+  return register_and_login(client, TEST_USERNAME_2, TEST_PASSWORD_2, TEST_EMAIL_2)
+
+
+def register_and_login(client, user, password, email):
   response = client.post('/api/v1/auth/register', json={
-    'username':TEST_USERNAME, 
-    'password':TEST_PASSWORD,
-    'email':TEST_EMAIL
-    })
-  
+  'username': user, 
+  'password': password,
+  'email': email
+  })
+
   response = client.post('/api/v1/auth/token', json={
-    'username':TEST_USERNAME, 
-    'password':TEST_PASSWORD
+    'username': user, 
+    'password': password
     })
 
   headers = {
