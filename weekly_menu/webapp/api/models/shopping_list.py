@@ -8,7 +8,7 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     listPosition = mongo.IntField(min_value=0)
 
 class ShoppingList(mongo.Document):
-    name = mongo.StringField(unique=True)
+    name = mongo.StringField()
     items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
     owner = mongo.ReferenceField('User', required=True)

@@ -351,5 +351,15 @@ def test_remove_shopping_list_item(client: FlaskClient, auth_headers):
 
   assert ham['_id'] in [ it['item'] for it in shop_list['items'] ] and not (tuna['_id'] in [ it['item'] for it in shop_list['items'] ])
 
+def test_two_list_with_same_name(client: FlaskClient, auth_headers, auth_headers_2):
+  response = create_shopping_list(client, {
+    'name' : 'Main List'
+  }, auth_headers)
 
+  assert response.status_code == 201
 
+  response = create_shopping_list(client, {
+    'name' : 'Main List'
+  }, auth_headers_2)
+
+  assert response.status_code == 201
