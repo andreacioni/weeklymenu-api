@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="weekly-menu",
-    version="0.0.9",
+    version="0.0.10",
     author="Andrea Cioni",
     description="Automate your weekly menu with AI",
     long_description=long_description,
