@@ -86,7 +86,7 @@ def load_user_info(func):
     def wrapper(*args, **kwargs):
         from .models import User
         try:
-            user = User.objects(Q(username=get_jwt_identity())).get()
+            user = User.objects(Q(email=get_jwt_identity())).get()
         except DoesNotExist:
             raise Forbidden()
 

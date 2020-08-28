@@ -13,9 +13,9 @@ def create_module(app, **kwargs):
     from .controllers import auth_blueprint
     app.register_blueprint(auth_blueprint)
 
-def authenticate(username, password):
+def authenticate(email, password):
     user = User.objects(
-        username__exact=username
+        email__exact=email
     ).first()
     
     if not user:

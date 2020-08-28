@@ -18,13 +18,13 @@ auth_blueprint = Blueprint(
 @auth_blueprint.route('/token', methods=['POST'])
 @validate_payload(PostUserTokenSchema(), 'user')
 def get_token(user: PostUserTokenSchema):
-    user = authenticate(user['username'], user['password'])
+    user = authenticate(user['email'], user['password'])
     
     if not user:
         raise InvalidCredentials("Provided credentials doesn't match for specific user")
 
     # Identity can be any data that is json serializable
-    access_token = create_access_token(identity=user.username)
+    access_token = create_access_token(identity=user.email)
     return jsonify(access_token=access_token), 200
 
 
@@ -32,7 +32,7 @@ def get_token(user: PostUserTokenSchema):
 @validate_payload(PostRegisterUserSchema(), 'user_meta')
 def register_user(user_meta: PostRegisterUserSchema):
     user = User()
-    user.username = user_meta['username']
+    user.name = user_meta['name']
     user.password = encode_password(user_meta['password'])
     user.email = user_meta['email']
     user.save()

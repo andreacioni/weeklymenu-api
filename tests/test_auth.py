@@ -13,13 +13,13 @@ def test_bad_request_registration(client: FlaskClient):
 
   assert response.status_code == 400
 
-  response = client.post('/api/v1/auth/register', json={'username':'a'})
+  response = client.post('/api/v1/auth/register', json={'name':'a'})
 
   assert response.status_code == 400
 
 def test_user_creation(client: FlaskClient):
   response = client.post('/api/v1/auth/register', json={
-    'username':"test2", 
+    'name':"test2", 
     'password':"password12",
     'email':"pippo@pluto.com"
     })
@@ -29,14 +29,14 @@ def test_user_creation(client: FlaskClient):
   assert response.status_code == 200
 
   response = client.post('/api/v1/auth/token', json={
-    'username':"test2", 
+    'email':"test2@pluto.com", 
     'password':'wrong-password'
   })
 
   assert response.status_code == 401
 
   response = client.post('/api/v1/auth/token', json={
-    'username':"test2", 
+    'email':"pippo@pluto.com", 
     'password':"password12"
   })
 
@@ -46,7 +46,7 @@ def test_user_creation(client: FlaskClient):
 
 def test_shopping_list_creation_on_registration(client: FlaskClient):
   response = client.post('/api/v1/auth/register', json={
-    'username':"test_usr", 
+    'name':"test_usr", 
     'password':"password",
     'email':"pippo@pluto.com"
     })
@@ -54,7 +54,7 @@ def test_shopping_list_creation_on_registration(client: FlaskClient):
   assert response.status_code == 200
 
   response = client.post('/api/v1/auth/token', json={
-    'username':"test_usr", 
+    'email':"pippo@pluto.com", 
     'password':"password"
   })
 
