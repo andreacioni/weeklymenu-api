@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended.config import config
 from marshmallow_mongoengine import schema
 
-from . import authenticate, encode_password
-from .schemas import PostRegisterUserSchema, PostUserTokenSchema
+from . import authenticate, encode_password, get_user_by_email
+from .schemas import PostRegisterUserSchema, PostUserTokenSchema, PostResetPasswordSchema
 from .. import BASE_PATH
 from ... import validate_payload
 from ...models import User, ShoppingList
-from ...exceptions import InvalidCredentials
+from ...exceptions import InvalidCredentials, NotFound
 
 auth_blueprint = Blueprint(
     'auth',
@@ -25,7 +26,7 @@ def get_token(user: PostUserTokenSchema):
 
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=user.email)
-    return jsonify(access_token=access_token), 200
+    return jsonify(access_token=access_token, expires_in=config.access_expires.seconds), 200
 
 
 @auth_blueprint.route('/register', methods=['POST'])
@@ -43,3 +44,13 @@ def register_user(user_meta: PostRegisterUserSchema):
     shop_list.save()
     
     return jsonify(user.to_mongo()), 200
+
+@auth_blueprint.route('/reset_password', methods=['POST'])
+@validate_payload(PostResetPasswordSchema(), 'user_meta')
+def reset_password(user_meta: PostResetPasswordSchema):
+    user = get_user_by_email(user_meta['email'])
+
+    if user is None:
+        raise NotFound('User not found')
+
+    return '', 201

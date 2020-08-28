@@ -6,11 +6,17 @@ from marshmallow.validate import Length, Regexp, Range
 from ... import mongo
 from ...models import User
 
+_email_field = fields.Str(required=True, validate=Regexp(User.USER_EMAIL_REGEX))
+_password_field = fields.Str(required=True, validate=Length(User.MIN_PASSWORD_LENGTH,User.MAX_PASSWORD_LENGTH))
+
 class PostUserTokenSchema(Schema):
-    email = fields.String()
-    password = fields.String()
+    email = _email_field
+    password = _password_field
 
 class PostRegisterUserSchema(Schema):
     name = fields.Str(required=True, validate=Length(User.MIN_USERNAME_LENGTH,User.MAX_USERNAME_LENGTH))
-    password = fields.Str(required=True, validate=Length(User.MIN_PASSWORD_LENGTH,User.MAX_PASSWORD_LENGTH))
-    email = fields.Str(required=True, validate=Regexp(User.USER_EMAIL_REGEX))
+    password = _password_field
+    email = _email_field
+
+class PostResetPasswordSchema(Schema):
+    email = _email_field
