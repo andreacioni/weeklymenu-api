@@ -26,7 +26,7 @@ def get_token(user: PostUserTokenSchema):
 
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=user.email)
-    return jsonify(access_token=access_token, expires_in=config.access_expires.seconds), 200
+    return jsonify(user_id=user.id,access_token=access_token, expires_in=config.access_expires.seconds), 200
 
 
 @auth_blueprint.route('/register', methods=['POST'])

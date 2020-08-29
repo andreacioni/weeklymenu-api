@@ -95,4 +95,4 @@ def test_expires_in(client: FlaskClient, auth_headers):
     'password': TEST_PASSWORD
   })
 
-  assert response.status_code == 200 and response.json['expires_in'] == 60
+  assert response.status_code == 200 and response.json['expires_in'] == 60 and response.json['user_id'] != None
