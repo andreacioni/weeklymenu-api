@@ -13,10 +13,8 @@ def create_module(app, **kwargs):
     from .controllers import auth_blueprint
     app.register_blueprint(auth_blueprint)
 
-def authenticate(username, password):
-    user = User.objects(
-        username__exact=username
-    ).first()
+def authenticate(email, password):
+    user = get_user_by_email(email)
     
     if not user:
         return None
@@ -24,6 +22,13 @@ def authenticate(username, password):
     # Do the passwords match
     if not bcrypt.check_password_hash(user.password, password):
         return None
+    
+    return user
+
+def get_user_by_email(email):
+    user = User.objects(
+        email__exact=email
+    ).first()
     
     return user
 

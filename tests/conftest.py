@@ -46,13 +46,13 @@ def auth_headers_2(client: FlaskClient):
 
 def register_and_login(client, user, password, email):
   response = client.post('/api/v1/auth/register', json={
-  'username': user, 
+  'name': user, 
   'password': password,
   'email': email
   })
 
   response = client.post('/api/v1/auth/token', json={
-    'username': user, 
+    'email': email, 
     'password': password
     })
 
