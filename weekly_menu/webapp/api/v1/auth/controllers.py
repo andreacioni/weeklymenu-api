@@ -53,4 +53,12 @@ def reset_password(user_meta: PostResetPasswordSchema):
     if user is None:
         raise NotFound('User not found')
 
-    return '', 201
+    # TODO: send mail
+
+    return '', 204
+
+@auth_blueprint.route('/logout', methods=['POST'])
+def logout():
+    # TODO: token validation and blacklisting
+    return '', 204
+    

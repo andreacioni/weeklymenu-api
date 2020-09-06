@@ -81,7 +81,7 @@ def test_password_reset(client: FlaskClient):
     'email':"jsmith@pluto.com"
   })
 
-  assert response.status_code == 201
+  assert response.status_code == 204
 
   response = client.post('/api/v1/auth/reset_password', json={
   'email':"luke@pluto.com"
@@ -96,3 +96,9 @@ def test_expires_in(client: FlaskClient, auth_headers):
   })
 
   assert response.status_code == 200 and response.json['expires_in'] == 60 and response.json['user_id'] != None
+
+def test_logout(client: FlaskClient):
+  response = client.post('/api/v1/auth/logout', json={})
+
+  assert response.status_code == 204
+
