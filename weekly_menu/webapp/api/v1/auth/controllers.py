@@ -55,10 +55,10 @@ def reset_password(user_meta: PostResetPasswordSchema):
 
     # TODO: send mail
 
-    return '', 201
+    return '', 204
 
 @auth_blueprint.route('/logout', methods=['POST'])
 def logout():
     # TODO: token validation and blacklisting
-    return '', 201
+    return '', 204
     
