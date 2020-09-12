@@ -108,6 +108,6 @@ venv.bak/
 
 \.DS_Store
 
-config.py
+configs/config.py
 
 venv/
