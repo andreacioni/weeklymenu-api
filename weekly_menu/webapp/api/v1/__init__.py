@@ -10,6 +10,7 @@ def create_module(app, api):
     from .recipes import create_module as create_recipes_module
     #from .users import create_module as create_users_module
     from .shopping_list import create_module as create_shopping_list_module
+    from .config import create_module as create_config_module
 
     create_auth_module(app)
 
@@ -18,3 +19,4 @@ def create_module(app, api):
     create_recipes_module(app, api)
     #create_users_module(app, api)
     create_shopping_list_module(app, api)
+    create_config_module(app, api)
