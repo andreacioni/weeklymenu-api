@@ -6,6 +6,9 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     item = mongo.ReferenceField('Ingredient', required=True)
     supermarketSection = mongo.StringField()
     listPosition = mongo.IntField(min_value=0)
+    
+    quantity = mongo.FloatField(min_value=0)
+    unitOfMeasure = mongo.StringField(max_length=10)
 
 class ShoppingList(mongo.Document):
     name = mongo.StringField()

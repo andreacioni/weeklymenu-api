@@ -225,16 +225,23 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
       {
         'item' : ham['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSection': 'Groceries',
       },{
         'item' : tuna['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSection': 'Groceries',
+        'quantity': 12,
+        'unitOfMeasure': 'L'
       }
     ]
   }, auth_headers).json
 
-  assert shop_list['items'][0]['checked'] == False and shop_list['items'][1]['checked'] == False
+  assert shop_list['items'][0]['checked'] == False \
+    and ('quantity' not in shop_list['items'][0]) \
+    and ('unitOfMeasure') not in shop_list['items'][0] \
+    and shop_list['items'][1]['quantity'] == 12 \
+    and shop_list['items'][1]['unitOfMeasure'] == 'L' \
+    and shop_list['items'][1]['checked'] == False
   
   # NOTE replaced with test_item_change_shopping_list test
   #response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
@@ -245,10 +252,13 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
   #assert response.status_code == 409
 
   response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'],{
-      'checked' : True
+      'checked' : True,
+      'quantity' : 23
   }, auth_headers)
 
-  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
+  assert response.status_code == 200 and \
+    response.json['supermarketSection'] == 'Groceries' and \
+    response.json['quantity'] == 23.0
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 
@@ -256,10 +266,15 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
 
   response = update_item_in_shopping_list(client, shop_list['_id'], ham['_id'],{
       'item' : ham['_id'],
-      'checked' : True
+      'checked' : True,
+      'quantity': 33,
+      'unitOfMeasure': 'cl'
   }, auth_headers)
 
-  assert response.status_code == 200 and response.json['supermarketSection'] == 'Groceries'
+  assert response.status_code == 200 and \
+    response.json['supermarketSection'] == 'Groceries' and \
+    response.json['quantity'] == 33 and \
+    response.json['unitOfMeasure'] == 'cl'
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
 
