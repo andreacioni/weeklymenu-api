@@ -159,7 +159,16 @@ def test_duplicate_recipe_allowed(client: FlaskClient, auth_headers):
 
   assert response.status_code == 200 and len(response.json['results']) == 2 and response.json['pages'] == 1
 
+def test_update_recipe(client: FlaskClient, auth_headers):
+  response = create_recipe(client, {
+    'name': 'Tuna and tomatoes'
+  } , auth_headers)
 
+  assert response.status_code == 201 and 'description' not in response.json
 
-
-
+  response = patch_recipe(client, response.json['_id'], {
+    'name': 'Tuna and tomatoes',
+    'description': 'Test description'
+  }, auth_headers)
+  
+  assert response.status_code == 200 and response.json['description'] == 'Test description'
