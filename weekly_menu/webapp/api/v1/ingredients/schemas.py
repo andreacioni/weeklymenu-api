@@ -4,10 +4,9 @@ from marshmallow import Schema, fields
 
 from ... import mongo
 from ...models import Ingredient
+from ...schemas import BaseValidatorsMixin
 
-class IngredientSchema(me.ModelSchema):
-
-
+class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
 
     class Meta:
         model = Ingredient

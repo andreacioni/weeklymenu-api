@@ -1,10 +1,14 @@
 import pytest
 
+from uuid import uuid4
+
+from conftest import add_offline_id
+
 from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
 
-
+@add_offline_id
 def create_ingredient(client, json, auth_headers):
     return client.post('/api/v1/ingredients', json=json, headers=auth_headers)
 

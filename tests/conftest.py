@@ -2,6 +2,9 @@ import pytest
 import jwt
 import os
 
+from functools import wraps
+from uuid import uuid4
+
 from flask.testing import FlaskClient
 from weekly_menu import create_app
 
@@ -63,3 +66,13 @@ def register_and_login(client, user, password, email):
   }
 
   return headers
+
+def add_offline_id(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+      assert  isinstance(args[1], dict)
+
+      args[1]['offline_id'] = uuid4()
+
+      return func(*args, **kwargs)
+  return wrapper
