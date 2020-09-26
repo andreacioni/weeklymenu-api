@@ -2,11 +2,9 @@ from marshmallow import fields, Schema, validates_schema, ValidationError
 
 from ..exceptions import CannotUpdateResourceOwner, CannotSetResourceId
 
-
 class OwnerNotRequiredMixin:
   # Owner is not required because it will be attached server side based on token
   owner = fields.String(required=False)
-
 
 class CheckUnknownFieldsMixin:
   @validates_schema(pass_original=True)
@@ -24,7 +22,13 @@ class DenyOwnerOverrideMixin:
 class DenyIdOverrideMixin:
   @validates_schema
   def id_not_allowed(self, data):
-      if ('id' in data) or ('offline_id' in data):
+      if 'id' in data:
+          raise CannotSetResourceId()
+
+class DenyOfflineIdOverrideMixin:
+  @validates_schema
+  def offline_id_not_allowed(self, data):
+      if 'offline_id' in data:
           raise CannotSetResourceId()
 
 class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyIdOverrideMixin, DenyOwnerOverrideMixin):

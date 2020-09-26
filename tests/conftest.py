@@ -72,7 +72,8 @@ def add_offline_id(func):
   def wrapper(*args, **kwargs):
       assert  isinstance(args[1], dict)
 
-      args[1]['offline_id'] = uuid4()
+      if 'offline_id' not in args[1]:
+        args[1]['offline_id'] = uuid4()
 
       return func(*args, **kwargs)
   return wrapper

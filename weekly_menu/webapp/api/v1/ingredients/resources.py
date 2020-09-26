@@ -7,7 +7,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.fields import ObjectIdField
 from mongoengine.queryset.visitor import Q
 
-from .schemas import IngredientSchema, IngredientSchemaWithoutName
+from .schemas import IngredientSchema, UpdateIngredientSchema
 from ...models import Ingredient, User, Recipe, ShoppingList
 from ... import validate_payload, get_payload, paginated, mongo, load_user_info, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden
@@ -78,7 +78,7 @@ class IngredientInstance(Resource):
         return old_ingredient, 200
 
     @jwt_required
-    @validate_payload(IngredientSchemaWithoutName(), 'new_ingredient')
+    @validate_payload(UpdateIngredientSchema(), 'new_ingredient')
     @load_user_info
     def patch(self, new_ingredient, user_info: User, ingredient_id=''):
         old_ingredient = Ingredient.objects(
