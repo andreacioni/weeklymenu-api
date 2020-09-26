@@ -102,7 +102,7 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 201 and response.json[
         'name'] == 'ham'
 
-    # TODO uniqueness in collection cannot be guarateeded across different users
+    # TODO uniqueness in collection cannot be guaranteed across different users
     # Test fail duplicating ingredient
     # response = create_ingredient(client, {
     #  'name': 'ham'
