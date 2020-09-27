@@ -7,7 +7,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
 from bson import ObjectId
 
-from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema, ShoppingListItemWithoutRequiredItemSchema
+from .schemas import ShoppingListSchema, PutShoppingListSchema, PatchShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema, ShoppingListItemWithoutRequiredItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict, NotFound
@@ -60,7 +60,7 @@ class UserShoppingList(Resource):
         return "", 204
 
     @jwt_required
-    @validate_payload(ShoppingListSchema(), 'new_list')
+    @validate_payload(PutShoppingListSchema(), 'new_list')
     @load_user_info
     def put(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
         old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
@@ -74,7 +74,7 @@ class UserShoppingList(Resource):
         return old_list, 200
     
     @jwt_required
-    @validate_payload(ShoppingListSchema(), 'new_list')
+    @validate_payload(PatchShoppingListSchema(), 'new_list')
     @load_user_info
     def patch(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
         old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()

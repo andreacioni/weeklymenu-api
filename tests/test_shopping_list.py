@@ -212,7 +212,9 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
       ]
   }, auth_headers)
 
-  assert response.status_code == 200 and response.json['items'][0]['checked'] == True and response.json['items'][1]['checked'] == False
+  assert response.status_code == 200 \
+    and response.json['items'][0]['checked'] == True \
+    and response.json['items'][1]['checked'] == False
 def test_update_shopping_list_item(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
     'name': 'ham'
