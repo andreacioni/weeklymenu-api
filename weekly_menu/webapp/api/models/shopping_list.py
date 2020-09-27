@@ -14,7 +14,7 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     unitOfMeasure = mongo.StringField(max_length=10)
 
 class ShoppingList(BaseDocument):
-    name = mongo.StringField()
+    name = mongo.StringField(required=True)
     items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
     meta = {

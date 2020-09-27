@@ -7,7 +7,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.fields import ObjectIdField, ObjectId
 from mongoengine.queryset.visitor import Q
 
-from .schemas import RecipeSchema, RecipeSchemaWithoutName, RecipeIngredientSchema, RecipeIngredientWithoutRequiredIngredientSchema
+from .schemas import RecipeSchema, PatchRecipeSchema, PutRecipeSchema, RecipeIngredientSchema, RecipeIngredientWithoutRequiredIngredientSchema
 from ...models import Recipe, User, RecipeIngredient
 from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info, patch_embedded_document
 from ...exceptions import DuplicateEntry, BadRequest, Conflict, NotFound
@@ -67,7 +67,7 @@ class RecipeInstance(Resource):
         return "", 204
 
     @jwt_required
-    @validate_payload(RecipeSchema(), 'new_recipe')
+    @validate_payload(PutRecipeSchema(), 'new_recipe')
     @load_user_info
     def put(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         old_recipe = Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
@@ -81,7 +81,7 @@ class RecipeInstance(Resource):
         return old_recipe, 200
 
     @jwt_required
-    @validate_payload(RecipeSchemaWithoutName(), 'new_recipe')
+    @validate_payload(PatchRecipeSchema(), 'new_recipe')
     @load_user_info
     def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
         old_recipe = Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()

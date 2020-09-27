@@ -11,6 +11,14 @@ class ShoppingListSchema(me.ModelSchema, BaseValidatorsMixin):
 
     class Meta:
         model = ShoppingList
+class PutShoppingListSchema(me.ModelSchema, BaseValidatorsMixin):
+
+    offline_id = fields.String(required=False)
+
+class PatchShoppingListSchema(PutShoppingListSchema):
+
+    #Overriding name property
+    name = fields.String(required=False)
 
 class ShoppingListItemSchema(me.ModelSchema, CheckUnknownFieldsMixin):
     
