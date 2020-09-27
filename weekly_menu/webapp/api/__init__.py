@@ -152,6 +152,7 @@ def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Docume
     # Remove generated id and link new doc with current owner
     new_doc.id = None
     new_doc.owner = old_doc.owner
+    new_doc.offline_id = old_doc.offline_id
 
     if patch == True:
         return coll_class._get_collection().update(

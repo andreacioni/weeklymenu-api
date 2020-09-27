@@ -11,7 +11,12 @@ class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
     class Meta:
         model = Ingredient
 
-class UpdateIngredientSchema(IngredientSchema, DenyOfflineIdOverrideMixin):
+
+class PutIngredientSchema(IngredientSchema, DenyOfflineIdOverrideMixin):
+
+    offline_id = fields.String(required=False)
+
+class PatchIngredientSchema(PutIngredientSchema):
 
     #Overriding name property
     name = fields.String(required=False)

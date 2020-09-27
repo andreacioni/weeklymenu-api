@@ -8,6 +8,7 @@ from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
 
+
 @add_offline_id
 def create_ingredient(client, json, auth_headers):
     return client.post('/api/v1/ingredients', json=json, headers=auth_headers)
@@ -19,6 +20,7 @@ def replace_ingredient(client, ing_id, json, auth_headers):
 
 def patch_ingredient(client, ing_id, json, auth_headers):
     return client.patch('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
+
 
 def put_ingredient(client, ing_id, json, auth_headers):
     return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
@@ -135,9 +137,9 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
 
     response = get_all_ingredients(client, auth_headers)
 
-    assert response.status_code == 200 and response.json['pages'] == 1 and len(
-        response.json['results']) == 1
-
+    assert response.status_code == 200 \
+        and response.json['pages'] == 1 \
+        and len(response.json['results']) == 1
 
 def test_replace_ingredient(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
@@ -145,17 +147,26 @@ def test_replace_ingredient(client: FlaskClient, auth_headers):
         'description': 'this is a tuna'
     }, auth_headers)
 
-    assert response.status_code == 201 and response.json[
-        'name'] == 'Tuna' and response.json['description'] == 'this is a tuna'
+    assert response.status_code == 201 \
+        and response.json['name'] == 'Tuna'  \
+        and response.json['description'] == 'this is a tuna' \
+        and response.json['_id'] is not None \
+        and response.json['offline_id'] is not None
 
-    response = replace_ingredient(client, response.json['_id'], {
+    original_id = response.json['_id']
+    original_offline_id = response.json['offline_id']
+
+    response = replace_ingredient(client, original_id, {
         'name': 'Tuna',
         'description': 'always a tuna',
         'note': 'note about tuna'
     }, auth_headers)
 
-    assert response.status_code == 200 and response.json[
-        'description'] == 'always a tuna' and response.json['note'] == 'note about tuna'
+    assert response.status_code == 200 \
+        and response.json['description'] == 'always a tuna' \
+        and response.json['note'] == 'note about tuna' \
+        and original_id == response.json['_id'] \
+        and original_offline_id == response.json['offline_id']
 
 
 def test_duplicate_ingredient_allowed(client: FlaskClient, auth_headers):
