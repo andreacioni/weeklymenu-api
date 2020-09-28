@@ -1,5 +1,6 @@
 import pytest
 
+from datetime import datetime
 from uuid import uuid4
 
 from flask import jsonify
@@ -343,3 +344,96 @@ def test_offline_id(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 \
         and response.json['offline_id'] == offline_id
+
+def test_create_update_date(client: FlaskClient, auth_headers):
+    response = create_menu(client, {
+        'date': '2019-02-14',
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_menu(client, {
+        'date': '2019-02-14',
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = create_menu(client, {
+        'date': '2019-02-14',
+        'update_date': str(datetime.now()),
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_menu(client, {
+        'date': '2019-02-14'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['creation_date'] is not None \
+            and isinstance(response.json['creation_date'], int) \
+        and response.json['update_date'] is not None \
+            and isinstance(response.json['update_date'], int)    
+    
+    idx = response.json['_id']
+    creation_date = response.json['creation_date']
+    update_date = response.json['update_date']
+    
+    response = put_menu(client, idx, {
+        'date': '2019-02-14',
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_menu(client, idx, {
+        'date': '2019-02-14',
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_menu(client, idx, {
+        'date': '2019-02-14',
+        'creation_date': str(datetime.now()),
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = put_menu(client, idx, {
+        'date': '2019-02-14',
+        'creation_date': str(datetime.now()),
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_menu(client, idx, {
+        'date': '2019-02-14',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['creation_date'] == creation_date \
+        and response.json['update_date'] > update_date
+    
+    update_date = response.json['update_date']
+
+    response = put_menu(client, idx, {
+        'date': '2020-02-14',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['date'] == '2020-02-14' \
+        and response.json['creation_date'] == creation_date \
+        and response.json['update_date'] > update_date

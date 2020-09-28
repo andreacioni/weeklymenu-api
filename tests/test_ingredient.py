@@ -285,14 +285,79 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     assert response.status_code == 403 \
         and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'update_date': str(datetime.now()),
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
     
     response = create_ingredient(client, {
-        'name': 'Rice'
+        'name': 'Rice',
     }, auth_headers)
 
     assert response.status_code == 201 \
         and response.json['creation_date'] is not None \
-            and datetime.fromisoformat(response.json['creation_date']).time() != time(0,0) \
+            and isinstance(response.json['creation_date'], int) \
         and response.json['update_date'] is not None \
-            and datetime.fromisoformat(response.json['update_date']).time() != time(0,0)
+            and isinstance(response.json['update_date'], int)    
     
+    idx = response.json['_id']
+    creation_date = response.json['creation_date']
+    update_date = response.json['update_date']
+    
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+        'creation_date': str(datetime.now()),
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+        'creation_date': str(datetime.now()),
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['creation_date'] == creation_date \
+        and response.json['update_date'] > update_date
+    
+    update_date = response.json['update_date']
+
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['name'] == 'Tomato' \
+        and response.json['creation_date'] == creation_date \
+        and response.json['update_date'] > update_date
