@@ -5,7 +5,7 @@ from marshmallow import Schema, fields, validates_schema, ValidationError
 from ... import mongo
 from ...models import Menu, Recipe
 from ...exceptions import CannotUpdateResourceOwner, CannotSetResourceId
-from ...schemas import BaseValidatorsMixin
+from ...schemas import BaseValidatorsMixin, DenyOfflineIdOverrideMixin
 
 
 class MenuSchema(me.ModelSchema, BaseValidatorsMixin):
@@ -16,7 +16,11 @@ class MenuSchema(me.ModelSchema, BaseValidatorsMixin):
     class Meta:
         model = Menu
 
-class MenuWithoutDateSchema(MenuSchema):
+class PutMenuSchema(MenuSchema, DenyOfflineIdOverrideMixin):
+
+    offline_id = fields.String(required=False)
+
+class PatchMenuSchema(PutMenuSchema):
 
     date = fields.Date(required=False)
 

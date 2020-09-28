@@ -43,6 +43,7 @@ def register_user(user_meta: PostRegisterUserSchema):
     # Create a new shopping list for the newly created user
     shop_list = ShoppingList()
     shop_list.owner = user.id
+    shop_list.name = 'Shopping List' #TODO name of the list may vary based on the location of the user
     shop_list.offline_id = str(uuid4())
     shop_list.save()
     

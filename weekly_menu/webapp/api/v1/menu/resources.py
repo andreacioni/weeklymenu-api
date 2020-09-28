@@ -9,7 +9,7 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.fields import ObjectIdField, ObjectId
 from mongoengine.queryset.visitor import Q
 
-from .schemas import MenuSchema, MenuWithoutDateSchema, MenuRecipeSchema
+from .schemas import MenuSchema, PatchMenuSchema, PutMenuSchema, MenuRecipeSchema
 from ...models import Ingredient, User, menu, ShoppingList, Menu, Recipe
 from ... import validate_payload, paginated, mongo, load_user_info, put_document, patch_document
 from ...exceptions import DuplicateEntry, BadRequest
@@ -89,7 +89,7 @@ class MenuInstance(Resource):
         return "", 204
     
     @jwt_required
-    @validate_payload(MenuSchema(), 'new_menu')
+    @validate_payload(PutMenuSchema(), 'new_menu')
     @load_user_info
     def put(self, new_menu: Ingredient, user_info: User, menu_id=''):
         old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
@@ -104,7 +104,7 @@ class MenuInstance(Resource):
         
 
     @jwt_required
-    @validate_payload(MenuWithoutDateSchema(), 'new_menu')
+    @validate_payload(PatchMenuSchema(), 'new_menu')
     @load_user_info
     def patch(self, new_menu: Menu, user_info: User, menu_id=''):
         old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
