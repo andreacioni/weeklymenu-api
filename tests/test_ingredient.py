@@ -1,6 +1,7 @@
 import pytest
 
 from uuid import uuid4
+from datetime import datetime, time
 
 from conftest import add_offline_id
 
@@ -10,7 +11,10 @@ from flask.testing import FlaskClient
 
 
 @add_offline_id
-def create_ingredient(client, json, auth_headers):
+def create_ingredient(client, json, auth_headers, generate_offline_id: bool = True):
+    if generate_offline_id == False:
+        del json['offline_id']
+    
     return client.post('/api/v1/ingredients', json=json, headers=auth_headers)
 
 
@@ -32,6 +36,9 @@ def delete_ingredient(client, ing_id, auth_headers):
 
 def get_all_ingredients(client, auth_headers, page=1, per_page=10):
     return client.get('/api/v1/ingredients?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
+
+def get_ingredient(client, ing_id, auth_headers):
+    return client.get('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
 
 
 def test_not_authorized(client: FlaskClient):
@@ -222,3 +229,70 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 400
+
+def test_offline_id(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name' : 'Fish'
+    }, auth_headers, False)
+
+    assert response.status_code == 400
+
+    response = create_ingredient(client, {
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['_id'] is not None \
+        and response.json['offline_id'] is not None
+
+    idx = response.json['_id']
+    offline_id = response.json['offline_id']
+
+    response = put_ingredient(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+
+    response = patch_ingredient(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+    
+    response = get_ingredient(client, idx, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['offline_id'] == offline_id
+
+def test_create_update_date(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'creation_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'update_date': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_ingredient(client, {
+        'name': 'Rice'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['creation_date'] is not None \
+            and datetime.fromisoformat(response.json['creation_date']).time() != time(0,0) \
+        and response.json['update_date'] is not None \
+            and datetime.fromisoformat(response.json['update_date']).time() != time(0,0)
+    

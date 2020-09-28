@@ -1,6 +1,6 @@
 from marshmallow import fields, Schema, validates_schema, ValidationError
 
-from ..exceptions import CannotUpdateResourceOwner, CannotSetResourceId
+from ..exceptions import CannotUpdateResourceOwner, CannotSetResourceId, CannotSetOrChangeCreationUpdateTime
 
 class OwnerNotRequiredMixin:
   # Owner is not required because it will be attached server side based on token
@@ -31,5 +31,13 @@ class DenyOfflineIdOverrideMixin:
       if 'offline_id' in data:
           raise CannotSetResourceId()
 
-class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyIdOverrideMixin, DenyOwnerOverrideMixin):
-    pass
+class DenyInsertUpdateDateTime:
+  @validates_schema
+  def insert_update_time_not_allowed(self, data):
+      if 'creation_date' in data \
+        or 'update_date' in data:
+          raise CannotSetOrChangeCreationUpdateTime()
+
+class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyIdOverrideMixin, DenyOwnerOverrideMixin, DenyInsertUpdateDateTime):
+    creation_date = fields.Str(required=False)
+    update_date = fields.Str(required=False)

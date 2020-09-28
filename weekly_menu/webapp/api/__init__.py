@@ -28,7 +28,7 @@ def create_module(app):
 
     create_api_v1(app, api)
 
-    # Using workaround from here to handle inerith exception handling from flask: https://github.com/flask-restful/flask-restful/issues/280#issuecomment-280648790
+    # Using workaround from here to handle inherit exception handling from flask: https://github.com/flask-restful/flask-restful/issues/280#issuecomment-280648790
     handle_exceptions = app.handle_exception
     handle_user_exception = app.handle_user_exception
     api.init_app(app)
@@ -153,6 +153,7 @@ def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Docume
     new_doc.id = None
     new_doc.owner = old_doc.owner
     new_doc.offline_id = old_doc.offline_id
+    new_doc.creation_date = old_doc.creation_date
 
     if patch == True:
         return coll_class._get_collection().update(

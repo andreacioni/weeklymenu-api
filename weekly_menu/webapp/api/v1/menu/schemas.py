@@ -10,7 +10,7 @@ from ...schemas import BaseValidatorsMixin, DenyOfflineIdOverrideMixin
 
 class MenuSchema(me.ModelSchema, BaseValidatorsMixin):
 
-    # Overriding datetimefield
+    # Overriding datefield
     date = fields.Date(required=True)
 
     class Meta:

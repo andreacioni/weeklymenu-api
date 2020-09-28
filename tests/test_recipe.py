@@ -1,5 +1,7 @@
 import pytest
 
+from uuid import uuid4
+
 from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
@@ -9,7 +11,10 @@ from conftest import add_offline_id
 from test_ingredient import create_ingredient, delete_ingredient
 
 @add_offline_id
-def create_recipe(client, json, auth_headers):
+def create_recipe(client, json, auth_headers, generate_offline_id: bool = True):
+  if generate_offline_id == False:
+      del json['offline_id']
+  
   return client.post('/api/v1/recipes', json=json, headers=auth_headers)
 
 def patch_recipe(client, recipe_id, json, auth_headers):
@@ -175,3 +180,42 @@ def test_update_recipe(client: FlaskClient, auth_headers):
   }, auth_headers)
   
   assert response.status_code == 200 and response.json['description'] == 'Test description'
+
+def test_offline_id(client: FlaskClient, auth_headers):
+    response = create_recipe(client, {
+        'name' : 'Fish'
+    }, auth_headers, False)
+
+    assert response.status_code == 400
+
+    response = create_recipe(client, {
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['_id'] is not None \
+        and response.json['offline_id'] is not None
+
+    idx = response.json['_id']
+    offline_id = response.json['offline_id']
+
+    response = put_recipe(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+
+    response = patch_recipe(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+    
+    response = get_recipe(client, idx, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['offline_id'] == offline_id

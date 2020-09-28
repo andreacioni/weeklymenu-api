@@ -1,5 +1,7 @@
 import pytest
 
+from uuid import uuid4
+
 from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
@@ -9,8 +11,11 @@ from test_ingredient import create_ingredient, delete_ingredient
 from test_recipe import create_recipe
 
 @add_offline_id
-def create_menu(client, json, auth_headers):
-    return client.post('/api/v1/menus', json=json, headers=auth_headers)
+def create_menu(client, json, auth_headers, generate_offline_id: bool = True):
+  if generate_offline_id == False:
+      del json['offline_id']
+    
+  return client.post('/api/v1/menus', json=json, headers=auth_headers)
 
 
 def replace_menu(client, menu_id, json, auth_headers):
@@ -274,3 +279,67 @@ def test_update_menu(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 and response.json[
         '_id'] == menu_response['_id'] and response.json['date'] == '2019-10-12'
+
+def test_date_format(client: FlaskClient, auth_headers):
+    response = create_menu(client, {
+        'name' : 'Fish',
+        'date' : '2012-09-1212'
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    response = create_menu(client, {
+        'name' : 'Fish',
+        'date' : '2012-31-31'
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    response = create_menu(client, {
+        'name' : 'Fish',
+        'date' : '2012-12-31'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['date'] == '2012-12-31'
+
+def test_offline_id(client: FlaskClient, auth_headers):
+    response = create_menu(client, {
+        'name' : 'Fish',
+        'date' : '2012-09-12'
+    }, auth_headers, False)
+
+    assert response.status_code == 400
+
+    response = create_menu(client, {
+        'name' : 'Fish',
+        'date' : '2012-09-12'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['_id'] is not None \
+        and response.json['offline_id'] is not None
+
+    idx = response.json['_id']
+    offline_id = response.json['offline_id']
+
+    response = put_menu(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+
+    response = patch_menu(client, idx, {
+        'name' : 'Fish',
+        'offline_id': str(uuid4())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+    
+    response = get_menu(client, idx, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['offline_id'] == offline_id
