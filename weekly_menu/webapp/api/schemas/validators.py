@@ -34,10 +34,10 @@ class DenyOfflineIdOverrideMixin:
 class DenyInsertUpdateDateTime:
   @validates_schema
   def insert_update_time_not_allowed(self, data):
-      if 'creation_date' in data \
-        or 'update_date' in data:
+      if 'insert_timestamp' in data \
+        or 'update_timestamp' in data:
           raise CannotSetOrChangeCreationUpdateTime()
 
 class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyIdOverrideMixin, DenyOwnerOverrideMixin, DenyInsertUpdateDateTime):
-    creation_date = fields.Str(required=False)
-    update_date = fields.Str(required=False)
+    insert_timestamp = fields.Str(required=False)
+    update_timestamp = fields.Str(required=False)

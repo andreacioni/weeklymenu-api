@@ -153,7 +153,7 @@ def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Docume
     new_doc.id = None
     new_doc.owner = old_doc.owner
     new_doc.offline_id = old_doc.offline_id
-    new_doc.creation_date = old_doc.creation_date
+    new_doc.insert_timestamp = old_doc.insert_timestamp
 
     if patch == True:
         return coll_class._get_collection().update(

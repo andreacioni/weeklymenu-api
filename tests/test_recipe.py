@@ -221,10 +221,10 @@ def test_offline_id(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['offline_id'] == offline_id
 
-def test_create_update_date(client: FlaskClient, auth_headers):
+def test_create_update_timestamp(client: FlaskClient, auth_headers):
     response = create_recipe(client, {
         'name': 'Rice',
-        'creation_date': str(datetime.now())
+        'insert_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -232,7 +232,7 @@ def test_create_update_date(client: FlaskClient, auth_headers):
     
     response = create_recipe(client, {
         'name': 'Rice',
-        'update_date': str(datetime.now())
+        'update_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -240,8 +240,8 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     response = create_recipe(client, {
         'name': 'Rice',
-        'update_date': str(datetime.now()),
-        'creation_date': str(datetime.now())
+        'update_timestamp': str(datetime.now()),
+        'insert_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -252,18 +252,18 @@ def test_create_update_date(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 201 \
-        and response.json['creation_date'] is not None \
-            and isinstance(response.json['creation_date'], int) \
-        and response.json['update_date'] is not None \
-            and isinstance(response.json['update_date'], int)    
+        and response.json['insert_timestamp'] is not None \
+            and isinstance(response.json['insert_timestamp'], int) \
+        and response.json['update_timestamp'] is not None \
+            and isinstance(response.json['update_timestamp'], int)    
     
     idx = response.json['_id']
-    creation_date = response.json['creation_date']
-    update_date = response.json['update_date']
+    insert_timestamp = response.json['insert_timestamp']
+    update_timestamp = response.json['update_timestamp']
     
     response = put_recipe(client, idx, {
         'name': 'Tomato',
-        'update_date': str(datetime.now())
+        'update_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -271,7 +271,7 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     response = patch_recipe(client, idx, {
         'name': 'Tomato',
-        'creation_date': str(datetime.now())
+        'insert_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -279,8 +279,8 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     response = patch_recipe(client, idx, {
         'name': 'Tomato',
-        'creation_date': str(datetime.now()),
-        'update_date': str(datetime.now())
+        'insert_timestamp': str(datetime.now()),
+        'update_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -288,8 +288,8 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     response = put_recipe(client, idx, {
         'name': 'Tomato',
-        'creation_date': str(datetime.now()),
-        'update_date': str(datetime.now())
+        'insert_timestamp': str(datetime.now()),
+        'update_timestamp': str(datetime.now())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -300,10 +300,10 @@ def test_create_update_date(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 200 \
-        and response.json['creation_date'] == creation_date \
-        and response.json['update_date'] > update_date
+        and response.json['insert_timestamp'] == insert_timestamp \
+        and response.json['update_timestamp'] > update_timestamp
     
-    update_date = response.json['update_date']
+    update_timestamp = response.json['update_timestamp']
 
     response = put_recipe(client, idx, {
         'name': 'Tomato',
@@ -311,5 +311,5 @@ def test_create_update_date(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 \
         and response.json['name'] == 'Tomato' \
-        and response.json['creation_date'] == creation_date \
-        and response.json['update_date'] > update_date
+        and response.json['insert_timestamp'] == insert_timestamp \
+        and response.json['update_timestamp'] > update_timestamp
