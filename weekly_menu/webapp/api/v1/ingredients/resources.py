@@ -9,17 +9,17 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import IngredientSchema, PatchIngredientSchema, PutIngredientSchema
 from ...models import Ingredient, User, Recipe, ShoppingList
-from ... import validate_payload, get_payload, paginated, mongo, load_user_info, put_document, patch_document
+from ... import validate_payload, get_payload, paginated, parse_query_args, mongo, load_user_info, put_document, patch_document, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden
 
 
 class IngredientsList(Resource):
     @jwt_required
+    @parse_query_args
     @paginated
     @load_user_info
-    def get(self, req_args, user_info: User):
-        return Ingredient.objects(owner=str(user_info.id)).paginate(
-            page=req_args['page'], per_page=req_args['per_page'])
+    def get(self, query_args, page_args, user_info: User):
+        return search_on_model(Ingredient, Q(owner=str(user_info.id)), query_args, page_args)
 
     @jwt_required
     @validate_payload(IngredientSchema(), 'ingredient')

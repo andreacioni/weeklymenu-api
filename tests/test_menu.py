@@ -35,8 +35,8 @@ def get_menu(client, menu_id, auth_headers):
     return client.get('/api/v1/menus/{}'.format(menu_id), headers=auth_headers)
 
 
-def get_all_menus(client, auth_headers, page=1, per_page=10):
-    return client.get('/api/v1/menus?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
+def get_all_menus(client, auth_headers, page=1, per_page=10, order_by='', desc=False):
+    return client.get('/api/v1/menus?page={}&per_page={}&order_by={}&desc={}'.format(page, per_page, order_by, desc), headers=auth_headers)
 
 
 def get_all_menus_by_day(client, auth_headers, day):
@@ -437,3 +437,99 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
         and response.json['date'] == '2020-02-14' \
         and response.json['insert_timestamp'] == insert_timestamp \
         and response.json['update_timestamp'] > update_timestamp
+
+def test_get_last_updated(client: FlaskClient, auth_headers):
+    response = create_menu(client, {
+        'date': '2019-09-06',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_1 = response.json['_id']
+    insert_timestamp_1 = response.json['insert_timestamp']
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = create_menu(client, {
+        'date': '2019-10-06',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_2 = response.json['_id']
+    insert_timestamp_2 = response.json['insert_timestamp']
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_menus(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2
+
+    response = patch_menu(client, idx_1, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+    
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_menus(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+
+    response = put_menu(client, idx_1, {
+        'date': '2019-10-06',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_menus(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+    
+    response = patch_menu(client, idx_2, {
+        'date': '2019-10-06',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+    
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_menus(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+
+    response = put_menu(client, idx_2, {
+        'date': '2019-10-06',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_menus(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+        

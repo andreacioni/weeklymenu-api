@@ -9,7 +9,7 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import RecipeSchema, PatchRecipeSchema, PutRecipeSchema, RecipeIngredientSchema, RecipeIngredientWithoutRequiredIngredientSchema
 from ...models import Recipe, User, RecipeIngredient
-from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info, patch_embedded_document
+from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info, patch_embedded_document, parse_query_args, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest, Conflict, NotFound
 
 
@@ -25,13 +25,11 @@ def _dereference_ingredients(recipe: Recipe):
 
 class RecipeList(Resource):
     @jwt_required
+    @parse_query_args
     @paginated
     @load_user_info
-    def get(self, req_args, user_info: User):
-        page = Recipe.objects(owner=str(user_info.id)).paginate(
-            page=req_args['page'], per_page=req_args['per_page'])
-        #page.items = [_dereference_ingredients(item) for item in page.items]
-        return page
+    def get(self, query_args, page_args, user_info: User):
+        return search_on_model(Recipe, Q(owner=str(user_info.id)), query_args, page_args)
 
     @jwt_required
     @validate_payload(RecipeSchema(), 'recipe')

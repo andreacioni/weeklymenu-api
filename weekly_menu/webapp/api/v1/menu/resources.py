@@ -11,7 +11,7 @@ from mongoengine.queryset.visitor import Q
 
 from .schemas import MenuSchema, PatchMenuSchema, PutMenuSchema, MenuRecipeSchema
 from ...models import Ingredient, User, menu, ShoppingList, Menu, Recipe
-from ... import validate_payload, paginated, mongo, load_user_info, put_document, patch_document
+from ... import validate_payload, paginated, mongo, load_user_info, put_document, patch_document, parse_query_args, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest
 
 def _dereference_recipes(menu: Menu):
@@ -36,28 +36,11 @@ class MenuList(Resource):
     )
 
     @jwt_required
+    @parse_query_args
     @paginated
     @load_user_info
-    def get(self, req_args, user_info: User):
-        req_args = {**MenuList.menu_query_reqparse.parse_args(), **req_args} 
-
-        base_query = Q(owner=str(user_info.id))
-
-        if req_args['day'] is not None:
-            if bool(re.search('^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', req_args['day'])):
-                try:
-                    searched_day = datetime.strptime(req_args['day'], '%Y-%m-%d')
-                except ValueError as ex:
-                    raise BadRequest('invalid day parameter supplied: {}'.format(ex))
-            else:
-                raise BadRequest('invalid day format')
-            
-            base_query = base_query & Q(date=searched_day)
-
-        page = Menu.objects(base_query).paginate(
-            page=req_args['page'], per_page=req_args['per_page'])
-        #page.items = [_dereference_recipes(item) for item in page.items]
-        return page
+    def get(self, query_args, page_args, user_info: User):
+        return search_on_model(Menu, Q(owner=str(user_info.id)), query_args, page_args)
     
     @jwt_required
     @validate_payload(MenuSchema(), 'menu')
