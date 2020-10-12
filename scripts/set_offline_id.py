@@ -4,6 +4,7 @@ import argparse
 import pymongo
 import bson
 import uuid
+from  datetime import date
 
 parser = argparse.ArgumentParser()
 parser.add_argument('mongo_url',
@@ -30,7 +31,7 @@ for coll_name in apply_to:
 
   for doc in documents:
     print('Update doc', doc['_id'])
-    db[coll_name].update_one({'_id': doc['_id']}, {'$set': {'offline_id': str(uuid.uuid4())}})
+    db[coll_name].update_one({'_id': doc['_id']}, {'$set': {'offline_id': str(uuid.uuid4()), 'create_timestamp': int(datetime.utcnow().timestamp()*1000), 'update_timestamp': int(datetime.utcnow().timestamp()*1000)}})
     print('Updated document', doc['_id'])
 
 

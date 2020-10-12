@@ -30,8 +30,8 @@ def replace_recipe(client, recipe_id, json, auth_headers):
 def get_recipe(client, recipe_id, auth_headers):
   return client.get('/api/v1/recipes/{}'.format(recipe_id), headers=auth_headers)
 
-def get_all_recipes(client, auth_headers, page=1, per_page=10):
-  return client.get('/api/v1/recipes?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
+def get_all_recipes(client, auth_headers, page=1, per_page=10, order_by='', desc=False):
+  return client.get('/api/v1/recipes?page={}&per_page={}&order_by={}&desc={}'.format(page, per_page, order_by, desc), headers=auth_headers)
 
 def test_not_authorized(client: FlaskClient):
   response = get_all_recipes(client, {})
@@ -313,3 +313,99 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
         and response.json['name'] == 'Tomato' \
         and response.json['insert_timestamp'] == insert_timestamp \
         and response.json['update_timestamp'] > update_timestamp
+      
+def test_get_last_updated(client: FlaskClient, auth_headers):
+    response = create_recipe(client, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_1 = response.json['_id']
+    insert_timestamp_1 = response.json['insert_timestamp']
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = create_recipe(client, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_2 = response.json['_id']
+    insert_timestamp_2 = response.json['insert_timestamp']
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_recipes(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2
+
+    response = patch_recipe(client, idx_1, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+    
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_recipes(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+
+    response = put_recipe(client, idx_1, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_recipes(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+    
+    response = patch_recipe(client, idx_2, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+    
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_recipes(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+
+    response = put_recipe(client, idx_2, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_recipes(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+        
