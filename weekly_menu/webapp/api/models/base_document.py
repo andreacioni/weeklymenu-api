@@ -4,6 +4,7 @@ from .. import mongo
 
 class BaseDocument(mongo.Document):
 
+  #TODO add: , unique_with=['owner']
   offline_id = mongo.StringField(required=True, regex=r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
   
   owner = mongo.ReferenceField('User', required=True)
@@ -12,5 +13,6 @@ class BaseDocument(mongo.Document):
   update_timestamp = mongo.LongField(required=True, default=lambda: int(datetime.utcnow().timestamp()*1000))
 
   meta = {
-    'allow_inheritance': True
+    'abstract': True,
+    'strict': False
   }

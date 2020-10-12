@@ -3,7 +3,7 @@ import logging
 import traceback
 
 from flask import Flask, request, jsonify, json
-from werkzeug.exceptions import NotFound, MethodNotAllowed
+from werkzeug.exceptions import NotFound, MethodNotAllowed, BadRequest
 from mongoengine.fields import ObjectId, DateField, Binary
 from mongoengine.errors import ValidationError
 from datetime import datetime, date
@@ -77,6 +77,14 @@ def handle_notfound(e):
         return jsonify({
             'error': 'NOT_FOUND',
             'descritpion': 'resource was not found on this server',
+            'details': []
+    }), 404
+
+@app.errorhandler(BadRequest)
+def handle_notfound(e):
+        return jsonify({
+            'error': 'BAD_REQUEST',
+            'descritpion': 'invalid request supplied',
             'details': []
     }), 404
 

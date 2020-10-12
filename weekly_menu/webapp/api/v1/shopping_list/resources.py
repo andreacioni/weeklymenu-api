@@ -12,14 +12,14 @@ from ...models import ShoppingList, ShoppingListItem, User
 from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document, put_document, patch_document, parse_query_args, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict, NotFound
 
-def _dereference_item(shopping_list: ShoppingListItem):
-    if shopping_list.items != None:
-        shopping_list_items = [item.item.to_mongo()
-                            for item in shopping_list.items]
-        shopping_list = shopping_list.to_mongo()
-        for i in range(len(shopping_list_items)):
-            shopping_list['items'][i]['item'] = shopping_list_items[i]
-    return shopping_list
+# def _dereference_item(shopping_list: ShoppingListItem):
+#     if shopping_list.items != None:
+#         shopping_list_items = [item.item.to_mongo()
+#                             for item in shopping_list.items]
+#         shopping_list = shopping_list.to_mongo()
+#         for i in range(len(shopping_list_items)):
+#             shopping_list['items'][i]['item'] = shopping_list_items[i]
+#     return shopping_list
 
 class UserShoppingLists(Resource):
     @jwt_required

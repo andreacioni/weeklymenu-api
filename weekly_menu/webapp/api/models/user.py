@@ -16,7 +16,8 @@ class User(mongo.Document):
     )
 
     meta = {
-        'collection' : 'users'
+        'collection' : 'users',
+        'strict': False
     }
 
     def __repr__(self):
