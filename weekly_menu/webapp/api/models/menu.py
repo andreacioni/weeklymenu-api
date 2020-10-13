@@ -10,7 +10,8 @@ class Menu(mongo.Document):
     owner = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY) #It could be useful to have an history of user's menu also when they leave
 
     meta = {
-        'collection' : 'menu'
+        'collection' : 'menu',
+        'strict' : False #TODO remove when use base_model as parent model
     }
 
     def __repr__(self):

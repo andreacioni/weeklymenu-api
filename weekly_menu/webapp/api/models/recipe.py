@@ -33,7 +33,8 @@ class Recipe(mongo.Document):
     owner = mongo.ReferenceField('User', required=True)
 
     meta = {
-        'collection': 'recipes'
+        'collection': 'recipes',
+        'strict' : False #TODO remove when use base_model as parent model
     }
 
     def __repr__(self):
