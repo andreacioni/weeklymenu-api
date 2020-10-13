@@ -16,7 +16,8 @@ class Ingredient(mongo.Document):
     owner = mongo.ReferenceField('User', required=True)
 
     meta = {
-        'collection' : 'ingredients'
+        'collection' : 'ingredients',
+        'strict' : False #TODO remove when use base_model as parent model
     }
 
     def __repr__(self):

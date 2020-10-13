@@ -17,7 +17,8 @@ class ShoppingList(mongo.Document):
     owner = mongo.ReferenceField('User', required=True)
 
     meta = {
-        'collection' : 'shopping_lists'
+        'collection' : 'shopping_lists',
+        'strict' : False #TODO remove when use base_model as parent model
     }
 
     def __repr__(self):
