@@ -32,7 +32,8 @@ class Recipe(BaseDocument):
     )
 
     meta = {
-        'collection': 'recipes'
+        'collection': 'recipes',
+        'strict' : False #TODO remove when use base_model as parent model
     }
 
     def __repr__(self):
