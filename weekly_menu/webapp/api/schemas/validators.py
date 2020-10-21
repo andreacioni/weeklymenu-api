@@ -25,12 +25,6 @@ class DenyIdOverrideMixin:
       if 'id' in data:
           raise CannotSetResourceId()
 
-class DenyOfflineIdOverrideMixin:
-  @validates_schema
-  def offline_id_not_allowed(self, data):
-      if 'offline_id' in data:
-          raise CannotSetResourceId()
-
 class DenyInsertUpdateDateTime:
   @validates_schema
   def insert_update_time_not_allowed(self, data):
@@ -38,6 +32,6 @@ class DenyInsertUpdateDateTime:
         or 'update_timestamp' in data:
           raise CannotSetOrChangeCreationUpdateTime()
 
-class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyIdOverrideMixin, DenyOwnerOverrideMixin, DenyInsertUpdateDateTime):
+class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyOwnerOverrideMixin, DenyInsertUpdateDateTime):
     insert_timestamp = fields.Str(required=False)
     update_timestamp = fields.Str(required=False)

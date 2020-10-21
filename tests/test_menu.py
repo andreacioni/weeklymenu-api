@@ -7,15 +7,10 @@ from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
 
-from conftest import add_offline_id
 from test_ingredient import create_ingredient, delete_ingredient
 from test_recipe import create_recipe
 
-@add_offline_id
-def create_menu(client, json, auth_headers, generate_offline_id: bool = True):
-  if generate_offline_id == False:
-      del json['offline_id']
-    
+def create_menu(client, json, auth_headers):
   return client.post('/api/v1/menus', json=json, headers=auth_headers)
 
 

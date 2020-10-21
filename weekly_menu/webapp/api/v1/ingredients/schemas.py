@@ -4,7 +4,7 @@ from marshmallow import Schema, fields
 
 from ... import mongo
 from ...models import Ingredient
-from ...schemas import BaseValidatorsMixin, DenyOfflineIdOverrideMixin
+from ...schemas import BaseValidatorsMixin
 
 class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
 
@@ -12,7 +12,7 @@ class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
         model = Ingredient
 
 
-class PutIngredientSchema(IngredientSchema, DenyOfflineIdOverrideMixin):
+class PutIngredientSchema(IngredientSchema):
 
     offline_id = fields.String(required=False)
 

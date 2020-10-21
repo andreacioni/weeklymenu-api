@@ -3,18 +3,12 @@ import pytest
 from uuid import uuid4
 from datetime import datetime, time
 
-from conftest import add_offline_id
-
 from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
 
 
-@add_offline_id
-def create_ingredient(client, json, auth_headers, generate_offline_id: bool = True):
-    if generate_offline_id == False:
-        del json['offline_id']
-    
+def create_ingredient(client, json, auth_headers):
     return client.post('/api/v1/ingredients', json=json, headers=auth_headers)
 
 
@@ -157,11 +151,9 @@ def test_replace_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 201 \
         and response.json['name'] == 'Tuna'  \
         and response.json['description'] == 'this is a tuna' \
-        and response.json['_id'] is not None \
-        and response.json['offline_id'] is not None
+        and response.json['_id'] is not None
 
     original_id = response.json['_id']
-    original_offline_id = response.json['offline_id']
 
     response = replace_ingredient(client, original_id, {
         'name': 'Tuna',
@@ -172,8 +164,7 @@ def test_replace_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['description'] == 'always a tuna' \
         and response.json['note'] == 'note about tuna' \
-        and original_id == response.json['_id'] \
-        and original_offline_id == response.json['offline_id']
+        and original_id == response.json['_id']
 
 
 def test_duplicate_ingredient_allowed(client: FlaskClient, auth_headers):
@@ -232,8 +223,9 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
 
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
+        'id': '5f5cd7d4f8cb6cd5acaec6f5',
         'name' : 'Fish'
-    }, auth_headers, False)
+    }, auth_headers)
 
     assert response.status_code == 400
 

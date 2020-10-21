@@ -66,14 +66,3 @@ def register_and_login(client, user, password, email):
   }
 
   return headers
-
-def add_offline_id(func):
-  @wraps(func)
-  def wrapper(*args, **kwargs):
-      assert  isinstance(args[1], dict)
-
-      if 'offline_id' not in args[1]:
-        args[1]['offline_id'] = uuid4()
-
-      return func(*args, **kwargs)
-  return wrapper
