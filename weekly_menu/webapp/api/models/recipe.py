@@ -1,5 +1,6 @@
 from .. import mongo
 
+from .base_document import BaseDocument
 
 class RecipeIngredient(mongo.EmbeddedDocument):
     quantity = mongo.FloatField()
@@ -9,7 +10,7 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     ingredient = mongo.ReferenceField('Ingredient', required=True)
 
 
-class Recipe(mongo.Document):
+class Recipe(BaseDocument):
     name = mongo.StringField(required=True)
     description = mongo.StringField()
     preparation = mongo.StringField() #TODO will be a list of strings
@@ -29,8 +30,6 @@ class Recipe(mongo.Document):
     tags = mongo.ListField(
         mongo.StringField(), default=None
     )
-
-    owner = mongo.ReferenceField('User', required=True)
 
     meta = {
         'collection': 'recipes',

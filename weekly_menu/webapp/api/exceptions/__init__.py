@@ -59,3 +59,8 @@ class CannotUpdateResourceOwner(BaseRESTException):
 class CannotSetResourceId(BaseRESTException):
     def __init__(self, description=None):
         super().__init__(403, 'CANNOT_SET_ID', description)
+
+
+class CannotSetOrChangeCreationUpdateTime(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(403, 'CANNOT_SET_CREATION_UPDATE_TIME', description)

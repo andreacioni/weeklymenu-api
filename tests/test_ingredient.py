@@ -1,5 +1,8 @@
 import pytest
 
+from uuid import uuid4
+from datetime import datetime, time
+
 from flask import jsonify
 from flask.json import dumps, loads
 from flask.testing import FlaskClient
@@ -16,6 +19,7 @@ def replace_ingredient(client, ing_id, json, auth_headers):
 def patch_ingredient(client, ing_id, json, auth_headers):
     return client.patch('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
+
 def put_ingredient(client, ing_id, json, auth_headers):
     return client.put('/api/v1/ingredients/{}'.format(ing_id), json=json, headers=auth_headers)
 
@@ -24,8 +28,11 @@ def delete_ingredient(client, ing_id, auth_headers):
     return client.delete('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
 
 
-def get_all_ingredients(client, auth_headers, page=1, per_page=10):
-    return client.get('/api/v1/ingredients?page={}&per_page={}'.format(page, per_page), headers=auth_headers)
+def get_all_ingredients(client, auth_headers, page=1, per_page=10, order_by='', desc=False):
+    return client.get('/api/v1/ingredients?page={}&per_page={}&order_by={}&desc={}'.format(page, per_page, order_by, desc), headers=auth_headers)
+
+def get_ingredient(client, ing_id, auth_headers):
+    return client.get('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
 
 
 def test_not_authorized(client: FlaskClient):
@@ -40,16 +47,16 @@ def test_create_with_supplied_id(client: FlaskClient, auth_headers):
         'id': '5e4ae04561fe8235a5a18824'
     }, auth_headers)
 
-    assert response.status_code == 403
+    assert response.status_code == 201
 
-    response = patch_ingredient(client, '1fe8235a5a5e4ae045618824', {
+    response = patch_ingredient(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Garlic',
         'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
     assert response.status_code == 403
 
-    response = put_ingredient(client, '1fe8235a5a5e4ae045618824', {
+    response = put_ingredient(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Garlic',
         'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
@@ -102,7 +109,7 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 201 and response.json[
         'name'] == 'ham'
 
-    # TODO uniqueness in collection cannot be guarateeded across different users
+    # TODO uniqueness in collection cannot be guaranteed across different users
     # Test fail duplicating ingredient
     # response = create_ingredient(client, {
     #  'name': 'ham'
@@ -131,9 +138,9 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
 
     response = get_all_ingredients(client, auth_headers)
 
-    assert response.status_code == 200 and response.json['pages'] == 1 and len(
-        response.json['results']) == 1
-
+    assert response.status_code == 200 \
+        and response.json['pages'] == 1 \
+        and len(response.json['results']) == 1
 
 def test_replace_ingredient(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
@@ -141,17 +148,23 @@ def test_replace_ingredient(client: FlaskClient, auth_headers):
         'description': 'this is a tuna'
     }, auth_headers)
 
-    assert response.status_code == 201 and response.json[
-        'name'] == 'Tuna' and response.json['description'] == 'this is a tuna'
+    assert response.status_code == 201 \
+        and response.json['name'] == 'Tuna'  \
+        and response.json['description'] == 'this is a tuna' \
+        and response.json['_id'] is not None
 
-    response = replace_ingredient(client, response.json['_id'], {
+    original_id = response.json['_id']
+
+    response = replace_ingredient(client, original_id, {
         'name': 'Tuna',
         'description': 'always a tuna',
         'note': 'note about tuna'
     }, auth_headers)
 
-    assert response.status_code == 200 and response.json[
-        'description'] == 'always a tuna' and response.json['note'] == 'note about tuna'
+    assert response.status_code == 200 \
+        and response.json['description'] == 'always a tuna' \
+        and response.json['note'] == 'note about tuna' \
+        and original_id == response.json['_id']
 
 
 def test_duplicate_ingredient_allowed(client: FlaskClient, auth_headers):
@@ -207,3 +220,232 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 400
+
+def test_offline_id(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    response = create_ingredient(client, {
+        'id': '5f5cd7d4f8cb6cd5acaec6f5',
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['_id'] == '5f5cd7d4f8cb6cd5acaec6f5'
+
+    idx = response.json['_id']
+
+    response = put_ingredient(client, idx, {
+        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+
+    response = patch_ingredient(client, idx, {
+        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        'name' : 'Fish'
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_ID'
+    
+    response = get_ingredient(client, idx, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
+
+def test_create_update_timestamp(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'insert_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'update_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'update_timestamp': str(datetime.now()),
+        'insert_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+    
+    response = create_ingredient(client, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['insert_timestamp'] is not None \
+            and isinstance(response.json['insert_timestamp'], int) \
+        and response.json['update_timestamp'] is not None \
+            and isinstance(response.json['update_timestamp'], int)    
+    
+    idx = response.json['_id']
+    insert_timestamp = response.json['insert_timestamp']
+    update_timestamp = response.json['update_timestamp']
+    
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+        'update_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+        'insert_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+        'insert_timestamp': str(datetime.now()),
+        'update_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+        'insert_timestamp': str(datetime.now()),
+        'update_timestamp': str(datetime.now())
+    }, auth_headers)
+
+    assert response.status_code == 403 \
+        and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
+
+    response = patch_ingredient(client, idx, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp \
+        and response.json['update_timestamp'] > update_timestamp
+    
+    update_timestamp = response.json['update_timestamp']
+
+    response = put_ingredient(client, idx, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['name'] == 'Tomato' \
+        and response.json['insert_timestamp'] == insert_timestamp \
+        and response.json['update_timestamp'] > update_timestamp
+
+
+def test_get_last_updated(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_1 = response.json['_id']
+    insert_timestamp_1 = response.json['insert_timestamp']
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = create_ingredient(client, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 201  
+    
+    idx_2 = response.json['_id']
+    insert_timestamp_2 = response.json['insert_timestamp']
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2
+
+    response = patch_ingredient(client, idx_1, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+    
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+
+    response = put_ingredient(client, idx_1, {
+        'name': 'Rice',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_1 \
+        and response.json['update_timestamp'] > update_timestamp_1
+
+    update_timestamp_1 = response.json['update_timestamp']
+
+    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_1 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_1
+    
+    response = patch_ingredient(client, idx_2, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+    
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+
+    response = put_ingredient(client, idx_2, {
+        'name': 'Tomato',
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['insert_timestamp'] == insert_timestamp_2 \
+        and response.json['update_timestamp'] > update_timestamp_2
+
+    update_timestamp_2 = response.json['update_timestamp']
+
+    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+
+    assert response.status_code == 200 \
+        and len(response.json['results']) == 1 \
+        and response.json['results'][0]['_id'] == idx_2 \
+        and response.json['results'][0]['update_timestamp'] == update_timestamp_2
+        

@@ -3,10 +3,10 @@ import logging
 import traceback
 
 from flask import Flask, request, jsonify, json
-from werkzeug.exceptions import NotFound, MethodNotAllowed
+from werkzeug.exceptions import NotFound, MethodNotAllowed, BadRequest
 from mongoengine.fields import ObjectId, DateField, Binary
 from mongoengine.errors import ValidationError
-from datetime import datetime
+from datetime import datetime, date
 
 from .api.exceptions import BaseRESTException
 
@@ -16,8 +16,12 @@ class ObjectIdJSONEncoder(json.JSONEncoder):
     def default(self, o): # pylint: disable=E0202
         if isinstance(o, ObjectId):
             return str(o)
-        if isinstance(o, datetime):
+        # NOTE: the order of these two conditions below matter! 
+        # They must remain in this order
+        if isinstance(o, date):
             return o.strftime("%Y-%m-%d")
+        if isinstance(o, datetime):
+            return o.isoformat()
         if isinstance(o, Binary):
             return str(o)
         return json.JSONEncoder.default(self, o)
@@ -73,6 +77,14 @@ def handle_notfound(e):
         return jsonify({
             'error': 'NOT_FOUND',
             'descritpion': 'resource was not found on this server',
+            'details': []
+    }), 404
+
+@app.errorhandler(BadRequest)
+def handle_notfound(e):
+        return jsonify({
+            'error': 'BAD_REQUEST',
+            'descritpion': 'invalid request supplied',
             'details': []
     }), 404
 
