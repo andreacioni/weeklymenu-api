@@ -15,8 +15,7 @@ class Menu(BaseDocument):
     # owner = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY)
 
     meta = {
-        'collection' : 'menu',
-        'strict' : False #TODO remove when use base_model as parent model
+        'collection' : 'menu'
     }
 
     def __repr__(self):

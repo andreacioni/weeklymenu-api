@@ -16,8 +16,7 @@ class Ingredient(BaseDocument):
     )
 
     meta = {
-        'collection' : 'ingredients',
-        'strict' : False #TODO remove when use base_model as parent model
+        'collection' : 'ingredients'
     }
 
     def __repr__(self):
