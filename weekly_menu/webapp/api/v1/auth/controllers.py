@@ -44,7 +44,6 @@ def register_user(user_meta: PostRegisterUserSchema):
     shop_list = ShoppingList()
     shop_list.owner = user.id
     shop_list.name = 'Shopping List' #TODO name of the list may vary based on the location of the user
-    shop_list.offline_id = str(uuid4())
     shop_list.save()
     
     return jsonify(user.to_mongo()), 200
