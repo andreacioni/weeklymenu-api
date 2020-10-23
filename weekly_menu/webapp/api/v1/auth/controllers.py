@@ -1,3 +1,5 @@
+
+from uuid import uuid4
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended.config import config
@@ -41,6 +43,7 @@ def register_user(user_meta: PostRegisterUserSchema):
     # Create a new shopping list for the newly created user
     shop_list = ShoppingList()
     shop_list.owner = user.id
+    shop_list.name = 'Shopping List' #TODO name of the list may vary based on the location of the user
     shop_list.save()
     
     return jsonify(user.to_mongo()), 200

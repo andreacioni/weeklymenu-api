@@ -1,6 +1,8 @@
 from .. import mongo
 
-class Ingredient(mongo.Document):
+from .base_document import BaseDocument
+
+class Ingredient(BaseDocument):
     name = mongo.StringField(required=True)
     description = mongo.StringField()
     note = mongo.StringField()
@@ -12,12 +14,9 @@ class Ingredient(mongo.Document):
     tags = mongo.ListField(
         mongo.StringField(), default=None
     )
-    
-    owner = mongo.ReferenceField('User', required=True)
 
     meta = {
-        'collection' : 'ingredients',
-        'strict' : False #TODO remove when use base_model as parent model
+        'collection' : 'ingredients'
     }
 
     def __repr__(self):

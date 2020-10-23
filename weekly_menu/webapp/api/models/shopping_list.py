@@ -1,6 +1,9 @@
 from .. import mongo
 from ..models import Ingredient
 
+from .base_document import BaseDocument
+
+
 class ShoppingListItem(mongo.EmbeddedDocument):
     checked = mongo.BooleanField(required=True)
     item = mongo.ReferenceField('Ingredient', required=True)
@@ -10,15 +13,12 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     quantity = mongo.FloatField(min_value=0)
     unitOfMeasure = mongo.StringField(max_length=10)
 
-class ShoppingList(mongo.Document):
-    name = mongo.StringField()
+class ShoppingList(BaseDocument):
+    name = mongo.StringField(required=True)
     items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
-    owner = mongo.ReferenceField('User', required=True)
-
     meta = {
-        'collection' : 'shopping_lists',
-        'strict' : False #TODO remove when use base_model as parent model
+        'collection' : 'shopping_lists'
     }
 
     def __repr__(self):

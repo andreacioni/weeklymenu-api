@@ -7,26 +7,27 @@ from mongoengine.errors import NotUniqueError
 from mongoengine.queryset.visitor import Q
 from bson import ObjectId
 
-from .schemas import ShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema, ShoppingListItemWithoutRequiredItemSchema
+from .schemas import ShoppingListSchema, PutShoppingListSchema, PatchShoppingListSchema, ShoppingListItemSchema, ShoppingListItemWithoutRequiredItemSchema, ShoppingListItemWithoutRequiredItemSchema
 from ...models import ShoppingList, ShoppingListItem, User
-from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document, put_document, patch_document
+from ... import validate_payload, paginated, mongo, load_user_info, put_embedded_document, patch_embedded_document, put_document, patch_document, parse_query_args, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest, Forbidden, Conflict, NotFound
 
-def _dereference_item(shopping_list: ShoppingListItem):
-    if shopping_list.items != None:
-        shopping_list_items = [item.item.to_mongo()
-                            for item in shopping_list.items]
-        shopping_list = shopping_list.to_mongo()
-        for i in range(len(shopping_list_items)):
-            shopping_list['items'][i]['item'] = shopping_list_items[i]
-    return shopping_list
+# def _dereference_item(shopping_list: ShoppingListItem):
+#     if shopping_list.items != None:
+#         shopping_list_items = [item.item.to_mongo()
+#                             for item in shopping_list.items]
+#         shopping_list = shopping_list.to_mongo()
+#         for i in range(len(shopping_list_items)):
+#             shopping_list['items'][i]['item'] = shopping_list_items[i]
+#     return shopping_list
 
 class UserShoppingLists(Resource):
     @jwt_required
+    @parse_query_args
     @paginated
     @load_user_info
-    def get(self, req_args, user_info: User): 
-        return ShoppingList.objects(owner=str(user_info.id)).paginate(page=req_args['page'], per_page=req_args['per_page'])
+    def get(self, query_args, page_args, user_info: User): 
+        return search_on_model(ShoppingList, Q(owner=str(user_info.id)), query_args, page_args)
 
     @jwt_required
     @load_user_info
@@ -60,7 +61,7 @@ class UserShoppingList(Resource):
         return "", 204
 
     @jwt_required
-    @validate_payload(ShoppingListSchema(), 'new_list')
+    @validate_payload(PutShoppingListSchema(), 'new_list')
     @load_user_info
     def put(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
         old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
@@ -74,7 +75,7 @@ class UserShoppingList(Resource):
         return old_list, 200
     
     @jwt_required
-    @validate_payload(ShoppingListSchema(), 'new_list')
+    @validate_payload(PatchShoppingListSchema(), 'new_list')
     @load_user_info
     def patch(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
         old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()

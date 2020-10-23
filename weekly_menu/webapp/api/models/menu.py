@@ -1,17 +1,21 @@
 from .. import mongo
 
-class Menu(mongo.Document):
+from .base_document import BaseDocument
+
+class Menu(BaseDocument):
     name = mongo.StringField()
     date = mongo.DateField(required=True)
     meal = mongo.StringField()
     recipes = mongo.ListField(
         mongo.ReferenceField('Recipe', reverse_delete_rule=mongo.PULL), default=None
     )
-    owner = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY) #It could be useful to have an history of user's menu also when they leave
+
+    #It could be useful to have an history of user's menu also when they leave
+    # REMOVED - probably not usefull
+    # owner = mongo.ReferenceField('User', required=True, reverse_delete_rule=mongo.NULLIFY)
 
     meta = {
-        'collection' : 'menu',
-        'strict' : False #TODO remove when use base_model as parent model
+        'collection' : 'menu'
     }
 
     def __repr__(self):
