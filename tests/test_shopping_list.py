@@ -410,16 +410,16 @@ def test_offline_id(client: FlaskClient, auth_headers):
         'name' : 'Fish'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
 
     response = patch_shopping_list(client, idx, {
         'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
     
     response = get_shopping_list(client, idx, auth_headers)
 

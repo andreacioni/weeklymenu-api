@@ -12,7 +12,7 @@ class RecipeSchema(me.ModelSchema, BaseValidatorsMixin):
     class Meta:
         model = Recipe
 
-class PutRecipeSchema(RecipeSchema, DenyIdOverrideMixin):
+class PutRecipeSchema(RecipeSchema):
     pass
     
 class PatchRecipeSchema(PutRecipeSchema):

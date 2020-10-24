@@ -57,14 +57,16 @@ def test_create_with_supplied_id(client: FlaskClient, auth_headers):
         'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
-    assert response.status_code == 403
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
     response = put_menu(client, '5e4ae04561fe8235a5a18824', {
         'date': '2019-09-01',
         'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
-    assert response.status_code == 403
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
 
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
@@ -322,16 +324,16 @@ def test_offline_id(client: FlaskClient, auth_headers):
         'date' : '2020-12-09'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
 
     response = patch_menu(client, idx, {
         'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'date' : '2020-12-09'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
     
     response = get_menu(client, idx, auth_headers)
 
