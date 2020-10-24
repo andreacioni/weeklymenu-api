@@ -11,7 +11,7 @@ class ShoppingListSchema(me.ModelSchema, BaseValidatorsMixin):
 
     class Meta:
         model = ShoppingList
-class PutShoppingListSchema(ShoppingListSchema, DenyIdOverrideMixin):
+class PutShoppingListSchema(ShoppingListSchema):
     pass
 
 class PatchShoppingListSchema(PutShoppingListSchema):

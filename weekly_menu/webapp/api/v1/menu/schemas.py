@@ -16,7 +16,7 @@ class MenuSchema(me.ModelSchema, BaseValidatorsMixin):
     class Meta:
         model = Menu
 
-class PutMenuSchema(MenuSchema, DenyIdOverrideMixin):
+class PutMenuSchema(MenuSchema):
     pass
 
 class PatchMenuSchema(PutMenuSchema):
