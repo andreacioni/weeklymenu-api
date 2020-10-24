@@ -35,14 +35,14 @@ def test_not_authorized(client: FlaskClient):
 def test_create_with_supplied_id(client: FlaskClient, auth_headers):
     response = create_recipe(client, {
         'name': 'Menu',
-        '_id': '5e4ae04561fe8235a5a18824'
+        'id': '5e4ae04561fe8235a5a18824'
     }, auth_headers)
 
     assert response.status_code == 201
 
     response = patch_recipe(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Menu',
-        '_id': '1fe8235a5a5e4ae045618824'
+        'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
     assert response.status_code == 200 \
@@ -50,7 +50,7 @@ def test_create_with_supplied_id(client: FlaskClient, auth_headers):
 
     response = put_recipe(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Menu',
-        '_id': '1fe8235a5a5e4ae045618824'
+        'id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
     assert response.status_code == 200 \
@@ -180,14 +180,14 @@ def test_update_recipe(client: FlaskClient, auth_headers):
 
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_recipe(client, {
-        '_id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
+        'id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
     assert response.status_code == 400
 
     response = create_recipe(client, {
-        '_id': '5f5cd7d4f8cb6cd5acaec6f5',
+        'id': '5f5cd7d4f8cb6cd5acaec6f5',
         'name' : 'Fish'
     }, auth_headers)
 
@@ -197,7 +197,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
     idx = response.json['_id']
 
     response = put_recipe(client, idx, {
-        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
@@ -205,7 +205,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
         and response.json['_id'] == idx
 
     response = patch_recipe(client, idx, {
-        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 

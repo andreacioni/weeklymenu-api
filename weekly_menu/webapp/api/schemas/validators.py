@@ -22,7 +22,7 @@ class DenyOwnerOverrideMixin:
 class DenyIdOverrideMixin:
   @validates_schema
   def id_not_allowed(self, data):
-      if ('id' in data) or ('_id' in data):
+      if 'id' in data:
           raise CannotSetResourceId()
 
 class DenyInsertUpdateDateTime:
