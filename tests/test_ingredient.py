@@ -44,24 +44,27 @@ def test_not_authorized(client: FlaskClient):
 def test_create_with_supplied_id(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
         'name': 'Garlic',
-        'id': '5e4ae04561fe8235a5a18824'
+        '_id': '5e4ae04561fe8235a5a18824'
     }, auth_headers)
 
-    assert response.status_code == 201
+    assert response.status_code == 201 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
     response = patch_ingredient(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Garlic',
-        'id': '1fe8235a5a5e4ae045618824'
+        '_id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
-    assert response.status_code == 403
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
     response = put_ingredient(client, '5e4ae04561fe8235a5a18824', {
         'name': 'Garlic',
-        'id': '1fe8235a5a5e4ae045618824'
+        '_id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
-    assert response.status_code == 403
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
 
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
@@ -223,14 +226,14 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
 
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
-        'id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
+        '_id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
     assert response.status_code == 400
 
     response = create_ingredient(client, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f5',
+        '_id': '5f5cd7d4f8cb6cd5acaec6f5',
         'name' : 'Fish'
     }, auth_headers)
 
@@ -240,20 +243,20 @@ def test_offline_id(client: FlaskClient, auth_headers):
     idx = response.json['_id']
 
     response = put_ingredient(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
 
     response = patch_ingredient(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
-    assert response.status_code == 403 \
-        and response.json['error'] == 'CANNOT_SET_ID'
+    assert response.status_code == 200 \
+        and response.json['_id'] == idx
     
     response = get_ingredient(client, idx, auth_headers)
 

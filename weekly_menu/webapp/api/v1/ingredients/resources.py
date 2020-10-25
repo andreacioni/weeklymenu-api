@@ -42,14 +42,14 @@ class IngredientInstance(Resource):
     @load_user_info
     def get(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
-            return Ingredient.objects(Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+            return Ingredient.objects(Q(_id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, ingredient_id=''):
         if ingredient_id != None:
             ingredient = Ingredient.objects(
-                Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+                Q(_id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
             # Removing references in embedded documents is not automatic (see: https://github.com/MongoEngine/mongoengine/issues/1592)
             Recipe.objects(owner=user_info.id).update(
@@ -66,7 +66,7 @@ class IngredientInstance(Resource):
     @load_user_info
     def put(self, new_ingredient: Ingredient, user_info: User, ingredient_id=''):
         old_ingredient = Ingredient.objects(
-            Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+            Q(_id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = put_document(Ingredient, new_ingredient, old_ingredient)
 
@@ -82,7 +82,7 @@ class IngredientInstance(Resource):
     @load_user_info
     def patch(self, new_ingredient, user_info: User, ingredient_id=''):
         old_ingredient = Ingredient.objects(
-            Q(id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
+            Q(_id=ingredient_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = patch_document(Ingredient, new_ingredient, old_ingredient)
 

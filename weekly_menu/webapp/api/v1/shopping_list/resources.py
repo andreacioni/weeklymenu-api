@@ -48,7 +48,7 @@ class UserShoppingList(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, shopping_list_id: str): 
-        shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+        shopping_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
         #return _dereference_item(shopping_list)
         return shopping_list
@@ -56,7 +56,7 @@ class UserShoppingList(Resource):
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, shopping_list_id=''):
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(
+        ShoppingList.objects(Q(_id=shopping_list_id) & Q(
             owner=str(user_info.id))).get_or_404().delete()
         return "", 204
 
@@ -64,7 +64,7 @@ class UserShoppingList(Resource):
     @validate_payload(PutShoppingListSchema(), 'new_list')
     @load_user_info
     def put(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
-        old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = put_document(ShoppingList, new_list, old_list)
 
@@ -78,7 +78,7 @@ class UserShoppingList(Resource):
     @validate_payload(PatchShoppingListSchema(), 'new_list')
     @load_user_info
     def patch(self, new_list: ShoppingList, user_info: User, shopping_list_id=''):
-        old_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = patch_document(ShoppingList, new_list, old_list)
 
@@ -89,7 +89,7 @@ class UserShoppingList(Resource):
         return old_list, 200
 
 def _retrieve_base_shopping_list(shopping_list_id: str, user_id: str) -> ShoppingList:
-    return ShoppingList.objects(Q(owner=user_id) & Q(id=shopping_list_id)).get_or_404()
+    return ShoppingList.objects(Q(owner=user_id) & Q(_id=shopping_list_id)).get_or_404()
 
 class UserShoppingListItems(Resource):
     @jwt_required
@@ -102,7 +102,7 @@ class UserShoppingListItems(Resource):
     @load_user_info
     @validate_payload(ShoppingListItemSchema(), 'shopping_list_item')
     def post(self, user_info: User, shopping_list_id: str, shopping_list_item: ShoppingListItem):        
-        shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
+        shopping_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
         # NOTE Check if an ingredient is already present in a specific list
         current_ingredients_in_list = [str(it.item.id) for it in shopping_list.items]
@@ -120,7 +120,7 @@ class UserShoppingListItem(Resource):
     @load_user_info
     def get(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str):
 
-        base_shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
+        base_shopping_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
 
         for item_doc in base_shopping_list.items:
             if str(item_doc.item.id) == shopping_list_item_id:
@@ -138,7 +138,7 @@ class UserShoppingListItem(Resource):
         #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
         #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        base_shopping_list = ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
+        base_shopping_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).get_or_404()
 
         for item_doc in base_shopping_list.items:
             if str(item_doc.item.id) == shopping_list_item_id:
@@ -158,13 +158,13 @@ class UserShoppingListItem(Resource):
         #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
         #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
+        ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id)) & Q(items__item=shopping_list_item_id)).update(set__items__S=shopping_list_item)
 
         return shopping_list_item, 200
 
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, shopping_list_id: str, shopping_list_item_id: str):
-        ShoppingList.objects(Q(id=shopping_list_id) & Q(owner=str(user_info.id))).update(pull__items__item=ObjectId(shopping_list_item_id))
+        ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).update(pull__items__item=ObjectId(shopping_list_item_id))
 
         return '', 204

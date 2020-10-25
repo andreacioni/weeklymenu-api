@@ -198,7 +198,7 @@ def _update_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.Em
 
 def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, old_doc: mongo.Document, patch=True):
     # Remove generated id and link new doc with current owner
-    new_doc.id = None
+    new_doc._id = old_doc._id
     new_doc.owner = old_doc.owner
     new_doc.insert_timestamp = old_doc.insert_timestamp
 
