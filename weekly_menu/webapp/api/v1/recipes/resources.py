@@ -51,7 +51,7 @@ class RecipeInstance(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, recipe_id=''):
-        recipe = Recipe.objects(Q(id=recipe_id) & Q(
+        recipe = Recipe.objects(Q(_id=recipe_id) & Q(
             owner=str(user_info.id))).get_or_404()
 
         #return _dereference_ingredients(recipe)
@@ -60,7 +60,7 @@ class RecipeInstance(Resource):
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, recipe_id=''):
-        Recipe.objects(Q(id=recipe_id) & Q(
+        Recipe.objects(Q(_id=recipe_id) & Q(
             owner=str(user_info.id))).get_or_404().delete()
         return "", 204
 
@@ -68,7 +68,7 @@ class RecipeInstance(Resource):
     @validate_payload(PutRecipeSchema(), 'new_recipe')
     @load_user_info
     def put(self, new_recipe: Recipe, user_info: User, recipe_id=''):
-        old_recipe = Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_recipe = Recipe.objects(Q(_id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = put_document(Recipe, new_recipe, old_recipe)
 
@@ -82,7 +82,7 @@ class RecipeInstance(Resource):
     @validate_payload(PatchRecipeSchema(), 'new_recipe')
     @load_user_info
     def patch(self, new_recipe: Recipe, user_info: User, recipe_id=''):
-        old_recipe = Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_recipe = Recipe.objects(Q(_id=recipe_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = patch_document(Recipe, new_recipe, old_recipe)
 
@@ -93,7 +93,7 @@ class RecipeInstance(Resource):
         return old_recipe, 200
 
 def _retrieve_base_recipe(recipe_id: str, user_id: str) -> Recipe:
-    return Recipe.objects(Q(owner=user_id) & Q(id=recipe_id)).get_or_404()
+    return Recipe.objects(Q(owner=user_id) & Q(_id=recipe_id)).get_or_404()
 
 
 class RecipeIngredientsList(Resource):
@@ -125,7 +125,7 @@ class RecipeIngredientInstance(Resource):
     @load_user_info
     def get(self, user_info: User, recipe_id: str, ingredient_id: str):
 
-        recipe = Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id)) & Q(ingredients__ingredient=ingredient_id)).get_or_404()
+        recipe = Recipe.objects(Q(_id=recipe_id) & Q(owner=str(user_info.id)) & Q(ingredients__ingredient=ingredient_id)).get_or_404()
 
         for ing_doc in recipe.ingredients:
             if str(ing_doc.ingredient.id) == ingredient_id:
@@ -174,6 +174,6 @@ class RecipeIngredientInstance(Resource):
         #if shopping_list_item.item != None and shopping_list_item_id != str(shopping_list_item.item.id):
         #    raise Conflict("can't update item {} with different item {}".format(str(shopping_list_item.item.id), shopping_list_item_id))
 
-        Recipe.objects(Q(id=recipe_id) & Q(owner=str(user_info.id)) & Q(ingredients__ingredient=ingredient_id)).update(set__ingredients__S=recipe_ingredient)
+        Recipe.objects(Q(_id=recipe_id) & Q(owner=str(user_info.id)) & Q(ingredients__ingredient=ingredient_id)).update(set__ingredients__S=recipe_ingredient)
 
         return recipe_ingredient, 200

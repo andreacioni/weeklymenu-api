@@ -33,5 +33,7 @@ class DenyInsertUpdateDateTime:
           raise CannotSetOrChangeCreationUpdateTime()
 
 class BaseValidatorsMixin(OwnerNotRequiredMixin, CheckUnknownFieldsMixin, DenyOwnerOverrideMixin, DenyInsertUpdateDateTime):
+    _id = fields.String(required=False)
+
     insert_timestamp = fields.Str(required=False)
     update_timestamp = fields.Str(required=False)

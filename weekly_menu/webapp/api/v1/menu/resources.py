@@ -60,7 +60,7 @@ class MenuInstance(Resource):
     @jwt_required
     @load_user_info
     def get(self, user_info: User, menu_id=''):
-        menu = Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404()
+        menu = Menu.objects(Q(owner=str(user_info.id)) & Q(_id=menu_id)).get_or_404()
 
         #return _dereference_recipes(menu)
         return menu
@@ -68,14 +68,14 @@ class MenuInstance(Resource):
     @jwt_required
     @load_user_info
     def delete(self, user_info: User, menu_id=''):
-        Menu.objects(Q(owner=str(user_info.id)) & Q(id=menu_id)).get_or_404().delete()
+        Menu.objects(Q(owner=str(user_info.id)) & Q(_id=menu_id)).get_or_404().delete()
         return "", 204
     
     @jwt_required
     @validate_payload(PutMenuSchema(), 'new_menu')
     @load_user_info
     def put(self, new_menu: Ingredient, user_info: User, menu_id=''):
-        old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_menu = Menu.objects(Q(_id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = put_document(Menu, new_menu, old_menu)
 
@@ -90,7 +90,7 @@ class MenuInstance(Resource):
     @validate_payload(PatchMenuSchema(), 'new_menu')
     @load_user_info
     def patch(self, new_menu: Menu, user_info: User, menu_id=''):
-        old_menu = Menu.objects(Q(id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
+        old_menu = Menu.objects(Q(_id=menu_id) & Q(owner=str(user_info.id))).get_or_404()
 
         result = patch_document(Menu, new_menu, old_menu)
 
@@ -101,7 +101,7 @@ class MenuInstance(Resource):
         return old_menu, 200
 
 def _retrieve_base_menu(menu_id: str, user_id: str) -> Menu:
-    return Menu.objects(Q(owner=user_id) & Q(id=menu_id)).get_or_404()
+    return Menu.objects(Q(owner=user_id) & Q(_id=menu_id)).get_or_404()
 
 
 class MenuRecipesList(Resource):
@@ -116,7 +116,7 @@ class MenuRecipesList(Resource):
     @load_user_info
     def post(self, menu_id, menu_recipe, user_info: User):
         menu = _retrieve_base_menu(menu_id, str(user_info.id))
-        recipe = Recipe.objects(Q(owner=str(user_info.id)) & Q(id=menu_recipe['recipe_id'])).get_or_404()
+        recipe = Recipe.objects(Q(owner=str(user_info.id)) & Q(_id=menu_recipe['recipe_id'])).get_or_404()
         
         if menu.recipes:
             menu.recipes.append(recipe.id)

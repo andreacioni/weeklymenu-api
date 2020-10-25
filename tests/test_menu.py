@@ -47,14 +47,14 @@ def test_not_authorized(client: FlaskClient):
 def test_create_with_supplied_id(client: FlaskClient, auth_headers):
     response = create_menu(client, {
         'date': '2019-09-01',
-        'id': '5e4ae04561fe8235a5a18824'
+        '_id': '5e4ae04561fe8235a5a18824'
     }, auth_headers)
 
     assert response.status_code == 201
 
     response = patch_menu(client, '5e4ae04561fe8235a5a18824', {
         'date': '2019-09-01',
-        'id': '1fe8235a5a5e4ae045618824'
+        '_id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
     assert response.status_code == 200 \
@@ -62,7 +62,7 @@ def test_create_with_supplied_id(client: FlaskClient, auth_headers):
 
     response = put_menu(client, '5e4ae04561fe8235a5a18824', {
         'date': '2019-09-01',
-        'id': '1fe8235a5a5e4ae045618824'
+        '_id': '1fe8235a5a5e4ae045618824'
     }, auth_headers)
 
     assert response.status_code == 200 \
@@ -303,14 +303,14 @@ def test_date_format(client: FlaskClient, auth_headers):
 
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_menu(client, {
-        'id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
+        '_id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
         'date' : '2020-12-09'
     }, auth_headers)
 
     assert response.status_code == 400
 
     response = create_menu(client, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f5',
+        '_id': '5f5cd7d4f8cb6cd5acaec6f5',
         'date' : '2020-12-09'
     }, auth_headers)
 
@@ -320,7 +320,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
     idx = response.json['_id']
 
     response = put_menu(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'date' : '2020-12-09'
     }, auth_headers)
 
@@ -328,7 +328,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
         and response.json['_id'] == idx
 
     response = patch_menu(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'date' : '2020-12-09'
     }, auth_headers)
 

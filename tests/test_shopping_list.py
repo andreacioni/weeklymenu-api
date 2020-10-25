@@ -389,14 +389,14 @@ def test_two_list_with_same_name(client: FlaskClient, auth_headers, auth_headers
 
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_shopping_list(client, {
-        'id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
+        '_id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
     assert response.status_code == 400
 
     response = create_shopping_list(client, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f5',
+        '_id': '5f5cd7d4f8cb6cd5acaec6f5',
         'name' : 'Fish'
     }, auth_headers)
 
@@ -406,7 +406,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
     idx = response.json['_id']
 
     response = put_shopping_list(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 
@@ -414,7 +414,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
         and response.json['_id'] == idx
 
     response = patch_shopping_list(client, idx, {
-        'id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
         'name' : 'Fish'
     }, auth_headers)
 

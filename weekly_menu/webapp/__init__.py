@@ -98,8 +98,15 @@ def handle_method_not_allowed(e):
 
 @app.errorhandler(ValidationError)
 def handle_validation_error(e: ValidationError):
-        return jsonify({
-            'error': 'VALIDATION_ERROR',
-            'descritpion': e.message,
-            'details': [{err : e.errors[err][1].message} for err in (e.errors or [])]
+
+    def get_error(err):
+        if isinstance(e.errors[err], list):
+            return e.errors[err][1].message
+        else:
+            return e.errors[err].message
+
+    return jsonify({
+        'error': 'VALIDATION_ERROR',
+        'descritpion': e.message,
+        'details': [{err : get_error(err)} for err in (e.errors or [])]
     }), 400
