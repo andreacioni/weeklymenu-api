@@ -429,7 +429,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
 def test_create_update_timestamp(client: FlaskClient, auth_headers):
     response = create_shopping_list(client, {
         'name': 'Rice',
-        'insert_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -437,7 +437,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
     
     response = create_shopping_list(client, {
         'name': 'Rice',
-        'update_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -445,8 +445,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = create_shopping_list(client, {
         'name': 'Rice',
-        'update_timestamp': str(datetime.now()),
-        'insert_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp()),
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -468,7 +468,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
     
     response = put_shopping_list(client, idx, {
         'name': 'Tomato',
-        'update_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -476,7 +476,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = patch_shopping_list(client, idx, {
         'name': 'Tomato',
-        'insert_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -484,8 +484,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = patch_shopping_list(client, idx, {
         'name': 'Tomato',
-        'insert_timestamp': str(datetime.now()),
-        'update_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp()),
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -493,8 +493,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = put_shopping_list(client, idx, {
         'name': 'Tomato',
-        'insert_timestamp': str(datetime.now()),
-        'update_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp()),
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \

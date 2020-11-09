@@ -343,7 +343,7 @@ def test_offline_id(client: FlaskClient, auth_headers):
 def test_create_update_timestamp(client: FlaskClient, auth_headers):
     response = create_menu(client, {
         'date': '2019-02-14',
-        'insert_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -351,7 +351,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
     
     response = create_menu(client, {
         'date': '2019-02-14',
-        'update_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -359,8 +359,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = create_menu(client, {
         'date': '2019-02-14',
-        'update_timestamp': str(datetime.now()),
-        'insert_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp()),
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -382,7 +382,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
     
     response = put_menu(client, idx, {
         'date': '2019-02-14',
-        'update_timestamp': str(datetime.now())
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -390,7 +390,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = patch_menu(client, idx, {
         'date': '2019-02-14',
-        'insert_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -398,8 +398,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = patch_menu(client, idx, {
         'date': '2019-02-14',
-        'insert_timestamp': str(datetime.now()),
-        'update_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp()),
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
@@ -407,8 +407,8 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     response = put_menu(client, idx, {
         'date': '2019-02-14',
-        'insert_timestamp': str(datetime.now()),
-        'update_timestamp': str(datetime.now())
+        'insert_timestamp': int(datetime.now().timestamp()),
+        'update_timestamp': int(datetime.now().timestamp())
     }, auth_headers)
 
     assert response.status_code == 403 \
