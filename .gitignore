@@ -1,1 +1,6 @@
 .venv/
+.pytest_cache/
+.configs/
+.vscode/
+__pycache__/
+weekly_menu.egg-info/

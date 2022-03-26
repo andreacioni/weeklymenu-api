@@ -25,7 +25,7 @@ def authenticate(email, password):
     
     return user
 
-def get_user_by_email(email):
+def get_user_by_email(email) -> User:
     user = User.objects(
         email__exact=email
     ).first()
