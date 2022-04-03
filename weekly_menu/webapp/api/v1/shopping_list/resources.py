@@ -96,7 +96,7 @@ class UserShoppingListItems(Resource):
     @load_user_info
     def get(self, user_info: User, shopping_list_id=''):
         shopping_list = _retrieve_base_shopping_list(shopping_list_id, str(user_info.id))
-        return [shopping_list.to_mongo() for shopping_list in shopping_list.ingredients] if shopping_list.ingredients != None else []
+        return [shopping_list.to_mongo() for shopping_list in shopping_list.items] if shopping_list.items != None else []
 
     @jwt_required
     @load_user_info
@@ -105,11 +105,17 @@ class UserShoppingListItems(Resource):
         shopping_list = ShoppingList.objects(Q(_id=shopping_list_id) & Q(owner=str(user_info.id))).get_or_404()
 
         # NOTE Check if an ingredient is already present in a specific list
-        current_ingredients_in_list = [str(it.item.id) for it in shopping_list.items]
-        if str(shopping_list_item.item.id) in current_ingredients_in_list:
-            raise Conflict('ingredient already present inside shopping list')
+        # in this case we simulate a PUT instead of adding a new one
+        found=False
+        for idx, it in enumerate(shopping_list.items):
+            if str(shopping_list_item.item.id) == str(it.item.id):
+                shopping_list.items[idx] = shopping_list_item
+                found=True
+                break
 
-        shopping_list.items.append(shopping_list_item)
+        if not found:
+            shopping_list.items.append(shopping_list_item)
+
         shopping_list.save()
 
         return shopping_list, 201
