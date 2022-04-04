@@ -51,9 +51,9 @@ def output_json(data, code, headers=None):
     """
         NOTE: if a resource method is decorated with 'paginated' this method is not called
     """
-    if isinstance(data, mongo.Document):
+    if isinstance(data, mongo.Document) or isinstance(data, mongo.EmbeddedDocument):
         data = data.to_mongo()
-    
+
     resp = make_response(jsonify(data), code)
     resp.headers.extend(headers or {})
     return resp

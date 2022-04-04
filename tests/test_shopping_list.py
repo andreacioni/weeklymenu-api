@@ -137,10 +137,10 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
 
   response = add_item_in_shopping_list(client, shop_list['_id'], {
         'item' : tuna['_id'],
-        'checked': False
+        'checked': True
   }, auth_headers)
 
-  assert response.status_code == 409
+  assert response.status_code == 200 and response.json['checked'] == True
 
 def test_item_change_shopping_list(client: FlaskClient, auth_headers):
   ham = create_ingredient(client, {
