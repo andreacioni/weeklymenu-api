@@ -118,7 +118,7 @@ class UserShoppingListItems(Resource):
 
         shopping_list.save()
 
-        return shopping_list, 201
+        return shopping_list_item, 200 if found else 201 
     
 class UserShoppingListItem(Resource):
 
