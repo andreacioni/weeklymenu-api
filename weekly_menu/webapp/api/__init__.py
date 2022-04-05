@@ -105,8 +105,7 @@ def parse_query_args(func):
         QueryArgs.GREATER,
         type=str,
         location=['args'],
-        required=False,
-        default=False
+        required=False
     )
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -235,7 +234,7 @@ def patch_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.Embe
 
 def _build_query_by_params(base_query, query_args):
     if QueryArgs.DAY in query_args and query_args[QueryArgs.DAY] is not None:
-        if bool(re.search('^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', query_args[QueryArgs.DAY])):
+        if bool(re.search(r'^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', query_args[QueryArgs.DAY])):
             try:
                 searched_day = datetime.strptime(query_args[QueryArgs.DAY], '%Y-%m-%d')
             except ValueError as ex:
@@ -246,7 +245,7 @@ def _build_query_by_params(base_query, query_args):
         base_query = base_query & Q(date=searched_day)
     
     if QueryArgs.GREATER in query_args and query_args[QueryArgs.GREATER] is not None:
-        if (not bool(bool(re.search(r'^\w+\$\d+$', query_args[QueryArgs.GREATER])))):
+        if (not bool(re.search(r'^\w+\$\d+$', query_args[QueryArgs.GREATER]))):
             raise BadRequest('invalid gt value')
         
         split = query_args[QueryArgs.GREATER].split('$')
