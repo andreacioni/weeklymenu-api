@@ -22,6 +22,8 @@ class QueryArgs:
     ORDER_BY = 'order_by'
     DESC = 'desc'
 
+    GREATER = 'gt'
+
 # Pagination
 DEFAULT_PAGE_SIZE = 10
 
@@ -99,6 +101,13 @@ def parse_query_args(func):
         required=False,
         default=False
     )
+    query_args_reqparse.add_argument(
+        QueryArgs.GREATER,
+        type=str,
+        location=['args'],
+        required=False,
+        default=False
+    )
     @wraps(func)
     def wrapper(*args, **kwargs):
         query_args = query_args_reqparse.parse_args()
@@ -107,7 +116,7 @@ def parse_query_args(func):
             QueryArgs.DAY: query_args[QueryArgs.DAY],
             QueryArgs.ORDER_BY: query_args[QueryArgs.ORDER_BY],
             QueryArgs.DESC: query_args[QueryArgs.DESC],
-
+            QueryArgs.GREATER: query_args[QueryArgs.GREATER],
         }
 
         return func(*args, **kwargs)
@@ -235,6 +244,14 @@ def _build_query_by_params(base_query, query_args):
             raise BadRequest('invalid day format')
         
         base_query = base_query & Q(date=searched_day)
+    
+    if QueryArgs.GREATER in query_args and query_args[QueryArgs.GREATER] is not None:
+        if (not bool(bool(re.search(r'^\w+\$\d+$', query_args[QueryArgs.GREATER])))):
+            raise BadRequest('invalid gt value')
+        
+        split = query_args[QueryArgs.GREATER].split('$')
+        
+        base_query = base_query & Q(**{"{}__gt".format(split[0]): split[1]})
     
     return base_query
 

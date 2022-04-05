@@ -51,6 +51,11 @@ def before_request():
     if ((request.data != b'') and (not request.is_json)):
         return jsonify({'msg': 'payload does not contains json data'}), 400
 
+@app.after_request
+def after_request(resp):
+    resp.headers['X-Server-Timestamp']=int(datetime.utcnow().timestamp())
+    return resp
+
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception):
         print(traceback.format_exc())
