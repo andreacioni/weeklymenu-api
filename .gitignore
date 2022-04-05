@@ -4,5 +4,5 @@
 .vscode/
 __pycache__/
 weekly_menu.egg-info/
-build/
 dist/
+build/

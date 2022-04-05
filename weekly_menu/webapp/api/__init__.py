@@ -211,10 +211,10 @@ def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Docume
     new_doc.insert_timestamp = old_doc.insert_timestamp
 
     if patch == True:
-        return coll_class._get_collection().update(
+        return coll_class._get_collection().update_one(
             {'_id': old_doc.id}, {'$set': new_doc.to_mongo()})
     else:
-        return coll_class._get_collection().update(
+        return coll_class._get_collection().replace_one(
             {'_id': old_doc.id}, new_doc.to_mongo())
 
 
