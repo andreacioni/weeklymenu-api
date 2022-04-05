@@ -68,7 +68,7 @@ class UserShoppingList(Resource):
 
         result = put_document(ShoppingList, new_list, old_list)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching shopping list with id: {}'.format(shopping_list_id))
         
         old_list.reload()
@@ -82,7 +82,7 @@ class UserShoppingList(Resource):
 
         result = patch_document(ShoppingList, new_list, old_list)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching shopping list with id: {}'.format(shopping_list_id))
         
         old_list.reload()

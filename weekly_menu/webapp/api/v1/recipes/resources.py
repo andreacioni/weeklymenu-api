@@ -72,7 +72,7 @@ class RecipeInstance(Resource):
 
         result = put_document(Recipe, new_recipe, old_recipe)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching recipe with id: {}'.format(recipe_id))
         
         old_recipe.reload()
@@ -86,7 +86,7 @@ class RecipeInstance(Resource):
 
         result = patch_document(Recipe, new_recipe, old_recipe)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching recipe with id: {}'.format(recipe_id))
         
         old_recipe.reload()

@@ -79,7 +79,7 @@ class MenuInstance(Resource):
 
         result = put_document(Menu, new_menu, old_menu)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching menu with id: {}'.format(menu_id))
         
         old_menu.reload()
@@ -94,7 +94,7 @@ class MenuInstance(Resource):
 
         result = patch_document(Menu, new_menu, old_menu)
 
-        if(result['n'] != 1):
+        if(result.modified_count != 1):
             raise BadRequest(description='no matching menu with id: {}'.format(menu_id))
         
         old_menu.reload()
