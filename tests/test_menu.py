@@ -284,7 +284,7 @@ def test_date_format(client: FlaskClient, auth_headers):
         'date' : '2012-09-1212'
     }, auth_headers)
 
-    assert response.status_code == 400
+    assert response.status_code == 201 #truncated to 12
 
     response = create_menu(client, {
         'name' : 'Fish',
