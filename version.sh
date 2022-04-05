@@ -14,6 +14,7 @@ echo "Testing app"...
 
 source venv/bin/activate
 
+pip install -r requirements.txt --upgrade --force-reinstall
 python3 -m pytest ./tests
 
 if [ $? != 0 ]; then
