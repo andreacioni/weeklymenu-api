@@ -50,7 +50,7 @@ class MenuList(Resource):
         menu.owner = user_info.id
         
         try:
-            menu.save()
+            menu.save(force_insert=True)
         except NotUniqueError as nue:
             raise DuplicateEntry(description="duplicate entry found for a menu", details=nue.args or [])
         

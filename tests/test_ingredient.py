@@ -1,5 +1,7 @@
+from mongomock import ObjectId
 import pytest
 
+from time import sleep
 from uuid import uuid4
 from datetime import datetime, time
 
@@ -144,6 +146,23 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['pages'] == 1 \
         and len(response.json['results']) == 1
+
+def test_duplicate_entry_ingredient(client: FlaskClient, auth_headers):
+  idx = ObjectId() 
+  response = create_ingredient(client, {
+    "_id": idx,
+    'name': 'Ingredient 1',
+  } , auth_headers)
+
+  assert response.status_code == 201 and ObjectId(response.json['_id']) == idx and response.json['name'] == 'Ingredient 1'
+
+  response = create_ingredient(client, {
+    "_id": idx,
+    'name': 'Ingredient 2',
+  } , auth_headers)
+
+  assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
+
 
 def test_replace_ingredient(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
@@ -367,6 +386,8 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     idx_1 = response.json['_id']
     insert_timestamp_1 = response.json['insert_timestamp']
     update_timestamp_1 = response.json['update_timestamp']
+
+    sleep(1) #avoid conflicting timestamps
 
     response = create_ingredient(client, {
         'name': 'Tomato',
