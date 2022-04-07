@@ -1,5 +1,7 @@
+from mongomock import ObjectId
 import pytest
 
+from time import sleep
 from datetime import datetime
 from uuid import uuid4
 
@@ -223,6 +225,23 @@ def test_create_menu(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 and response.json['date'] == '2019-10-11'
 
+def test_duplicate_entry_menu(client: FlaskClient, auth_headers):
+  idx = ObjectId() 
+  response = create_menu(client, {
+    "_id": idx,
+    "name": "Menu 1",
+    'date': '2012-01-12',
+  } , auth_headers)
+
+  assert response.status_code == 201 and ObjectId(response.json['_id']) == idx and response.json['date'] == '2012-01-12'
+
+  response = create_menu(client, {
+    "_id": idx,
+    'name': 'Menu 2',
+    'date': '2014-11-10',
+  } , auth_headers)
+
+  assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
 
 def test_update_menu(client: FlaskClient, auth_headers):
     ham = create_ingredient(client, {
@@ -443,6 +462,8 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     idx_1 = response.json['_id']
     insert_timestamp_1 = response.json['insert_timestamp']
     update_timestamp_1 = response.json['update_timestamp']
+
+    sleep(1) #avoid conflicting timestamps
 
     response = create_menu(client, {
         'date': '2019-10-06',

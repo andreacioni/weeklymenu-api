@@ -39,7 +39,7 @@ class RecipeList(Resource):
         recipe.owner = user_info.id
 
         try:
-            recipe.save()
+            recipe.save(force_insert=True)
         except NotUniqueError as nue:
             raise DuplicateEntry(
                 description="duplicate entry found for a recipe", details=nue.args or [])

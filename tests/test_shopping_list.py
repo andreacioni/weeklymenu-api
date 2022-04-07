@@ -1,5 +1,7 @@
+from mongomock import ObjectId
 import pytest
 
+from time import sleep
 from datetime import datetime
 from uuid import uuid4
 
@@ -107,6 +109,24 @@ def test_create_shopping_list(client: FlaskClient, auth_headers):
   }, auth_headers)
 
   assert response.status_code == 201
+
+def test_duplicate_entry_shopping_list(client: FlaskClient, auth_headers):
+  idx = ObjectId() 
+  response = create_shopping_list(client, {
+    "_id": idx,
+    'name': 'Shop List 1',
+    'items' : []
+  } , auth_headers)
+
+  assert response.status_code == 201 and ObjectId(response.json['_id']) == idx and response.json['name'] == 'Shop List 1'
+
+  response = create_shopping_list(client, {
+    "_id": idx,
+    'name': 'Shop List 2',
+    'items' : []
+  } , auth_headers)
+
+  assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
 
 def test_append_item_to_list(client: FlaskClient, auth_headers):
 
@@ -529,6 +549,8 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     idx_1 = response.json['_id']
     insert_timestamp_1 = response.json['insert_timestamp']
     update_timestamp_1 = response.json['update_timestamp']
+
+    sleep(1) #avoid conflicting timestamps
 
     response = create_shopping_list(client, {
         'name': 'Tomato',

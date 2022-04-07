@@ -29,7 +29,7 @@ class IngredientsList(Resource):
         ingredient.owner = user_info.id
 
         try:
-            ingredient.save()
+            ingredient.save(force_insert=True)
         except NotUniqueError as nue:
             raise DuplicateEntry(
                 description="duplicate entry found for an ingredient", details=nue.args or [])

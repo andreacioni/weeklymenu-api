@@ -37,7 +37,7 @@ class UserShoppingLists(Resource):
         shopping_list.owner = user_info.id
         
         try:
-            shopping_list.save()
+            shopping_list.save(force_insert=True)
         except NotUniqueError as nue:
             raise DuplicateEntry(
                 description="duplicate entry found for a shopping list", details=nue.args or [])

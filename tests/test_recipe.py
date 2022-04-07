@@ -1,5 +1,7 @@
+from mongomock import ObjectId
 import pytest
 
+from time import sleep
 from datetime import datetime
 from uuid import uuid4
 
@@ -56,6 +58,30 @@ def test_create_with_supplied_id(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['_id'] == '5e4ae04561fe8235a5a18824'
 
+def test_create_with_supplied_id_using_put(client: FlaskClient, auth_headers):
+    response = put_recipe(client, '5e4ae04561fe8235a5a18824', {
+        'name': 'Menu',
+        '_id': '5e4ae04561fe8235a5a18824'
+    }, auth_headers)
+
+    assert response.status_code == 201
+
+    response = patch_recipe(client, '5e4ae04561fe8235a5a18824', {
+        'name': 'Menu',
+        '_id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
+
+    response = put_recipe(client, '5e4ae04561fe8235a5a18824', {
+        'name': 'Menu',
+        '_id': '1fe8235a5a5e4ae045618824'
+    }, auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['_id'] == '5e4ae04561fe8235a5a18824'
+
 def test_create_with_different_owner_not_allowed(client: FlaskClient, auth_headers):
 
     response = create_recipe(client, {
@@ -85,6 +111,25 @@ def test_owner_update(client: FlaskClient, auth_headers):
     }, auth_headers)
 
     assert response.status_code == 403
+
+def test_duplicate_entry_recipe(client: FlaskClient, auth_headers):
+  idx = ObjectId() 
+  response = create_recipe(client, {
+    "_id": idx,
+    'name': 'Recipe 1',
+    'ingredients' : []
+  } , auth_headers)
+
+  assert response.status_code == 201 and ObjectId(response.json['_id']) == idx and response.json['name'] == 'Recipe 1'
+
+  response = create_recipe(client, {
+    "_id": idx,
+    'name': 'Recipe 2',
+    'ingredients' : []
+  } , auth_headers)
+
+  assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
+
 
 def test_create_recipe(client: FlaskClient, auth_headers):
   response = get_all_recipes(client, auth_headers)
@@ -320,6 +365,8 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     idx_1 = response.json['_id']
     insert_timestamp_1 = response.json['insert_timestamp']
     update_timestamp_1 = response.json['update_timestamp']
+
+    sleep(1) #avoid conflicting timestamps
 
     response = create_recipe(client, {
         'name': 'Tomato',
