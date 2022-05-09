@@ -8,7 +8,7 @@ from uuid import uuid4
 from flask.testing import FlaskClient
 from weekly_menu import create_app
 
-from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, ShoppingList
+from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, ShoppingList, UserPreferences
 from weekly_menu.webapp.api.v1.auth import encode_password
 
 TEST_USERNAME = 'test'
@@ -24,6 +24,7 @@ def clear_db():
   yield
   #Clear all collections
   #User.drop_collection()
+  #UserPreferences.drop_collection()
   Recipe.drop_collection()
   Menu.drop_collection()
   Ingredient.drop_collection()
