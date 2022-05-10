@@ -9,7 +9,7 @@ from . import authenticate, encode_password, get_user_by_email
 from .schemas import PostRegisterUserSchema, PostUserTokenSchema, PostResetPasswordSchema
 from .. import BASE_PATH
 from ... import validate_payload
-from ...models import User, ShoppingList
+from ...models import User, ShoppingList, UserPreferences
 from ...exceptions import InvalidCredentials, NotFound
 
 auth_blueprint = Blueprint(
@@ -44,6 +44,11 @@ def register_user(user_meta: PostRegisterUserSchema):
     shop_list = ShoppingList()
     shop_list.owner = user.id
     shop_list.name = 'Shopping List' #TODO name of the list may vary based on the location of the user
+    shop_list.save()
+
+    # Create a new preferences object for the newly created user
+    shop_list = UserPreferences()
+    shop_list.owner = user.id
     shop_list.save()
     
     return jsonify(user.to_mongo()), 200
