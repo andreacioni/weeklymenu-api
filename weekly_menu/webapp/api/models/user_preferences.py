@@ -8,9 +8,9 @@ class SupermarketSectionPreference(mongo.EmbeddedDocument):
     color = mongo.StringField(max_length=MAX_SECTION_NAME_LENGTH)
 
 class UserPreferences(BaseDocument):
-    supermarket_sections = mongo.EmbeddedDocumentListField(SupermarketSectionPreference)
+    supermarket_sections = mongo.EmbeddedDocumentListField(SupermarketSectionPreference, default=None)
     
-    shopping_days = mongo.ListField(mongo.IntField(min_value=1, max_value=7))
+    shopping_days = mongo.ListField(mongo.IntField(min_value=1, max_value=7), default=None)
 
     meta = {
         'collection' : 'user_preferences'
