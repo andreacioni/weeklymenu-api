@@ -7,7 +7,7 @@ from .base_document import BaseDocument
 class ShoppingListItem(mongo.EmbeddedDocument):
     checked = mongo.BooleanField(required=True)
     item = mongo.ReferenceField('Ingredient', required=True)
-    supermarketSection = mongo.StringField()
+    supermarketSectionName = mongo.StringField()
     listPosition = mongo.IntField(min_value=0)
     
     quantity = mongo.FloatField(min_value=0)
