@@ -107,3 +107,20 @@ def test_get_user_profile(client: FlaskClient, auth_headers):
     response = get_user_profile(client, auth_headers)
 
     assert response.status_code == 200
+
+def test_fail_on_empty_supermarket_section_name(client: FlaskClient, auth_headers):
+    response = post_user_preferences(client, {
+        'supermarket_sections': [{
+            'color': 12
+        }],
+    }, auth_headers)
+
+    assert response.status_code == 400
+
+    response = post_user_preferences(client, {
+        'supermarket_sections': [{
+            'name': 'hello'
+        }],
+    }, auth_headers)
+
+    assert response.status_code == 201
