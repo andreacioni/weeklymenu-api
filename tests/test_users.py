@@ -50,24 +50,28 @@ def test_replace_user_preference(client: FlaskClient, auth_headers):
     current_prefs = get_user_preferences(client, response['_id'], auth_headers).json
 
     assert ('shopping_days' not in current_prefs.keys()) and \
-            ('supermarket_sections' not in current_prefs.keys())
+            ('supermarket_sections' not in current_prefs.keys() and \
+                ('units_of_measure' not in current_prefs.keys()) )
     
     response = put_user_preferences(client, current_prefs['_id'], {
         'shopping_days': [1, 4],
         'supermarket_sections': [{
             'name': 'section1'
         }],
+        'units_of_measure': ['gr', 'L'],
     }, auth_headers)
 
     assert response.status_code == 200 and \
         len(response.json['shopping_days']) == 2 and \
-            len(response.json['supermarket_sections']) == 1 \
+            len(response.json['supermarket_sections']) == 1 and \
+                len(response.json['units_of_measure']) == 2
 
     response = get_user_preferences(client, current_prefs['_id'], auth_headers)
 
     assert response.status_code == 200 and \
         response.json['shopping_days'] == [1, 4] and \
-            response.json['supermarket_sections'][0]['name'] == 'section1'
+            response.json['supermarket_sections'][0]['name'] == 'section1' and \
+                response.json['units_of_measure'][0] == 'gr'
 
 def test_update_user_preference(client: FlaskClient, auth_headers):
     response = post_user_preferences(client, {}, auth_headers).json
