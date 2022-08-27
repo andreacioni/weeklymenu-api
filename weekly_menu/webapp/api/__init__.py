@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from functools import wraps
 from flask import request, jsonify, make_response
+from flask_cors import CORS
 from json import dumps
 from marshmallow_mongoengine import ModelSchema
 from flask_restful import Api, reqparse
@@ -35,6 +36,7 @@ mongo = MongoEngine()
 def create_module(app):
 
     mongo.init_app(app)
+    CORS(app)
 
     from .v1 import create_module as create_api_v1
 

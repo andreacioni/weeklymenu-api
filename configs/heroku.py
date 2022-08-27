@@ -2,6 +2,9 @@ import os
 
 JSON_SORT_KEYS=os.getenv('JSON_SORT_KEYS',False)
 
+#CORS
+CORS_ORIGINS=['https://weeklymenu.altervista.org']
+
 #MongoDb
 MONGODB_SETTINGS={
     'host': os.getenv('MONGO_HOST', None)

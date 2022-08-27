@@ -8,7 +8,7 @@ def create_module(app, api):
     from .ingredients import create_module as create_ingredients_module
     from .menu import create_module as create_menu_module
     from .recipes import create_module as create_recipes_module
-    #from .users import create_module as create_users_module
+    from .users import create_module as create_users_module
     from .shopping_list import create_module as create_shopping_list_module
     from .config import create_module as create_config_module
 
@@ -17,6 +17,6 @@ def create_module(app, api):
     create_ingredients_module(app, api)
     create_menu_module(app, api)
     create_recipes_module(app, api)
-    #create_users_module(app, api)
+    create_users_module(app, api)
     create_shopping_list_module(app, api)
     create_config_module(app, api)

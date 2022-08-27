@@ -11,10 +11,6 @@ class User(mongo.Document):
     password = mongo.BinaryField(required=True)
     email = mongo.StringField(unique=True, regex=USER_EMAIL_REGEX)
 
-    shoppingDay = mongo.ListField(
-        mongo.IntField(min_value=1, max_value=7)
-    )
-
     meta = {
         'collection' : 'users',
         'strict': False

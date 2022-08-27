@@ -210,11 +210,11 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
       {
         'item' : ham['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSectionName': 'Groceries'
       },{
         'item' : tuna['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSectionName': 'Groceries'
       }
     ]
   }, auth_headers).json
@@ -226,11 +226,11 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
         {
           'item' : ham['_id'],
           'checked': True,
-          'supermarketSection': 'Groceries'
+          'supermarketSectionName': 'Groceries'
         },{
           'item' : tuna['_id'],
           'checked': False,
-          'supermarketSection': 'Groceries'
+          'supermarketSectionName': 'Groceries'
         }
       ]
   }, auth_headers)
@@ -253,11 +253,11 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
       {
         'item' : ham['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries',
+        'supermarketSectionName': 'Groceries',
       },{
         'item' : tuna['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries',
+        'supermarketSectionName': 'Groceries',
         'quantity': 12,
         'unitOfMeasure': 'L'
       }
@@ -285,7 +285,7 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
   }, auth_headers)
 
   assert response.status_code == 200 and \
-    response.json['supermarketSection'] == 'Groceries' and \
+    response.json['supermarketSectionName'] == 'Groceries' and \
     response.json['quantity'] == 23.0
 
   shop_list = get_shopping_list(client, shop_list['_id'], auth_headers).json
@@ -300,7 +300,7 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
   }, auth_headers)
 
   assert response.status_code == 200 and \
-    response.json['supermarketSection'] == 'Groceries' and \
+    response.json['supermarketSectionName'] == 'Groceries' and \
     response.json['quantity'] == 33 and \
     response.json['unitOfMeasure'] == 'cl'
 
@@ -323,11 +323,11 @@ def test_replace_shopping_list_item(client: FlaskClient, auth_headers):
       {
         'item' : ham['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSectionName': 'Groceries'
       },{
         'item' : tuna['_id'],
         'checked': False,
-        'supermarketSection': 'Groceries'
+        'supermarketSectionName': 'Groceries'
       }
     ]
   }, auth_headers).json
