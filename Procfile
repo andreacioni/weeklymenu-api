@@ -1,1 +1,1 @@
-web: gunicorn "weekly_menu:create_app('heroku')" --log-file -
+web: gunicorn "weekly_menu:create_app('flyio')" --log-file -
