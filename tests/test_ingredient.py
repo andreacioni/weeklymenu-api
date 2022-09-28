@@ -1,3 +1,4 @@
+from pydoc import cli
 from mongomock import ObjectId
 import pytest
 
@@ -32,6 +33,7 @@ def delete_ingredient(client, ing_id, auth_headers):
 
 def get_all_ingredients(client, auth_headers, page=1, per_page=10, order_by='', desc=False):
     return client.get('/api/v1/ingredients?page={}&per_page={}&order_by={}&desc={}'.format(page, per_page, order_by, desc), headers=auth_headers)
+
 
 def get_ingredient(client, ing_id, auth_headers):
     return client.get('/api/v1/ingredients/{}'.format(ing_id), headers=auth_headers)
@@ -147,21 +149,23 @@ def test_create_ingredient(client: FlaskClient, auth_headers):
         and response.json['pages'] == 1 \
         and len(response.json['results']) == 1
 
+
 def test_duplicate_entry_ingredient(client: FlaskClient, auth_headers):
-  idx = ObjectId() 
-  response = create_ingredient(client, {
-    "_id": idx,
-    'name': 'Ingredient 1',
-  } , auth_headers)
+    idx = ObjectId()
+    response = create_ingredient(client, {
+        "_id": idx,
+        'name': 'Ingredient 1',
+    }, auth_headers)
 
-  assert response.status_code == 201 and ObjectId(response.json['_id']) == idx and response.json['name'] == 'Ingredient 1'
+    assert response.status_code == 201 and ObjectId(
+        response.json['_id']) == idx and response.json['name'] == 'Ingredient 1'
 
-  response = create_ingredient(client, {
-    "_id": idx,
-    'name': 'Ingredient 2',
-  } , auth_headers)
+    response = create_ingredient(client, {
+        "_id": idx,
+        'name': 'Ingredient 2',
+    }, auth_headers)
 
-  assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
+    assert response.status_code == 409 and response.json['error'] == 'DUPLICATE_ENTRY'
 
 
 def test_replace_ingredient(client: FlaskClient, auth_headers):
@@ -243,17 +247,18 @@ def test_partial_ingredient_update(client: FlaskClient, auth_headers):
 
     assert response.status_code == 400
 
+
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
-        '_id': 'Mf5cd7d4f8cb6cd5acaec6f', # invalid ObjectId
-        'name' : 'Fish'
+        '_id': 'Mf5cd7d4f8cb6cd5acaec6f',  # invalid ObjectId
+        'name': 'Fish'
     }, auth_headers)
 
     assert response.status_code == 400
 
     response = create_ingredient(client, {
         '_id': '5f5cd7d4f8cb6cd5acaec6f5',
-        'name' : 'Fish'
+        'name': 'Fish'
     }, auth_headers)
 
     assert response.status_code == 201 \
@@ -262,25 +267,26 @@ def test_offline_id(client: FlaskClient, auth_headers):
     idx = response.json['_id']
 
     response = put_ingredient(client, idx, {
-        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
-        'name' : 'Fish'
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8',  # Different ObjectId
+        'name': 'Fish'
     }, auth_headers)
 
     assert response.status_code == 200 \
         and response.json['_id'] == idx
 
     response = patch_ingredient(client, idx, {
-        '_id': '5f5cd7d4f8cb6cd5acaec6f8', # Different ObjectId
-        'name' : 'Fish'
+        '_id': '5f5cd7d4f8cb6cd5acaec6f8',  # Different ObjectId
+        'name': 'Fish'
     }, auth_headers)
 
     assert response.status_code == 200 \
         and response.json['_id'] == idx
-    
+
     response = get_ingredient(client, idx, auth_headers)
 
     assert response.status_code == 200 \
         and response.json['_id'] == idx
+
 
 def test_create_update_timestamp(client: FlaskClient, auth_headers):
     response = create_ingredient(client, {
@@ -290,7 +296,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     assert response.status_code == 403 \
         and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
-    
+
     response = create_ingredient(client, {
         'name': 'Rice',
         'update_timestamp': int(datetime.now().timestamp())
@@ -307,21 +313,21 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
 
     assert response.status_code == 403 \
         and response.json['error'] == 'CANNOT_SET_CREATION_UPDATE_TIME'
-    
+
     response = create_ingredient(client, {
         'name': 'Rice',
     }, auth_headers)
 
     assert response.status_code == 201 \
         and response.json['insert_timestamp'] is not None \
-            and isinstance(response.json['insert_timestamp'], int) \
+        and isinstance(response.json['insert_timestamp'], int) \
         and response.json['update_timestamp'] is not None \
-            and isinstance(response.json['update_timestamp'], int)    
-    
+        and isinstance(response.json['update_timestamp'], int)
+
     idx = response.json['_id']
     insert_timestamp = response.json['insert_timestamp']
     update_timestamp = response.json['update_timestamp']
-    
+
     response = put_ingredient(client, idx, {
         'name': 'Tomato',
         'update_timestamp': int(datetime.now().timestamp())
@@ -363,7 +369,7 @@ def test_create_update_timestamp(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['insert_timestamp'] == insert_timestamp \
         and response.json['update_timestamp'] > update_timestamp
-    
+
     update_timestamp = response.json['update_timestamp']
 
     response = put_ingredient(client, idx, {
@@ -381,25 +387,26 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
         'name': 'Rice',
     }, auth_headers)
 
-    assert response.status_code == 201  
-    
+    assert response.status_code == 201
+
     idx_1 = response.json['_id']
     insert_timestamp_1 = response.json['insert_timestamp']
     update_timestamp_1 = response.json['update_timestamp']
 
-    sleep(1) #avoid conflicting timestamps
+    sleep(1)  # avoid conflicting timestamps
 
     response = create_ingredient(client, {
         'name': 'Tomato',
     }, auth_headers)
 
-    assert response.status_code == 201  
-    
+    assert response.status_code == 201
+
     idx_2 = response.json['_id']
     insert_timestamp_2 = response.json['insert_timestamp']
     update_timestamp_2 = response.json['update_timestamp']
 
-    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+    response = get_all_ingredients(
+        client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
 
     assert response.status_code == 200 \
         and len(response.json['results']) == 1 \
@@ -412,10 +419,11 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['insert_timestamp'] == insert_timestamp_1 \
         and response.json['update_timestamp'] > update_timestamp_1
-    
+
     update_timestamp_1 = response.json['update_timestamp']
 
-    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+    response = get_all_ingredients(
+        client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
 
     assert response.status_code == 200 \
         and len(response.json['results']) == 1 \
@@ -432,13 +440,14 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
 
     update_timestamp_1 = response.json['update_timestamp']
 
-    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+    response = get_all_ingredients(
+        client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
 
     assert response.status_code == 200 \
         and len(response.json['results']) == 1 \
         and response.json['results'][0]['_id'] == idx_1 \
         and response.json['results'][0]['update_timestamp'] == update_timestamp_1
-    
+
     response = patch_ingredient(client, idx_2, {
         'name': 'Tomato',
     }, auth_headers)
@@ -446,10 +455,11 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and response.json['insert_timestamp'] == insert_timestamp_2 \
         and response.json['update_timestamp'] > update_timestamp_2
-    
+
     update_timestamp_2 = response.json['update_timestamp']
 
-    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+    response = get_all_ingredients(
+        client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
 
     assert response.status_code == 200 \
         and len(response.json['results']) == 1 \
@@ -466,10 +476,27 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
 
     update_timestamp_2 = response.json['update_timestamp']
 
-    response = get_all_ingredients(client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
+    response = get_all_ingredients(
+        client, auth_headers, order_by='update_timestamp', desc=True, page=1, per_page=1)
 
     assert response.status_code == 200 \
         and len(response.json['results']) == 1 \
         and response.json['results'][0]['_id'] == idx_2 \
         and response.json['results'][0]['update_timestamp'] == update_timestamp_2
-        
+
+
+def test_allow_unexpected_value(client: FlaskClient, auth_headers):
+    response = create_ingredient(client, {
+        'name': 'Rice',
+        'unexpected': 'field',
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and 'name' in response.json \
+        and 'unexpected' not in response.json
+
+    response = get_ingredient(client, response.json['_id'], auth_headers)
+
+    assert response.status_code == 200 \
+        and 'name' in response.json \
+        and 'unexpected' not in response.json
