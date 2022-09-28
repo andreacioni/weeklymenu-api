@@ -478,17 +478,30 @@ def test_get_last_updated(client: FlaskClient, auth_headers):
 
 
 def test_allow_unexpected_value(client: FlaskClient, auth_headers):
+    ingredient = create_ingredient(
+        client, {'name': 'Mozzarella'}, auth_headers)
+
     response = create_recipe(client, {
         'name': 'Lasagna',
         'unexpected': 'field',
+        'ingredients': [
+            {
+                'ingredient': ingredient.json['_id'],
+                'unexpected': 'field',
+            }
+        ]
     }, auth_headers)
 
     assert response.status_code == 201 \
         and 'name' in response.json \
-        and 'unexpected' not in response.json
+        and 'ingredient' in response.json['ingredients'][0] \
+        and 'unexpected' not in response.json \
+        and 'unexpected' not in response.json['ingredients'][0]
 
     response = get_recipe(client, response.json['_id'], auth_headers)
 
     assert response.status_code == 200 \
         and 'name' in response.json \
-        and 'unexpected' not in response.json
+        and 'ingredient' in response.json['ingredients'][0] \
+        and 'unexpected' not in response.json \
+        and 'unexpected' not in response.json['ingredients'][0]
