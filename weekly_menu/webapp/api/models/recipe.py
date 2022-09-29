@@ -2,6 +2,7 @@ from .. import mongo
 
 from .base_document import BaseDocument
 
+
 class RecipeIngredient(mongo.EmbeddedDocument):
     quantity = mongo.FloatField()
     unitOfMeasure = mongo.StringField(max_length=10)
@@ -10,10 +11,16 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     ingredient = mongo.ReferenceField('Ingredient', required=True)
 
 
+class RecipePreparationStep(mongo.EmbeddedDocument):
+    description = mongo.StringField(max_length=10)
+
+
 class Recipe(BaseDocument):
     name = mongo.StringField(required=True)
     description = mongo.StringField()
-    preparation = mongo.StringField() #TODO will be a list of strings
+    preparation = mongo.StringField()  # TODO will be a list of strings
+    preparationSteps = mongo.EmbeddedDocumentListField(
+        'RecipePreparationStep', default=None)
     note = mongo.StringField()
     availabilityMonths = mongo.ListField(mongo.IntField(
         min_value=1, max_value=12), max_length=12, default=None)
