@@ -1,3 +1,4 @@
+from pydoc import cli
 from mongomock import ObjectId
 import pytest
 
@@ -164,10 +165,22 @@ def test_create_recipe(client: FlaskClient, auth_headers):
             }, {
                 'ingredient': tomato_resp.json['_id']
             }
+        ],
+        'preparationSteps': [
+            {
+                'description': 'Step #1'
+            }
         ]
     }, auth_headers)
 
-    assert response.status_code == 201 and response.json['name'] == 'Tuna and tomatoes'
+    assert response.status_code == 201 \
+        and response.json['name'] == 'Tuna and tomatoes' \
+        and len(response.json['preparationSteps']) == 1
+
+    response = get_recipe(client, response.json['_id'], auth_headers)
+
+    assert response.json['name'] == 'Tuna and tomatoes' \
+        and len(response.json['preparationSteps']) == 1
 
     # Test fail duplicating ingredient
     # response = create_recipe(client, {
