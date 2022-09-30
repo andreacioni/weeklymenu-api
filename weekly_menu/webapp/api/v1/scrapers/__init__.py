@@ -17,8 +17,12 @@ def scrape_recipe_from_url(url: str):
         scraped = scrape_html(url)
 
     return {
-        'name': scraped.title(),
+        'title': scraped.title(),
         'image': scraped.image(),
         'servings': scraped.yields(),
         'ingredients': scraped.ingredients(),
+        'nutrients': scraped.nutrients(),
+        'instructions': scraped.instructions(),
+        'instructions_list': scraped.instructions_list(),
+        'links': scraped.links(),
     }
