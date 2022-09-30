@@ -18,12 +18,16 @@ from .exceptions import InvalidPayloadSupplied, BadRequest, Forbidden
 
 API_PREFIX = '/api'
 
+
 class QueryArgs:
     DAY = 'day'
     ORDER_BY = 'order_by'
     DESC = 'desc'
 
     GREATER = 'gt'
+
+    URL = 'url'
+
 
 # Pagination
 DEFAULT_PAGE_SIZE = 10
@@ -80,6 +84,7 @@ def validate_payload(model_schema: ModelSchema, kwname='payload'):
 
     return decorate
 
+
 def parse_query_args(func):
     query_args_reqparse = reqparse.RequestParser()
     query_args_reqparse.add_argument(
@@ -109,6 +114,13 @@ def parse_query_args(func):
         location=['args'],
         required=False
     )
+    query_args_reqparse.add_argument(
+        QueryArgs.URL,
+        type=str,
+        location=['args'],
+        required=False
+    )
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         query_args = query_args_reqparse.parse_args()
@@ -118,11 +130,11 @@ def parse_query_args(func):
             QueryArgs.ORDER_BY: query_args[QueryArgs.ORDER_BY],
             QueryArgs.DESC: query_args[QueryArgs.DESC],
             QueryArgs.GREATER: query_args[QueryArgs.GREATER],
+            QueryArgs.URL: query_args[QueryArgs.URL],
         }
 
         return func(*args, **kwargs)
     return wrapper
-
 
 
 def get_payload(kwname='payload'):
@@ -170,6 +182,7 @@ def paginated(func):
         required=False,
         default=DEFAULT_PAGE_SIZE
     )
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         page_args = pagination_reqparse.parse_args()
@@ -190,12 +203,13 @@ def paginated(func):
         page = func(*args, **kwargs)
 
         return jsonify({
-            #"results": page.items,
+            # "results": page.items,
             "results": [item.to_mongo() if isinstance(item, mongo.Document) else item for item in page.items],
             "pages": page.pages
         })
 
     return wrapper
+
 
 def _update_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument, patch=True):
     if patch == True:
@@ -205,6 +219,7 @@ def _update_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.Em
         return old_doc
     else:
         return new_doc
+
 
 def _update_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, old_doc: mongo.Document, patch=True):
     # Remove generated id and link new doc with current owner
@@ -227,8 +242,10 @@ def put_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, 
 def patch_document(coll_class: mongo.Document.__class__, new_doc: mongo.Document, old_doc: mongo.Document):
     return _update_document(coll_class, new_doc, old_doc, patch=True)
 
+
 def put_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument):
     return _update_embedded_document(new_doc, old_doc, patch=False)
+
 
 def patch_embedded_document(new_doc: mongo.EmbeddedDocument, old_doc: mongo.EmbeddedDocument):
     return _update_embedded_document(new_doc, old_doc, patch=True)
@@ -238,35 +255,42 @@ def _build_query_by_params(base_query, query_args):
     if QueryArgs.DAY in query_args and query_args[QueryArgs.DAY] is not None:
         if bool(re.search(r'^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$', query_args[QueryArgs.DAY])):
             try:
-                searched_day = datetime.strptime(query_args[QueryArgs.DAY], '%Y-%m-%d')
+                searched_day = datetime.strptime(
+                    query_args[QueryArgs.DAY], '%Y-%m-%d')
             except ValueError as ex:
-                raise BadRequest('invalid day parameter supplied: {}'.format(ex))
+                raise BadRequest(
+                    'invalid day parameter supplied: {}'.format(ex))
         else:
             raise BadRequest('invalid day format')
-        
+
         base_query = base_query & Q(date=searched_day)
-    
+
     if QueryArgs.GREATER in query_args and query_args[QueryArgs.GREATER] is not None:
         if (not bool(re.search(r'^\w+\$\d+$', query_args[QueryArgs.GREATER]))):
             raise BadRequest('invalid gt value')
-        
+
         split = query_args[QueryArgs.GREATER].split('$')
-        
+
         base_query = base_query & Q(**{"{}__gt".format(split[0]): split[1]})
-    
+
     return base_query
 
-def _apply_ordering(filtered_objects, query_args):
-    if(query_args[QueryArgs.ORDER_BY] != None and query_args[QueryArgs.ORDER_BY] != ''):
-        if(query_args[QueryArgs.DESC] == True):
-            filtered_objects = filtered_objects.order_by('-' + query_args[QueryArgs.ORDER_BY]) # descending "-"
-        else:
-            filtered_objects = filtered_objects.order_by('+' + query_args[QueryArgs.ORDER_BY]) # ascending "+"
 
-    return filtered_objects 
+def _apply_ordering(filtered_objects, query_args):
+    if (query_args[QueryArgs.ORDER_BY] != None and query_args[QueryArgs.ORDER_BY] != ''):
+        if (query_args[QueryArgs.DESC] == True):
+            filtered_objects = filtered_objects.order_by(
+                '-' + query_args[QueryArgs.ORDER_BY])  # descending "-"
+        else:
+            filtered_objects = filtered_objects.order_by(
+                '+' + query_args[QueryArgs.ORDER_BY])  # ascending "+"
+
+    return filtered_objects
+
 
 def _apply_pagination(ordered_objects, page_args):
     return ordered_objects.paginate(page=page_args['page'], per_page=page_args['per_page'])
+
 
 def search_on_model(coll_class: mongo.Document.__class__, base_query, query_args, page_args):
     query_filter = _build_query_by_params(base_query, query_args)
