@@ -12,7 +12,7 @@ class RecipeIngredient(mongo.EmbeddedDocument):
 
 
 class RecipePreparationStep(mongo.EmbeddedDocument):
-    description = mongo.StringField(max_length=10)
+    description = mongo.StringField(max_length=1000)
 
 
 class Recipe(BaseDocument):
