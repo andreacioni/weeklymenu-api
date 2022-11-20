@@ -6,7 +6,7 @@ from flask import request, jsonify, make_response
 from flask_cors import CORS
 from json import dumps
 from marshmallow_mongoengine import ModelSchema
-from flask_restful import Api, reqparse
+from flask_restful import Api, reqparse, inputs
 from flask_mongoengine import MongoEngine, DoesNotExist
 from flask_jwt_extended import get_jwt_identity
 from mongoengine.queryset.visitor import Q
@@ -116,7 +116,8 @@ def parse_query_args(func):
     )
     query_args_reqparse.add_argument(
         QueryArgs.URL,
-        type=str,
+        type=inputs.regex(
+            "^(https?:\\/\\/(?:www\\.)?)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&\\/=]*)$"),
         location=['args'],
         required=False
     )

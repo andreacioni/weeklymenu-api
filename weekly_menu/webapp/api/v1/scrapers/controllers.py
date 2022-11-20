@@ -25,4 +25,8 @@ def scrape_recipe(query_args):
         raise BadRequest('url not provided')
 
     url = query_args[QueryArgs.URL]
-    return jsonify(scrape_recipe_from_url(url)), 200
+
+    try:
+        return jsonify(scrape_recipe_from_url(url)), 200
+    except:
+        raise NotFound('no recipe found on supplied URL')
