@@ -15,6 +15,10 @@ class RecipePreparationStep(mongo.EmbeddedDocument):
     description = mongo.StringField(max_length=1000)
 
 
+class RelatedRecipe(mongo.EmbeddedDocument):
+    id = mongo.ObjectIdField()
+
+
 class Recipe(BaseDocument):
     name = mongo.StringField(required=True)
     description = mongo.StringField()
@@ -34,6 +38,10 @@ class Recipe(BaseDocument):
     difficulty = mongo.StringField()
     recipeUrl = mongo.StringField()
     imgUrl = mongo.StringField()
+    videoUrl = mongo.StringField()
+    section = mongo.StringField()
+    relatedRecipes = mongo.EmbeddedDocumentListField(
+        'RelatedRecipe', default=None)
     tags = mongo.ListField(
         mongo.StringField(), default=None
     )
