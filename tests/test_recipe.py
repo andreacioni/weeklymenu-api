@@ -518,3 +518,26 @@ def test_allow_unexpected_value(client: FlaskClient, auth_headers):
         and 'ingredient' in response.json['ingredients'][0] \
         and 'unexpected' not in response.json \
         and 'unexpected' not in response.json['ingredients'][0]
+
+
+def test_related_recipes(client: FlaskClient, auth_headers):
+    response = create_recipe(client, {
+        'name': 'Tomato sauce'
+    }, auth_headers)
+
+    relatedRecipeId = response.json['_id']
+
+    response = create_recipe(client, {
+        'name': 'Lasagna',
+        'relatedRecipes': [{
+            'id':     relatedRecipeId
+        }]
+    }, auth_headers)
+
+    assert response.status_code == 201 \
+        and response.json['relatedRecipes'][0]['id'] == relatedRecipeId
+
+    response = get_recipe(client, response.json['_id'], auth_headers)
+
+    assert response.status_code == 200 \
+        and response.json['relatedRecipes'][0]['id'] == relatedRecipeId
