@@ -9,19 +9,17 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     item = mongo.ReferenceField('Ingredient', required=True)
     supermarketSectionName = mongo.StringField()
     listPosition = mongo.IntField(min_value=0)
-
+    
     quantity = mongo.FloatField(min_value=0)
     unitOfMeasure = mongo.StringField(max_length=10)
-
 
 class ShoppingList(BaseDocument):
     name = mongo.StringField(required=True)
     items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
     meta = {
-        'collection': 'shopping_lists',
-        'strict': False
+        'collection' : 'shopping_lists'
     }
 
     def __repr__(self):
-        return "<ShoppingList '{}'>".format(self.name)
+           return "<ShoppingList '{}'>".format(self.name)
