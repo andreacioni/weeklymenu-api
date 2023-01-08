@@ -2,7 +2,6 @@ from .. import mongo
 
 from .base_document import BaseDocument
 
-
 class Ingredient(BaseDocument):
     name = mongo.StringField(required=True)
     description = mongo.StringField()
@@ -17,9 +16,8 @@ class Ingredient(BaseDocument):
     )
 
     meta = {
-        'collection': 'ingredients',
-        'strict': False
+        'collection' : 'ingredients'
     }
 
     def __repr__(self):
-        return "<Ingredient '{}'>".format(self.name)
+           return "<Ingredient '{}'>".format(self.name)

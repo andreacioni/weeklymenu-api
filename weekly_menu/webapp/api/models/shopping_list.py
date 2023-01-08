@@ -13,14 +13,17 @@ class ShoppingListItem(mongo.EmbeddedDocument):
     quantity = mongo.FloatField(min_value=0)
     unitOfMeasure = mongo.StringField(max_length=10)
 
+    meta = {
+        'strict': False
+    }
+
 
 class ShoppingList(BaseDocument):
     name = mongo.StringField(required=True)
     items = mongo.EmbeddedDocumentListField('ShoppingListItem', default=None)
 
     meta = {
-        'collection': 'shopping_lists',
-        'strict': False
+        'collection': 'shopping_lists'
     }
 
     def __repr__(self):
