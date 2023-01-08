@@ -10,13 +10,25 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     freezed = mongo.BooleanField()
     ingredient = mongo.ReferenceField('Ingredient', required=True)
 
+    meta = {
+        'strict': False
+    }
+
 
 class RecipePreparationStep(mongo.EmbeddedDocument):
     description = mongo.StringField(max_length=1000)
 
+    meta = {
+        'strict': False
+    }
+
 
 class RelatedRecipe(mongo.EmbeddedDocument):
     id = mongo.ObjectIdField()
+
+    meta = {
+        'strict': False
+    }
 
 
 class Recipe(BaseDocument):
