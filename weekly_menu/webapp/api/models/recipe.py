@@ -47,7 +47,8 @@ class Recipe(BaseDocument):
     )
 
     meta = {
-        'collection': 'recipes'
+        'collection': 'recipes',
+        'strict': False
     }
 
     def __repr__(self):
