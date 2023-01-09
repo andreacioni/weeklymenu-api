@@ -694,3 +694,7 @@ def test_allow_unexpected_value(client: FlaskClient, auth_headers):
     assert response.status_code == 200 \
         and 'name' in response.json \
         and 'unexpected' not in response.json
+
+
+def test_unexpected_field_in_shopping_list_collection():
+    raise Exception('todo')

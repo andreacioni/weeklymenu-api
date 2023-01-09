@@ -541,3 +541,7 @@ def test_related_recipes(client: FlaskClient, auth_headers):
 
     assert response.status_code == 200 \
         and response.json['relatedRecipes'][0]['id'] == relatedRecipeId
+
+
+def test_unexpected_field_in_recipe_collection():
+    raise Exception('todo')
