@@ -9,6 +9,7 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     required = mongo.BooleanField()
     freezed = mongo.BooleanField()
     ingredient = mongo.ReferenceField('Ingredient', required=True)
+    name = mongo.StringField(required=True)
 
     meta = {
         'strict': False

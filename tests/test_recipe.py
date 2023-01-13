@@ -12,6 +12,8 @@ from flask.testing import FlaskClient
 
 from test_ingredient import create_ingredient, delete_ingredient
 
+from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, ShoppingList, UserPreferences
+
 
 def create_recipe(client, json, auth_headers):
     return client.post('/api/v1/recipes', json=json, headers=auth_headers)
@@ -543,5 +545,29 @@ def test_related_recipes(client: FlaskClient, auth_headers):
         and response.json['relatedRecipes'][0]['id'] == relatedRecipeId
 
 
-def test_unexpected_field_in_recipe_collection():
-    raise Exception('todo')
+def test_unexpected_field_in_recipe_collection(client: FlaskClient, auth_headers):
+    tuna = create_ingredient(client, {
+        'name': 'tuna'
+    }, auth_headers).json
+
+    response = create_recipe(client, {
+        'name': 'Recipe',
+        'ingredients': [
+            {
+                'ingredient': tuna['_id'],
+                'name': tuna['name']
+            }
+        ]
+    }, auth_headers)
+
+    assert response.status_code == 201
+
+    saved = Recipe(name='Test', owner=ObjectId(), ingredients=[
+        {
+            "ingredient": ObjectId(tuna['_id']),
+            'name': 'test ingredient',
+            'unexpected': 1
+        }
+    ]).save()
+
+    assert saved is not None

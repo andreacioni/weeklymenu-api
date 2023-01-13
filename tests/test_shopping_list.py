@@ -11,6 +11,8 @@ from flask.testing import FlaskClient
 
 from test_ingredient import create_ingredient, delete_ingredient
 
+from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, ShoppingList, UserPreferences
+
 
 def create_shopping_list(client, json, auth_headers):
     return client.post('/api/v1/shopping-lists', json=json, headers=auth_headers)
@@ -302,7 +304,7 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
     #    'checked' : True
     # }, auth_headers)
 
-    #assert response.status_code == 409
+    # assert response.status_code == 409
 
     response = update_item_in_shopping_list(client, shop_list['_id'], tuna['_id'], {
         'checked': True,
@@ -368,7 +370,7 @@ def test_replace_shopping_list_item(client: FlaskClient, auth_headers):
     #    'checked' : True
     # }, auth_headers)
 
-    #assert response.status_code == 409
+    # assert response.status_code == 409
 
     response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'], {
         'item': tuna['_id'],
@@ -696,5 +698,33 @@ def test_allow_unexpected_value(client: FlaskClient, auth_headers):
         and 'unexpected' not in response.json
 
 
-def test_unexpected_field_in_shopping_list_collection():
-    raise Exception('todo')
+def test_unexpected_field_in_shopping_list_collection(client: FlaskClient, auth_headers):
+    tuna = create_ingredient(client, {
+        'name': 'tuna'
+    }, auth_headers).json
+
+    response = create_shopping_list(client, {
+        'name': 'Shop List #1',
+        'items': [
+            {
+                'item': tuna['_id'],
+                'name': tuna['name'],
+                'checked': False,
+                'unexpected': 1
+            }
+        ]
+    }, auth_headers)
+
+    assert response.status_code == 201
+
+    saved = ShoppingList(name='Test', owner=ObjectId(), items=[
+        {
+            "checked": False,
+
+            "item": ObjectId(tuna['_id']),
+            'name': 'test item',
+            'unexpected': 1
+        }
+    ]).save()
+
+    assert saved is not None
