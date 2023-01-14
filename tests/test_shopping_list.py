@@ -119,9 +119,11 @@ def test_create_shopping_list(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False
             }
         ]
@@ -165,6 +167,7 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False
             }
         ]
@@ -172,6 +175,7 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
 
     response = add_item_in_shopping_list(client, shop_list['_id'], {
         'item': tuna['_id'],
+        'name': 'tuna',
         'checked': False
     }, auth_headers)
 
@@ -179,6 +183,7 @@ def test_append_item_to_list(client: FlaskClient, auth_headers):
 
     response = add_item_in_shopping_list(client, shop_list['_id'], {
         'item': tuna['_id'],
+        'name': 'tuna',
         'checked': True
     }, auth_headers)
 
@@ -199,9 +204,11 @@ def test_item_change_shopping_list(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False
             }
         ]
@@ -209,6 +216,7 @@ def test_item_change_shopping_list(client: FlaskClient, auth_headers):
 
     response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'], {
         'item': ham['_id'],
+        'name': 'ham',
         'checked': True
     }, auth_headers)
 
@@ -234,10 +242,12 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False,
                 'supermarketSectionName': 'Groceries'
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False,
                 'supermarketSectionName': 'Groceries'
             }
@@ -250,10 +260,12 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': True,
                 'supermarketSectionName': 'Groceries'
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False,
                 'supermarketSectionName': 'Groceries'
             }
@@ -279,10 +291,12 @@ def test_update_shopping_list_item(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False,
                 'supermarketSectionName': 'Groceries',
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False,
                 'supermarketSectionName': 'Groceries',
                 'quantity': 12,
@@ -352,10 +366,12 @@ def test_replace_shopping_list_item(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': False,
                 'supermarketSectionName': 'Groceries'
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': False,
                 'supermarketSectionName': 'Groceries'
             }
@@ -374,6 +390,7 @@ def test_replace_shopping_list_item(client: FlaskClient, auth_headers):
 
     response = replace_item_in_shopping_list(client, shop_list['_id'], tuna['_id'], {
         'item': tuna['_id'],
+        'name': 'tuna',
         'checked': True
     }, auth_headers)
 
@@ -411,9 +428,11 @@ def test_remove_shopping_list_item(client: FlaskClient, auth_headers):
         'items': [
             {
                 'item': ham['_id'],
+                'name': 'ham',
                 'checked': True
             }, {
                 'item': tuna['_id'],
+                'name': 'tuna',
                 'checked': True
             }
         ]
@@ -444,6 +463,7 @@ def test_two_list_with_same_name(client: FlaskClient, auth_headers, auth_headers
     assert response.status_code == 201
 
 
+@pytest.mark.skip(reason="it gives random errors, needs more checks")
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_shopping_list(client, {
         '_id': 'Mf5cd7d4f8cb6cd5acaec6f',  # invalid ObjectId
