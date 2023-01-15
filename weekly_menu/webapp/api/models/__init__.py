@@ -5,3 +5,4 @@ from .user import User
 from .menu import Menu
 from .config import Config
 from .user_preferences import UserPreferences
+from .ingredients_view import IngredientView
