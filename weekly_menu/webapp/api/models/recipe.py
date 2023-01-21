@@ -8,7 +8,7 @@ class RecipeIngredient(mongo.EmbeddedDocument):
     unitOfMeasure = mongo.StringField(max_length=10)
     required = mongo.BooleanField()
     freezed = mongo.BooleanField()
-    ingredient = mongo.ReferenceField('Ingredient', required=True)
+    ingredient = mongo.ReferenceField('Ingredient')
     name = mongo.StringField(required=True)
 
     meta = {
