@@ -58,6 +58,7 @@ class Recipe(BaseDocument):
     tags = mongo.ListField(
         mongo.StringField(), default=None
     )
+    scraped = mongo.BooleanField()
 
     meta = {
         'collection': 'recipes'
