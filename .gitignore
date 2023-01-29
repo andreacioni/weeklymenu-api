@@ -6,3 +6,4 @@ __pycache__/
 weekly_menu.egg-info/
 dist/
 build/
+models/
