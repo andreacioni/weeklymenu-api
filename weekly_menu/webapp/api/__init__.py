@@ -27,6 +27,7 @@ class QueryArgs:
     GREATER = 'gt'
 
     URL = 'url'
+    INGREDIENT_PARSER_VERSION = 'ing_parser_ver'
 
 
 # Pagination
@@ -121,6 +122,13 @@ def parse_query_args(func):
         location=['args'],
         required=False
     )
+    query_args_reqparse.add_argument(
+        QueryArgs.INGREDIENT_PARSER_VERSION,
+        type=int,
+        default=0,
+        location=['args'],
+        required=False
+    )
 
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -132,6 +140,7 @@ def parse_query_args(func):
             QueryArgs.DESC: query_args[QueryArgs.DESC],
             QueryArgs.GREATER: query_args[QueryArgs.GREATER],
             QueryArgs.URL: query_args[QueryArgs.URL],
+            QueryArgs.INGREDIENT_PARSER_VERSION: query_args[QueryArgs.INGREDIENT_PARSER_VERSION],
         }
 
         return func(*args, **kwargs)
