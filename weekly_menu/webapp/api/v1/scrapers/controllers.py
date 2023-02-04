@@ -71,8 +71,11 @@ def _parse_ingredients(texts: list, parser_version: int) -> list:
 
     def _v1_parser():
         model_base_path = current_app.config['MODELS_BASE_PATH']
-        nlp = spacy.load(model_base_path + "/ingredient_parser_model_v1")
 
+        # TODO thread safety needed while initializing nlp
+        global nlp
+        if (nlp == None):
+            nlp = spacy.load(model_base_path + "/ingredient_parser_model_v1")
         docs = list(nlp.pipe(texts))
 
         for doc in docs:
