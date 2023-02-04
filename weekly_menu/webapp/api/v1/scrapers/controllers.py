@@ -24,6 +24,8 @@ scraper_blueprint = Blueprint(
     url_prefix=BASE_PATH + '/scrapers'
 )
 
+_nlp = None
+
 
 @scraper_blueprint.route('/recipe')
 @jwt_required
@@ -73,10 +75,10 @@ def _parse_ingredients(texts: list, parser_version: int) -> list:
         model_base_path = current_app.config['MODELS_BASE_PATH']
 
         # TODO thread safety needed while initializing nlp
-        global nlp
-        if (nlp == None):
-            nlp = spacy.load(model_base_path + "/ingredient_parser_model_v1")
-        docs = list(nlp.pipe(texts))
+        global _nlp
+        if (_nlp == None):
+            _nlp = spacy.load(model_base_path + "/ingredient_parser_model_v1")
+        docs = list(_nlp.pipe(texts))
 
         for doc in docs:
             # even if the ingredients belong at the same recipe
