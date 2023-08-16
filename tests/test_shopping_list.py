@@ -13,6 +13,8 @@ from test_ingredient import create_ingredient, delete_ingredient
 
 from weekly_menu.webapp.api.models import Ingredient, Menu, Recipe, User, ShoppingList, UserPreferences
 
+from urllib import parse
+
 
 def create_shopping_list(client, json, auth_headers):
     return client.post('/api/v1/shopping-lists', json=json, headers=auth_headers)
@@ -22,8 +24,20 @@ def add_item_in_shopping_list(client, shopping_list_id, json, auth_headers):
     return client.post('/api/v1/shopping-lists/{}/items'.format(shopping_list_id), json=json, headers=auth_headers)
 
 
+def update_item_in_shopping_list_by_name(client, shopping_list_id, json, auth_headers):
+    return client.post('/api/v1/shopping-lists/{}/items'.format(shopping_list_id), json=json, headers=auth_headers)
+
+
 def get_shopping_list_item(client, shopping_list_id, shopping_list_item_id, auth_headers):
     return client.get('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), headers=auth_headers)
+
+
+def get_shopping_list_item_by_name(client, shopping_list_id, shopping_list_item_name, auth_headers):
+    return client.get('/api/v1/shopping-lists/{}/items?item_name={}'.format(shopping_list_id, parse.quote_plus(shopping_list_item_name)), headers=auth_headers)
+
+
+def get_shopping_list_items(client, shopping_list_id, auth_headers):
+    return client.get('/api/v1/shopping-lists/{}/items'.format(shopping_list_id), headers=auth_headers)
 
 
 def replace_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, json, auth_headers):
@@ -36,6 +50,10 @@ def update_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id
 
 def delete_item_in_shopping_list(client, shopping_list_id, shopping_list_item_id, auth_headers):
     return client.delete('/api/v1/shopping-lists/{}/items/{}'.format(shopping_list_id, shopping_list_item_id), headers=auth_headers)
+
+
+def delete_item_in_shopping_by_name(client, shopping_list_id, shopping_list_item_name, auth_headers):
+    return client.delete('/api/v1/shopping-lists/{}/items?item_name={}'.format(shopping_list_id, parse.quote_plus(shopping_list_item_name)), headers=auth_headers)
 
 
 def get_shopping_list(client, shopping_list_id, auth_headers):
@@ -277,6 +295,79 @@ def test_update_shopping_list(client: FlaskClient, auth_headers):
         and response.json['items'][1]['checked'] == False
 
 
+def test_shopping_list_items_save_and_retrieve(client: FlaskClient, auth_headers):
+    shop_list = create_shopping_list(client, {
+        'name': 'list1',
+        'items': [
+            {
+                'name': 'ham and cheese 🍖',
+                'checked': True,
+                'supermarketSectionName': 'Groceries',
+            }, {
+                'name': 'tuna 🐟',
+                'checked': False,
+                'supermarketSectionName': 'Groceries',
+                'quantity': 12,
+                'unitOfMeasure': 'L'
+            }
+        ]
+    }, auth_headers).json
+
+    res = get_shopping_list_items(client, shop_list['_id'], auth_headers)
+
+    assert res.status_code == 200 and len(res.json) == 2
+
+    item_name = '°à*è - .:%!"£$%&^?ì*è§àù'
+
+    res = add_item_in_shopping_list(client, shop_list['_id'], {
+        'name': item_name,
+        'checked': False
+    }, auth_headers)
+
+    assert res.status_code == 201
+
+    res = get_shopping_list_item_by_name(
+        client, shop_list['_id'], item_name, auth_headers)
+
+    assert res.status_code == 200 and len(
+        res.json) == 1 and res.json[0]['name'] == item_name
+
+    res = update_item_in_shopping_list_by_name(client, shop_list['_id'], {
+        'name': item_name,
+        'checked': True
+    }, auth_headers)
+
+    assert res.status_code == 200 and \
+        res.json['name'] == item_name and \
+        res.json['checked'] == True
+
+    res = delete_item_in_shopping_by_name(
+        client, shop_list['_id'], item_name, auth_headers)
+
+    assert res.status_code == 204
+
+    res = get_shopping_list_item_by_name(
+        client, shop_list['_id'], item_name, auth_headers)
+
+    assert res.status_code == 200 and \
+        len(res.json) == 0
+
+    res = get_shopping_list_items(
+        client, shop_list['_id'], auth_headers)
+
+    assert len(res.json) == 2
+
+    res = delete_item_in_shopping_by_name(
+        client, shop_list['_id'], 'ham', auth_headers)
+
+    assert res.status_code == 204
+
+    res = delete_item_in_shopping_by_name(
+        client, shop_list['_id'], 'tuna', auth_headers)
+
+    assert res.status_code == 204
+
+
 def test_update_shopping_list_item(client: FlaskClient, auth_headers):
     ham = create_ingredient(client, {
         'name': 'ham'
@@ -463,7 +554,7 @@ def test_two_list_with_same_name(client: FlaskClient, auth_headers, auth_headers
     assert response.status_code == 201
 
 
-@pytest.mark.skip(reason="it gives random errors, needs more checks")
+@ pytest.mark.skip(reason="it gives random errors, needs more checks")
 def test_offline_id(client: FlaskClient, auth_headers):
     response = create_shopping_list(client, {
         '_id': 'Mf5cd7d4f8cb6cd5acaec6f',  # invalid ObjectId
