@@ -12,11 +12,12 @@ from .api.exceptions import BaseRESTException
 
 _logger = logging.getLogger(__name__)
 
-class ObjectIdJSONEncoder(json.JSONEncoder): 
-    def default(self, o): # pylint: disable=E0202
+
+class ObjectIdJSONEncoder(json.JSONEncoder):
+    def default(self, o):  # pylint: disable=E0202
         if isinstance(o, ObjectId):
             return str(o)
-        # NOTE: the order of these two conditions below matter! 
+        # NOTE: the order of these two conditions below matter!
         # They must remain in this order
         if isinstance(o, date):
             return o.strftime("%Y-%m-%d")
@@ -26,9 +27,11 @@ class ObjectIdJSONEncoder(json.JSONEncoder):
             return str(o)
         return json.JSONEncoder.default(self, o)
 
+
 app = Flask(__name__)
 
 app.json_encoder = ObjectIdJSONEncoder
+
 
 def create_app(object_name):
     """
@@ -46,60 +49,68 @@ def create_app(object_name):
 
     return app
 
+
 @app.before_request
 def before_request():
     if ((request.data != b'') and (not request.is_json)):
         return jsonify({'msg': 'payload does not contains json data'}), 400
 
+
 @app.after_request
 def after_request(resp):
-    resp.headers['X-Server-Timestamp']=int(datetime.utcnow().timestamp())
+    resp.headers['X-Server-Timestamp'] = int(datetime.utcnow().timestamp())
     return resp
+
 
 @app.errorhandler(Exception)
 def handle_generic_exception(e: Exception):
-        print(traceback.format_exc())
-        if len(e.args) > 0:
-          e = BaseRESTException(description=e.args[0], details=e.args[1:])
-        else:
-          e = BaseRESTException()
-        return jsonify({
-            'error': e.error,
-            'descritpion': e.description,
-            'details': e.details
-        }), e.code
+    print(traceback.format_exc())
+    if len(e.args) > 0:
+        e = BaseRESTException(description=e.args[0], details=e.args[1:])
+    else:
+        e = BaseRESTException()
+    return jsonify({
+        'error': e.error,
+        'descritpion': e.description,
+        'details': e.details
+    }), e.code
+
 
 @app.errorhandler(BaseRESTException)
 def handle_rest_exception(e: BaseRESTException):
     return jsonify({
-            'error': e.error,
-            'descritpion': e.description,
-            'details': e.details
+        'error': e.error,
+        'descritpion': e.description,
+        'details': e.details
     }), e.code
+
 
 @app.errorhandler(NotFound)
 def handle_notfound(e):
-        return jsonify({
-            'error': 'NOT_FOUND',
-            'descritpion': 'resource was not found on this server',
-            'details': []
+    return jsonify({
+        'error': 'NOT_FOUND',
+        'descritpion': 'resource was not found on this server',
+        'details': []
     }), 404
+
 
 @app.errorhandler(BadRequest)
 def handle_notfound(e):
-        return jsonify({
-            'error': 'BAD_REQUEST',
-            'descritpion': 'invalid request supplied',
-            'details': []
+    return jsonify({
+        'error': 'BAD_REQUEST',
+        'descritpion': 'invalid request supplied',
+        'details': []
     }), 404
+
 
 @app.errorhandler(MethodNotAllowed)
 def handle_method_not_allowed(e):
-        return jsonify({
-            'error': 'METHOD_NOT_ALLOWED',
-            'descritpion': 'method not allowed on selected resource',
-            'details': []
+    return jsonify({
+        'error': 'METHOD_NOT_ALLOWED',
+        'descritpion': 'method not allowed on selected resource',
+        'details': []
     }), 405
+
 
 @app.errorhandler(ValidationError)
 def handle_validation_error(e: ValidationError):
@@ -113,5 +124,5 @@ def handle_validation_error(e: ValidationError):
     return jsonify({
         'error': 'VALIDATION_ERROR',
         'descritpion': e.message,
-        'details': [{err : get_error(err)} for err in (e.errors or [])]
+        'details': [{err: get_error(err)} for err in (e.errors or [])]
     }), 400
