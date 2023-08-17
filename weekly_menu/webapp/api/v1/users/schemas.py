@@ -7,6 +7,7 @@ from ...models import User, RecipeIngredient
 from ...exceptions import CannotUpdateResourceOwner
 from ...schemas import BaseValidatorsMixin, DenyIdOverrideMixin
 
+
 class UserSchema(me.ModelSchema, BaseValidatorsMixin):
 
     class Meta:

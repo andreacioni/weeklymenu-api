@@ -1,9 +1,10 @@
 from .. import BASE_PATH
 
+
 def create_module(app, api):
-    
+
     from .resources import RecipeList, RecipeInstance, RecipeIngredientsList, RecipeIngredientInstance
-    
+
     api.add_resource(
         RecipeList,
         BASE_PATH + '/recipes'

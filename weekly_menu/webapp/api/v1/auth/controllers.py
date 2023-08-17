@@ -15,20 +15,22 @@ from ...exceptions import InvalidCredentials, NotFound
 auth_blueprint = Blueprint(
     'auth',
     __name__,
-    url_prefix = BASE_PATH + '/auth'
+    url_prefix=BASE_PATH + '/auth'
 )
+
 
 @auth_blueprint.route('/token', methods=['POST'])
 @validate_payload(PostUserTokenSchema(), 'user')
 def get_token(user: PostUserTokenSchema):
     user = authenticate(user['email'], user['password'])
-    
+
     if not user:
-        raise InvalidCredentials("Provided credentials doesn't match for specific user")
+        raise InvalidCredentials(
+            "Provided credentials doesn't match for specific user")
 
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=user.email)
-    return jsonify(user_id=user.id,access_token=access_token, expires_in=config.access_expires.seconds), 200
+    return jsonify(user_id=user.id, access_token=access_token, expires_in=config.access_expires.seconds), 200
 
 
 @auth_blueprint.route('/register', methods=['POST'])
@@ -43,15 +45,17 @@ def register_user(user_meta: PostRegisterUserSchema):
     # Create a new shopping list for the newly created user
     shop_list = ShoppingList()
     shop_list.owner = user.id
-    shop_list.name = 'Shopping List' #TODO name of the list may vary based on the location of the user
+    # TODO name of the list may vary based on the location of the user
+    shop_list.name = 'Shopping List'
     shop_list.save()
 
     # Create a new preferences object for the newly created user
     shop_list = UserPreferences()
     shop_list.owner = user.id
     shop_list.save()
-    
+
     return jsonify(user.to_mongo()), 200
+
 
 @auth_blueprint.route('/reset_password', methods=['POST'])
 @validate_payload(PostResetPasswordSchema(), 'user_meta')
@@ -65,8 +69,8 @@ def reset_password(user_meta: PostResetPasswordSchema):
 
     return '', 204
 
+
 @auth_blueprint.route('/logout', methods=['POST'])
 def logout():
     # TODO: token validation and blacklisting
     return '', 204
-    

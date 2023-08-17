@@ -29,6 +29,8 @@ class QueryArgs:
     URL = 'url'
     INGREDIENT_PARSER_VERSION = 'ing_parser_ver'
 
+    SHOPPING_LIST_ITEM_NAME = 'item_name'
+
 
 # Pagination
 DEFAULT_PAGE_SIZE = 10
@@ -129,6 +131,12 @@ def parse_query_args(func):
         location=['args'],
         required=False
     )
+    query_args_reqparse.add_argument(
+        QueryArgs.SHOPPING_LIST_ITEM_NAME,
+        type=str,
+        location=['args'],
+        required=False
+    )
 
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -141,6 +149,7 @@ def parse_query_args(func):
             QueryArgs.GREATER: query_args[QueryArgs.GREATER],
             QueryArgs.URL: query_args[QueryArgs.URL],
             QueryArgs.INGREDIENT_PARSER_VERSION: query_args[QueryArgs.INGREDIENT_PARSER_VERSION],
+            QueryArgs.SHOPPING_LIST_ITEM_NAME: query_args[QueryArgs.SHOPPING_LIST_ITEM_NAME],
         }
 
         return func(*args, **kwargs)

@@ -16,14 +16,16 @@ class MenuSchema(me.ModelSchema, BaseValidatorsMixin):
     class Meta:
         model = Menu
 
+
 class PutMenuSchema(MenuSchema):
     pass
+
 
 class PatchMenuSchema(PutMenuSchema):
 
     date = fields.Date(required=False)
 
+
 class MenuRecipeSchema(Schema):
 
     recipe_id = fields.String()
-

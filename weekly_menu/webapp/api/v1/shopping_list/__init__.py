@@ -1,9 +1,10 @@
 from .. import BASE_PATH
 
+
 def create_module(app, api):
-    
+
     from .resources import UserShoppingLists, UserShoppingList, UserShoppingListItems, UserShoppingListItem
-    
+
     api.add_resource(
         UserShoppingLists,
         BASE_PATH + '/shopping-lists'

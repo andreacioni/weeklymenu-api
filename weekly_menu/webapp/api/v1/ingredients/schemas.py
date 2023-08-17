@@ -6,6 +6,7 @@ from ... import mongo
 from ...models import Ingredient
 from ...schemas import BaseValidatorsMixin
 
+
 class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
 
     class Meta:
@@ -15,7 +16,8 @@ class IngredientSchema(me.ModelSchema, BaseValidatorsMixin):
 class PutIngredientSchema(IngredientSchema):
     pass
 
+
 class PatchIngredientSchema(PutIngredientSchema):
 
-    #Overriding name property
+    # Overriding name property
     name = fields.String(required=False)

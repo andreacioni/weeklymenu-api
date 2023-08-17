@@ -12,6 +12,7 @@ from ...models import User
 from ... import validate_payload, paginated, mongo, put_document, patch_document, load_user_info, patch_embedded_document, parse_query_args, search_on_model
 from ...exceptions import DuplicateEntry, BadRequest, Conflict, NotFound
 
+
 class UserProfileInstance(Resource):
     @jwt_required
     @load_user_info
