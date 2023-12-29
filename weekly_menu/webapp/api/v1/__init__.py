@@ -14,11 +14,14 @@ def create_module(app, api):
     from .users import create_module as create_users_module
     from .shopping_list import create_module as create_shopping_list_module
     from .config import create_module as create_config_module
+    from .external import create_module as create_external_module
 
     create_auth_module(app)
 
     create_scrapers_module(app)
 
+    create_external_module(app)
+    
     create_ingredients_module(app, api)
     create_ingredients_view_module(app, api)
     create_menu_module(app, api)

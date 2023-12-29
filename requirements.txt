@@ -77,3 +77,4 @@ Werkzeug==1.0.1
 WTForms==3.0.1
 zipp==3.8.1
 spacy==3.5.0
+serpapi==0.1.5
