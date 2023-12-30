@@ -5,7 +5,9 @@ from uuid import uuid4
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import jwt_required
 
+from .schema import ImageSchema 
 from .. import BASE_PATH
+from ...exceptions import ServiceUnavailable
 
 _logger = logging.getLogger(__name__)
 
@@ -1910,8 +1912,21 @@ external_blueprint = Blueprint(
     url_prefix=BASE_PATH + '/external'
 )
 
+_image_schema = ImageSchema()
+
 @external_blueprint.route('/image_search')
 @jwt_required
 def image_search():
-    return _mock, 200
+    serpApiResp = _mock;
+
+    _logger.debug("SerpAPI returns: %s", serpApiResp)
+
+    if(serpApiResp['search_metadata']['status'] != "Success"):
+        raise ServiceUnavailable('image search service failed to retrieve results') 
+    
+    imageResults = serpApiResp["images_results"];
+
+    schema = ImageSchema(many=True)
+    
+    return jsonify(schema.dump(imageResults)), 200
 
