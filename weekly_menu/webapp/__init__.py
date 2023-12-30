@@ -12,7 +12,6 @@ from .api.exceptions import BaseRESTException
 
 _logger = logging.getLogger(__name__)
 
-
 class ObjectIdJSONEncoder(json.JSONEncoder):
     def default(self, o):  # pylint: disable=E0202
         if isinstance(o, ObjectId):
@@ -44,8 +43,10 @@ def create_app(object_name):
     app.config.from_object('configs.' + object_name)
 
     from .api import create_module as create_api_module
+    from .scheduler import create_module as create_scheduler_module
 
     create_api_module(app)
+    create_scheduler_module(app)
 
     return app
 
