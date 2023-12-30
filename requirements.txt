@@ -95,7 +95,6 @@ w3lib==2.0.1
 wasabi==1.1.2
 wcwidth==0.2.5
 webencodings==0.5.1
--e git+git@github.com:andreacioni/weeklymenu-api.git@9f02b3fe769eb35265bdbedb6b2d37e212298f3c#egg=weekly_menu
 Werkzeug==1.0.1
 WTForms==3.0.1
 zipp==3.8.1
