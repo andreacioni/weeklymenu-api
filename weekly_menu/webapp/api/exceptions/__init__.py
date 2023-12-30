@@ -79,3 +79,7 @@ class CannotSetOrChangeCreationUpdateTime(BaseRESTException):
 class ParseFailed(BaseRESTException):
     def __init__(self, description=None):
         super().__init__(500, 'PARSE_FAILED', description)
+
+class ServiceUnavailable(BaseRESTException):
+    def __init__(self, description=None):
+        super().__init__(503, 'SERVICE_UNAVAILABLE', description)
