@@ -15,7 +15,8 @@ from scrapy.spidermiddlewares.httperror import HttpError
 from recipe_scrapers import scrape_me
 from mongoengine import *
 
-from weekly_menu.job.crawler import RecipeSites, ScrapedRecipes, IngredientGroup
+from weekly_menu.job.crawler import RecipeSites
+from weekly_menu.webapp.api.models.recipe import ScrapedRecipes, IngredientGroup
 
 
 CRAWLER_DATA_BASE_PATH = "crawler/"

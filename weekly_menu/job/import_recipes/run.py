@@ -10,7 +10,7 @@ from mongoengine import *
 from weekly_menu.webapp.api.models.recipe import Recipe
 from weekly_menu.lib.recipe_parser import RecipeParserV0, IngredientParseException
 
-from weekly_menu.job.import_recipes import ExternalRecipe
+from weekly_menu.webapp.api.models.recipe import ExternalRecipe
 
 _logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

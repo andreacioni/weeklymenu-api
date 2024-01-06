@@ -1,3 +1,5 @@
+import datetime
+
 from .. import mongo
 
 from .base_document import BaseDocument
@@ -50,7 +52,9 @@ class BaseRecipe(mongo.Document):
     section = mongo.StringField()
     relatedRecipes = mongo.EmbeddedDocumentListField("RelatedRecipe", default=None)
     tags = mongo.ListField(mongo.StringField(), default=None)
+
     scraped = mongo.BooleanField()
+    scraped_at = mongo.DateTimeField(default=datetime.datetime.utcnow)
 
     meta = {"abstract": True}
 
@@ -63,3 +67,38 @@ class Recipe(BaseRecipe, BaseDocument):
 
     def __repr__(self):
         return "<Recipe '{}'>".format(self.name)
+
+
+class IngredientGroup(mongo.EmbeddedDocument):
+    purpose = mongo.StringField()
+    ingredients = mongo.ListField()
+
+
+class ScrapedRecipes(mongo.Document):
+    # from recipe_scrapers
+    host = mongo.StringField()
+    title = mongo.StringField(unique_with="host")
+    total_time = mongo.IntField()
+    image = mongo.StringField()
+    ingredients = mongo.ListField()
+    ingredient_groups = mongo.EmbeddedDocumentListField(IngredientGroup)
+    instructions = mongo.StringField()
+    instructions_list = mongo.ListField()
+    links = mongo.ListField()
+    servings = mongo.IntField()
+    nutrients = mongo.DictField()
+    canonical_url = mongo.StringField()
+
+    # from scrapy
+    url = mongo.StringField()
+
+    meta = {"allow_inheritance": True}
+
+
+class ExternalRecipe(BaseRecipe):
+    scrape_id = mongo.ReferenceField(ScrapedRecipes, reverse_delete_rule=mongo.NULLIFY)
+
+    meta = {"collection": "external_recipes"}
+
+    def __repr__(self):
+        return "<ExternalRecipe '{}'>".format(self.name)
