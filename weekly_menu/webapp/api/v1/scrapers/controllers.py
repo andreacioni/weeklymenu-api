@@ -48,13 +48,17 @@ def scrape_recipe(query_args):
         query_args[QueryArgs.INGREDIENT_PARSER_VERSION]
     ] + ingredient_parser_available
 
+    done = False
+
     for ing_parser in ingredient_parser_available:
         try:
             parser = RecipeParserV0()
             recipe = parser.from_json(
                 recipeRaw,
+                model_base_path=current_app.config["MODELS_BASE_PATH"],
                 ingredient_parser_version=ing_parser,
             )
+            done = True
         except IngredientParseException:
             _logger.warn("failed to parse ingredients in recipe")
         except:
@@ -63,46 +67,9 @@ def scrape_recipe(query_args):
             )
             raise ParseFailed("failed to parse the scraped recipe")
 
-    if recipe == None:
+    if done == False:
         raise ParseFailed(
             "failed to parse the scraped recipe, ingredient parser exhausted"
         )
 
     return recipe.to_mongo(), 200
-
-
-def _parse_ingredients(texts: list, parser_version: int) -> list:
-    _logger.info("parser version %d start parsing list: %s", parser_version, texts)
-
-    try:
-        if parser_version == 1:
-            results = IngredientsParserV1(
-                model_base_path=current_app.config["MODELS_BASE_PATH"]
-            )
-        else:
-            results = IngredientsParserV0()
-    except:
-        _logger.exception("failed to parse ingredients, fallback to v0 parser")
-
-        try:
-            results = IngredientsParserV0()
-        except:
-            _logger.exception("failed to parse ingredients using default parser!")
-            results = []
-
-    _logger.info(
-        "parser version %d end parsing list: %s (output: %s)",
-        parser_version,
-        texts,
-        results,
-    )
-
-    return results
-
-
-def _extract_int(s: str):
-    match = re.search(r"\d+", s)
-    if match:
-        return int(match.group())
-    else:
-        return None
