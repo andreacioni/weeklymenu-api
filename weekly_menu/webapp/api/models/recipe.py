@@ -97,7 +97,7 @@ class ScrapedRecipes(mongo.Document):
 
 
 class ExternalRecipe(BaseRecipe):
-    scrape_id = mongo.ReferenceField(ScrapedRecipes, reverse_delete_rule=mongo.NULLIFY)
+    scrape_id = mongo.ObjectIdField()
 
     meta = {"collection": "external_recipes"}
 
