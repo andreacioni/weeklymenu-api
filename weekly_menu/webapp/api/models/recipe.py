@@ -55,6 +55,7 @@ class BaseRecipe(mongo.Document):
 
     scraped = mongo.BooleanField()
     scraped_at = mongo.DateTimeField(default=datetime.datetime.utcnow)
+    ingredient_parser_version = mongo.IntField()
 
     meta = {"abstract": True}
 

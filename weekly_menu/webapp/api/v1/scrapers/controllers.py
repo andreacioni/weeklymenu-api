@@ -59,6 +59,7 @@ def scrape_recipe(query_args):
                 ingredient_parser_version=ing_parser,
             )
             done = True
+            break
         except IngredientParseException:
             _logger.warn("failed to parse ingredients in recipe")
         except:

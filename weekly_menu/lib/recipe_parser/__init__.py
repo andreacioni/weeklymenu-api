@@ -59,6 +59,7 @@ class RecipeParserV0(RecipeParserInterface):
                 )
             ),
             recipeUrl=kwargs.get("url"),
+            ingredient_parser_version=ingredient_parser_version,
             scraped=True,
         )
 

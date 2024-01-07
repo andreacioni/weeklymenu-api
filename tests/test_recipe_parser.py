@@ -30,6 +30,9 @@ def test_scrape_api(client: FlaskClient, auth_headers):
         headers=auth_headers,
     )
 
-    assert response.status_code == 200
-    assert response.json["name"] == "Pasta alla Norma"
-    assert "_id" not in response.json
+    assert (
+        response.status_code == 200
+        and response.json["name"] == "Pasta alla Norma"
+        and response.json["ingredient_parser_version"] == 0
+        and "_id" not in response.json
+    )
