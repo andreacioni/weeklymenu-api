@@ -1,4 +1,4 @@
 from .webapp import create_app
 
 __name__ = 'Weekly Menu'
-__version__ = '0.0.51'
+__version__ = '[B[B[B0.0.52'
