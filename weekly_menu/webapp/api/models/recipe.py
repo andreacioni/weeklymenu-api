@@ -64,7 +64,7 @@ class BaseRecipe(mongo.Document):
 
 
 class Recipe(BaseRecipe, BaseDocument):
-    meta = {"collection": "recipes", "allow_inheritance": True}
+    meta = {"collection": "recipes"}
 
     def __repr__(self):
         return "<Recipe '{}'>".format(self.name)
