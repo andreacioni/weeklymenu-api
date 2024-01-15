@@ -55,6 +55,39 @@ def test_user_creation(client: FlaskClient):
     User.objects(id=user_id).get().delete()
 
 
+def test_user_creation_with_language_none(client: FlaskClient):
+    response = client.post(
+        "/api/v1/auth/register",
+        json={
+            "name": "test2",
+            "password": "password12",
+            "email": "pippo@pluto.com",
+            "language": None,
+        },
+    )
+
+    user_id = response.json["_id"]
+
+    assert response.status_code == 200
+
+    response = client.post(
+        "/api/v1/auth/token",
+        json={"email": "pippo@pluto.com", "password": "password12"},
+    )
+
+    headers = {
+        "Authorization": "Bearer {}".format(response.json["access_token"]),
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    user_prefs = get_user_preferences_list(client, auth_headers=headers)
+
+    assert "language" not in user_prefs.json
+
+    User.objects(id=user_id).get().delete()
+
+
 def test_user_creation_with_language_unset(client: FlaskClient):
     response = client.post(
         "/api/v1/auth/register",
