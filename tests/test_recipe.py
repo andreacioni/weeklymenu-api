@@ -735,3 +735,17 @@ def test_get_existing_recipe(client: FlaskClient, auth_headers):
     recipes = get_all_recipes(client, auth_headers).json
 
     assert len(recipes["results"]) == 1
+
+
+def test_create_with_language(client: FlaskClient, auth_headers):
+    response = create_recipe(client, {"name": "Menu", "language": "it"}, auth_headers)
+
+    assert response.status_code == 201
+
+    response = get_recipe(
+        client,
+        response.json["_id"],
+        auth_headers,
+    )
+
+    assert response.status_code == 200 and response.json["language"] == "it"
