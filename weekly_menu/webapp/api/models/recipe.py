@@ -3,6 +3,7 @@ import datetime
 from .. import mongo
 
 from .base_document import BaseDocument
+from .user_preferences import ISO_639_MAX_LENGTH, ISO_639_REGEXP
 
 
 class RecipeIngredient(mongo.EmbeddedDocument):
@@ -56,6 +57,8 @@ class BaseRecipe(mongo.Document):
     scraped = mongo.BooleanField()
     scraped_at = mongo.DateTimeField(default=datetime.datetime.utcnow)
     ingredient_parser_version = mongo.IntField()
+
+    language = mongo.StringField(max_length=ISO_639_MAX_LENGTH, regex=ISO_639_REGEXP)
 
     meta = {"abstract": True}
 
