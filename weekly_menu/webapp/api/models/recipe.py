@@ -60,14 +60,14 @@ class BaseRecipe(mongo.Document):
 
     language = mongo.StringField(max_length=ISO_639_MAX_LENGTH, regex=ISO_639_REGEXP)
 
-    meta = {"abstract": True}
+    meta = {"abstract": True, "strict": False}
 
     def __repr__(self):
         return "<BaseRecipe '{}'>".format(self.name)
 
 
 class Recipe(BaseRecipe, BaseDocument):
-    meta = {"collection": "recipes"}
+    meta = {"collection": "recipes", "strict": False}
 
     def __repr__(self):
         return "<Recipe '{}'>".format(self.name)
@@ -102,7 +102,7 @@ class ScrapedRecipes(mongo.Document):
 class ExternalRecipe(BaseRecipe):
     scrape_id = mongo.ObjectIdField()
 
-    meta = {"collection": "external_recipes"}
+    meta = {"collection": "external_recipes", "strict": False}
 
     def __repr__(self):
         return "<ExternalRecipe '{}'>".format(self.name)
