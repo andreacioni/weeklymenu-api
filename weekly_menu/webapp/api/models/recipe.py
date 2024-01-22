@@ -102,7 +102,25 @@ class ScrapedRecipes(mongo.Document):
 class ExternalRecipe(BaseRecipe):
     scrape_id = mongo.ObjectIdField()
 
-    meta = {"collection": "external_recipes", "strict": False}
+    meta = {
+        "collection": "external_recipes",
+        # DELETE INDEX ON MONGODB BEFORE CHANGING ANYTHING HERE
+        "indexes": [
+            {
+                "fields": [
+                    "$name",
+                    "$ingredients.name",
+                    "$preparationSteps.description",
+                ],
+                "weights": {
+                    "name": 10,
+                    "ingredients.name": 5,
+                    "preparationSteps.description": 1,
+                },
+            }
+        ],
+        "strict": False,
+    }
 
     def __repr__(self):
         return "<ExternalRecipe '{}'>".format(self.name)
