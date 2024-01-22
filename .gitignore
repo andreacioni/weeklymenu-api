@@ -8,3 +8,8 @@ dist/
 build/
 models/
 crawl/
+
+*.csv
+*.numbers
+*.xlsx
+ing_new.json
