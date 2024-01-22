@@ -328,7 +328,9 @@ def _apply_ordering(filtered_objects, query_args):
             query_args[QueryArgs.TEXT_SEARCH] != None
             and query_args[QueryArgs.TEXT_SEARCH] != ""
         ):
-            filtered_objects = filtered_objects.order_by(query_args[QueryArgs.ORDER_BY])
+            filtered_objects = filtered_objects.order_by(
+                "$" + query_args[QueryArgs.ORDER_BY]
+            )
         else:
             if query_args[QueryArgs.DESC] == True:
                 filtered_objects = filtered_objects.order_by(
