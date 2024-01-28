@@ -10,12 +10,12 @@ _logger = logging.getLogger(__name__)
 
 class RecipeParserInterface(ABC):
     @abstractmethod
-    def from_json(self, json_data) -> BaseRecipe:
+    def from_json(self, json_data, url=None, **kwargs) -> BaseRecipe:
         raise NotImplemented("from_json is not implemented")
 
 
 class RecipeParserV0(RecipeParserInterface):
-    def from_json(self, json_data, **kwargs) -> BaseRecipe:
+    def from_json(self, json_data, url=None, **kwargs) -> BaseRecipe:
         ingredient_parser_version = (
             0
             if kwargs.get("ingredient_parser_version") == None
@@ -58,7 +58,7 @@ class RecipeParserV0(RecipeParserInterface):
                     instruction_list,
                 )
             ),
-            recipeUrl=kwargs.get("url"),
+            recipeUrl=url,
             ingredient_parser_version=ingredient_parser_version,
             scraped=True,
         )

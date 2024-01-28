@@ -31,6 +31,7 @@ for scraped_recipe in scraped_recipes_to_import.find():
     try:
         recipe = recipe_parser.from_json(
             scraped_recipe,
+            url=scraped_recipe.get("canonical_url"),
             ingredient_parser_version=1,
             model_base_path="models/",
         )

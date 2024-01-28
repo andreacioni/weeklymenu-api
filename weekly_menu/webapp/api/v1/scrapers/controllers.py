@@ -55,6 +55,7 @@ def scrape_recipe(query_args):
             parser = RecipeParserV0()
             recipe = parser.from_json(
                 recipeRaw,
+                url=url,
                 model_base_path=current_app.config["MODELS_BASE_PATH"],
                 ingredient_parser_version=ing_parser,
             )
