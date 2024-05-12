@@ -6,3 +6,4 @@ from .menu import Menu
 from .config import Config
 from .user_preferences import UserPreferences, ISO_639_REGEXP, ISO_639_MAX_LENGTH
 from .ingredients_view import IngredientView
+from .daily_menu import DailyMenu, DailyMenuMeal

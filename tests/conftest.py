@@ -16,6 +16,7 @@ from weekly_menu.webapp.api.models import (
     ShoppingList,
     UserPreferences,
     ExternalRecipe,
+    DailyMenu,
 )
 from weekly_menu.webapp.api.v1.auth import encode_password
 
@@ -39,6 +40,7 @@ def clear_db():
     Ingredient.drop_collection()
     ShoppingList.drop_collection()
     ExternalRecipe.drop_collection()
+    DailyMenu.drop_collection()
 
 
 @pytest.fixture(scope="session")
