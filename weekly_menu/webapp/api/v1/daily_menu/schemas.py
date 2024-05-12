@@ -17,9 +17,9 @@ class DailyMenuSchema(me.ModelSchema, BaseValidatorsMixin):
         model = DailyMenu
 
 
-class PutMenuSchema(DailyMenuSchema):
+class PutDailyMenuSchema(DailyMenuSchema):
     pass
 
 
-class PatchMenuSchema(PutMenuSchema):
+class PatchDailyMenuSchema(PutDailyMenuSchema):
     date = fields.Date(required=False)
