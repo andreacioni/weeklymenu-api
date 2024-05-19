@@ -14,7 +14,7 @@ from test_recipe import create_recipe
 
 
 def create_or_merge_daily_menu(client, json, auth_headers):
-    return client.post("/api/v1/daily_menu/", json=json, headers=auth_headers)
+    return client.post("/api/v1/daily_menu", json=json, headers=auth_headers)
 
 
 def replace_daily_menu(client, date, json, auth_headers):
@@ -47,7 +47,7 @@ def get_all_daily_menus(
     client, auth_headers, page=1, per_page=10, order_by="", desc=False
 ):
     return client.get(
-        "/api/v1/daily_menu/?page={}&per_page={}&order_by={}&desc={}".format(
+        "/api/v1/daily_menu?page={}&per_page={}&order_by={}&desc={}".format(
             page, per_page, order_by, desc
         ),
         headers=auth_headers,
