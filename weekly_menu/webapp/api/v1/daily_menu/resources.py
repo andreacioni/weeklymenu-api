@@ -88,7 +88,7 @@ class DailyMenuList(Resource):
         try:
             menu.save(force_insert=True)
         except (NotUniqueError, DuplicateKeyError) as nue:
-            _logger.warn("not unique daily menu error: %s", nue)
+            _logger.debug("not unique daily menu error: %s", nue)
             menu = _patch_daily_menu(menu, user_info)
             ret_code = 200
 
