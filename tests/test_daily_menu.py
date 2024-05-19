@@ -178,3 +178,25 @@ def test_single_daily_menu_put(client: FlaskClient, auth_headers):
     assert response.status_code == 200 and response.json["meals"]["meal1"][
         "recipes"
     ] == [recipe["_id"]]
+
+
+def test_single_daily_menu_put_create(client: FlaskClient, auth_headers):
+    response = put_daily_menu(
+        client,
+        "2019-09-01",
+        {"date": "2019-09-01"},
+        auth_headers,
+    )
+
+    assert response.status_code == 404
+
+
+def test_single_daily_menu_patch_create(client: FlaskClient, auth_headers):
+    response = patch_daily_menu(
+        client,
+        "2019-09-01",
+        {"date": "2019-09-01"},
+        auth_headers,
+    )
+
+    assert response.status_code == 404
